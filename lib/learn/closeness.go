@@ -8,6 +8,8 @@ func (self *Obs) Canonical() bool {
 }
 
 func (self *Obs) TableClose() {
+	// step 1. fill the table
+
 }
 
 func (self *Obs) SuffixClose() {
