@@ -11,9 +11,29 @@ import "fmt"
 // we use ObsLine to store a single line in Obs table
 
 type ObsLine struct {
-	Index   sul.InputSeq
+	Index sul.InputSeq
+	// using link array here leads to some inconvinence
+	// however, we need to make an element in Result able
+	// to be assigned nil, indicating that the cell hasn't
+	// been calculated yet
 	Result  []*sul.Output
 	Partion int // denote the current partion index of this line
+}
+
+func (self ObsLine) EqualTo(l ObsLine) bool {
+	// first check if the two lines has the same length
+	// actually we suppose they have, otherwise this could be
+	// a terrible bug
+	if len(self.Result) != len(l.Result) {
+		return false
+	} else {
+		for i := 0; i < len(l.Result); i++ {
+			if !self.Result[i].EqualTo(l.Result[i]) {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 type Obs struct {

@@ -26,6 +26,24 @@ type Output map[string]SingleOutput
 type InputSeq []*Input
 type OutputSeq []Output
 
+func (self SingleOutput) EqualTo(so SingleOutput) bool {
+	if self.IsEmpty {
+		return so.IsEmpty
+	} else {
+		return self.Datum == so.Datum
+	}
+}
+
+func (self *Output) EqualTo(o *Output) bool {
+	// we assume that the two output share the same ports
+	for key, _ := range *self {
+		if !(*self)[key].EqualTo((*o)[key]) {
+			return false
+		}
+	}
+	return true
+}
+
 // Instance of System Under Test
 type SutInst struct {
 	// public fields
@@ -170,10 +188,21 @@ func (self *Oracle) SeqSimulate(ins InputSeq) OutputSeq {
 	return out
 }
 
+var mqcounter int = 0
+
+func CounterReset() {
+	mqcounter = 0
+}
+
+func Counter() int {
+	return mqcounter
+}
+
 func (self *Oracle) MQuery(in InputSeq) Output {
 	// TODO we should use cache technique to improve
 	// the effiency of MQuery, otherwise this would make
 	// it really slow
+	mqcounter++
 	outputs := self.SeqSimulate(in)
 	if len(outputs) == 0 {
 		panic("Fatal Error: SeqSimulate returns an empty array.")
