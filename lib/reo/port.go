@@ -162,6 +162,15 @@ func (p Port) UselessWrite(stop chan bool) {
 	}
 }
 
+func GenerateStopPort(n int) Ports {
+	stopports := []Port{}
+	stopflag := make(chan string)
+	for i := 0; i < n; i++ {
+		stopports = append(stopports, Port{stopflag, make(chan string)})
+	}
+	return stopports
+}
+
 func main() {
 	// this line is just make sure that
 	// there're some lines using fmt

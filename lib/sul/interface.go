@@ -45,20 +45,36 @@ func (self *Output) EqualTo(o *Output) bool {
 }
 
 // Instance of System Under Test
-type SutInst struct {
+type SulInst struct {
 	// public fields
-	InPorts, OutPorts map[string]reo.Port
-	OutBufs           map[string]chan string
-	Start             func()
-	StopPorts         []reo.Port
+	InPorts, OutPorts, MidPorts map[string]reo.Port
+	OutBufs                     map[string]chan string
+	Start                       func()
+	StopPorts                   []reo.Port
 }
 
 type Oracle struct {
 	InPorts      []string
+	MidPorts     []string
 	OutPorts     []string
 	Inputs       []*Input
 	TimeUnit     time.Duration
-	GenerateInst func() *SutInst
+	GenerateInst func() *SulInst
+}
+
+func (self *SulInst) GeneratePort(ref *Oracle) {
+	self.InPorts = map[string]reo.Port{}
+	self.OutPorts = map[string]reo.Port{}
+	self.MidPorts = map[string]reo.Port{}
+	for _, name := range ref.InPorts {
+		self.InPorts[name] = reo.MakePort()
+	}
+	for _, name := range ref.OutPorts {
+		self.OutPorts[name] = reo.MakePort()
+	}
+	for _, name := range ref.MidPorts {
+		self.MidPorts[name] = reo.MakePort()
+	}
 }
 
 func (self Input) deepcopy() *Input {
@@ -74,7 +90,7 @@ func (self Input) deepcopy() *Input {
 	return r
 }
 
-func (self *SutInst) Stop() {
+func (self *SulInst) Stop() {
 	// NOTE theoretically the array StopPorts includes
 	// at least one element since a connector usually
 	// contains at least one channel
@@ -92,7 +108,7 @@ func (self *SutInst) Stop() {
 	close(cmflag)
 }
 
-func (self *SutInst) monitor(stop chan bool) {
+func (self *SulInst) monitor(stop chan bool) {
 	for {
 		select {
 		case <-stop:
@@ -169,7 +185,9 @@ func (self *Oracle) SeqSimulate(ins InputSeq) OutputSeq {
 	}
 	// make sure all the i/o operations are finished
 	// then we try to stop the execution of connector
+	// fmt.Println("Going to STOP.")
 	inst.Stop()
+	// fmt.Println("STOP Finished.")
 	// generate output
 	var out OutputSeq
 	for _, _ = range ins {
@@ -202,6 +220,7 @@ func (self *Oracle) MQuery(in InputSeq) Output {
 	// TODO we should use cache technique to improve
 	// the effiency of MQuery, otherwise this would make
 	// it really slow
+	// fmt.Println("Membership Query.")
 	mqcounter++
 	outputs := self.SeqSimulate(in)
 	if len(outputs) == 0 {

@@ -2,6 +2,7 @@ package learn
 
 import "../sul"
 import "fmt"
+import "strconv"
 
 /*
 	Created By Li Yi @ Nov 17
@@ -81,11 +82,11 @@ func (self *Obs) expandLp() {
 	self.SpLoc = len(self.SL) - 1
 	newLp := []ObsLine{}
 	acts := self.orac.GetInputs()
-	for _, l := range self.SL {
-		l.Dist = []int{}
+	for i, _ := range self.SL {
+		self.SL[i].Dist = []int{}
 		for j, d := range acts {
-			newLp = append(newLp, NewLine(append(l.Index, d)))
-			l.Dist = append(l.Dist, self.SpLoc+1+j)
+			newLp = append(newLp, NewLine(append(self.SL[i].Index, d)))
+			self.SL[i].Dist = append(self.SL[i].Dist, self.SpLoc+1+j)
 		}
 	}
 	self.SL = append(self.SL, newLp...)
@@ -98,6 +99,22 @@ func (self *Obs) Run(in sul.InputSeq) sul.Output {
 
 func (self *Obs) AddSuffix(suf sul.InputSeq) {
 	// TODO
+}
+
+func (self *Obs) GetHypo() string {
+	rel := "Hypothesis Acquired: \n"
+	acts := self.orac.GetInputs()
+	for i := 0; i <= self.SpLoc; i++ {
+		if self.SL[i].AccessLine == i {
+			// then this is a state
+			rel += "> state " + strconv.Itoa(i) + " with edges: \n"
+			for j := 0; j < len(acts); j++ {
+				rel += fmt.Sprintf("[%d] -> state %d\n", j, self.SL[i].Dist[j])
+			}
+		}
+	}
+	rel += "Hypothesis's description is finished."
+	return rel
 }
 
 func ObsInit(orac *sul.Oracle) *Obs {
