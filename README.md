@@ -13,3 +13,8 @@ All the codes are written under Google Go.
 
 * example
   * fifo
+  * alternator
+
+## several questions
+
+* reo's semantics when a write operation from components is blocked?
