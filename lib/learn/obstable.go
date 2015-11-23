@@ -16,8 +16,31 @@ type ObsLine struct {
 	// however, we need to make an element in Result able
 	// to be assigned nil, indicating that the cell hasn't
 	// been calculated yet
-	Result  []*sul.Output
-	Partion int // denote the current partion index of this line
+	Result     []*sul.Output
+	AccessLine int
+	// lines can be equivalent if they share the same output signature
+	// AccessLine indicates the first line which has the same output
+	// with self
+	Dist []int
+	// Dist maps an action (by it's index) to its successor line
+	// denoted by its index too
+	// Every time we expandLp, the Dist of each line would be refreshed
+}
+
+func NewLine(index sul.InputSeq) ObsLine {
+	newl := ObsLine{
+		index, []*sul.Output{}, -1, []int{},
+	}
+	return newl
+}
+
+func (self ObsLine) LimitEqualTo(l ObsLine, limit int) bool {
+	for i := 0; i < limit; i++ {
+		if !self.Result[i].EqualTo(l.Result[i]) {
+			return false
+		}
+	}
+	return true
 }
 
 func (self ObsLine) EqualTo(l ObsLine) bool {
@@ -39,27 +62,30 @@ func (self ObsLine) EqualTo(l ObsLine) bool {
 type Obs struct {
 	// part 1. basic variables
 	// describing same arguments as in the paper
-	D        []sul.InputSeq
-	SL       []ObsLine // including Sp and Lp
-	SpLoc    int       // indicating [0 .. SpLen] of SL is Sp
-	Partions [][]int
+	D     []sul.InputSeq
+	SL    []ObsLine // including Sp and Lp
+	SpLoc int       // indicating [0 .. SpLen] of SL is Sp
 	// part 2. private variables
 	// -- orac
 	// -- lastadd: the last added suffix (from counter-example)
 	orac    *sul.Oracle
 	lastadd sul.InputSeq
+	states  []int // a list of valid states (there indexes in SL)
 }
 
 // suppose all the elements in SL are now in Sp
 // we need to expand all possible Sp to a new Lp
+// also we call call it one-step expansion
 func (self *Obs) expandLp() {
 	// refresh the amount of Sp
 	self.SpLoc = len(self.SL) - 1
 	newLp := []ObsLine{}
+	acts := self.orac.GetInputs()
 	for _, l := range self.SL {
-
-		for _, d := range self.D {
-			newLp = append(newLp, ObsLine{append(l.Index, d...), []*sul.Output{}, -1})
+		l.Dist = []int{}
+		for j, d := range acts {
+			newLp = append(newLp, NewLine(append(l.Index, d)))
+			l.Dist = append(l.Dist, self.SpLoc+1+j)
 		}
 	}
 	self.SL = append(self.SL, newLp...)
@@ -78,7 +104,7 @@ func ObsInit(orac *sul.Oracle) *Obs {
 	inst := new(Obs)
 	inst.orac = orac
 	// first element of SL should be \varpesilon
-	inst.SL = []ObsLine{ObsLine{[]*sul.Input{}, []*sul.Output{}, -1}}
+	inst.SL = []ObsLine{NewLine([]*sul.Input{})}
 	// here I've used a lambda function to simulate
 	// map operation in functional languages
 	inst.D = func(items []*sul.Input) []sul.InputSeq {

@@ -1,7 +1,13 @@
 package reo
 
-func SyncChannel(in, out Port) {
+func SyncChannel(in, out, stop Port) {
 	for {
+		select {
+		case <-stop.Main:
+			close(stop.Slave)
+			return
+		default:
+		}
 		in.WaitRead()
 		out.WaitWrite()
 		in.ConfirmRead()
@@ -10,8 +16,14 @@ func SyncChannel(in, out Port) {
 	}
 }
 
-func SyncdrainChannel(in1, in2 Port) {
+func SyncdrainChannel(in1, in2, stop Port) {
 	for {
+		select {
+		case <-stop.Main:
+			close(stop.Slave)
+			return
+		default:
+		}
 		in1.WaitRead()
 		in2.WaitRead()
 		in1.ConfirmRead()
@@ -34,8 +46,13 @@ func FifoChannel(in, out, stop Port) {
 	}
 }
 
-func LossysyncChannel(in, out Port) {
+func LossysyncChannel(in, out, stop Port) {
 	for {
+		select {
+		case <-stop.Main:
+			close(stop.Slave)
+			return
+		}
 		c := in.SyncRead()
 		select {
 		// try WaitWrite
@@ -48,8 +65,14 @@ func LossysyncChannel(in, out Port) {
 	}
 }
 
-func MergerChannel(in1, in2, out Port) {
+func MergerChannel(in1, in2, out, stop Port) {
 	for {
+		select {
+		case <-stop.Main:
+			close(stop.Slave)
+			return
+		default:
+		}
 		// considering the syntax of select, here we use
 		// <-in.slave instead of in.WaitRead()
 		select {
@@ -67,12 +90,17 @@ func MergerChannel(in1, in2, out Port) {
 	}
 }
 
-func ReplicatorChannel(in Port, out Ports) {
+func ReplicatorChannel(in, stop Port, out Ports) {
 	for {
-		in.WaitRead()
-		out.WaitWrite()
-		in.ConfirmRead()
-		out.ConfirmWrite()
-		out.Write(in.Read())
+		select {
+		case <-stop.Main:
+			close(stop.Slave)
+			return
+		case <-in.Slave:
+			out.WaitWrite()
+			in.ConfirmRead()
+			out.ConfirmWrite()
+			out.Write(in.Read())
+		}
 	}
 }
