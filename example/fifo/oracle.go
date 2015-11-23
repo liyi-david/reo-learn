@@ -9,10 +9,9 @@ func GetOracle() *sul.Oracle {
 	o.InPorts = []string{"A"}
 	o.OutPorts = []string{"B"}
 	o.TimeUnit = 100 * time.Millisecond
-	o.GenerateInst = func() *sul.SutInst {
-		r := new(sul.SutInst)
-		r.InPorts = map[string]reo.Port{"A": reo.MakePort()}
-		r.OutPorts = map[string]reo.Port{"B": reo.MakePort()}
+	o.GenerateInst = func() *sul.SulInst {
+		r := new(sul.SulInst)
+		r.GeneratePort(o)
 		// if there're several channels, a better solution is that
 		// we use one stop flag to close all of them
 		// and multiple stop finish flag to make sure that all of them
