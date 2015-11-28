@@ -19,4 +19,5 @@ func main() {
 	obs := learn.LStar(s)
 	fmt.Println(obs.GetHypo())
 	fmt.Println(sul.Counter())
+	fmt.Println(obs)
 }
