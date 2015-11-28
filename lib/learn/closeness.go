@@ -37,18 +37,18 @@ func (self *Obs) direct_hypothesis() {
 }
 
 func (self *Obs) fillTable() {
-	for _, line := range self.SL {
+	for i, _ := range self.SL {
 		// if a fillTable operation is executed, the hypothesis
 		// need to be reconstructed
-		line.AccessLine = -1
-		for i, d := range self.D {
-			str := append(line.Index, d...)
+		self.SL[i].AccessLine = -1
+		for j, d := range self.D {
+			str := append(self.SL[i].Index, d...)
 			rel := self.orac.MQuery(str)
-			if len(line.Result) <= i {
-				line.Result = append(line.Result, &rel)
+			if len(self.SL[i].Result) <= j {
+				self.SL[i].Result = append(self.SL[i].Result, &rel)
 			} else {
 				// simply assignment
-				line.Result[i] = &rel
+				self.SL[i].Result[j] = &rel
 			}
 		}
 	}

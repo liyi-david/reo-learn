@@ -117,6 +117,22 @@ func (self *Obs) GetHypo() string {
 	return rel
 }
 
+func (self *Obs) String() string {
+	rel := "Observation Table: \n"
+	for i := 0; i < len(self.SL); i++ {
+		rel += fmt.Sprintf("|%s\t|", self.SL[i].Index.String())
+		for j := 0; j < len(self.D); j++ {
+			// fmt.Println(self.SL[i].Result)
+			rel += fmt.Sprintf("%s\t", self.SL[i].Result[j].String())
+		}
+		rel += "\n"
+		if i == self.SpLoc {
+			rel += "---------------------------------------\n"
+		}
+	}
+	return rel
+}
+
 func ObsInit(orac *sul.Oracle) *Obs {
 	inst := new(Obs)
 	inst.orac = orac

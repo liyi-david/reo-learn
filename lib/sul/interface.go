@@ -26,6 +26,38 @@ type Output map[string]SingleOutput
 type InputSeq []*Input
 type OutputSeq []Output
 
+func (self InputSeq) String() string {
+	rel := ""
+	for _, d := range self {
+		if d.IsTime {
+			rel += "T,"
+		} else {
+			for key, val := range d.Datum {
+				if val {
+					rel += key + ","
+				}
+			}
+		}
+	}
+	if rel == "" {
+		rel += "ϵ"
+	}
+	return rel
+}
+
+func (self Output) String() string {
+	rel := ""
+	for key, val := range self {
+		if !val.IsEmpty {
+			rel += fmt.Sprintf("%s:%s,", key, val.Datum)
+		}
+	}
+	if rel == "" {
+		rel += "ϵ"
+	}
+	return rel
+}
+
 func (self SingleOutput) EqualTo(so SingleOutput) bool {
 	if self.IsEmpty {
 		return so.IsEmpty
@@ -95,6 +127,7 @@ func (self *SulInst) Stop() {
 	// at least one element since a connector usually
 	// contains at least one channel
 	close(self.StopPorts[0].Main)
+	fmt.Println("STOP FLAG SET ON")
 	// we need more iterations to stop all channels
 	// cmflag is used to terminate the monitor goroutine
 	// the monitor goroutine is used to deal with the
