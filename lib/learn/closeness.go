@@ -73,6 +73,7 @@ func (self *Obs) TableClose() {
 				flag = false
 				break
 			}
+			fmt.Println(self)
 		}
 		if flag {
 			// the obstable has been enclosed

@@ -119,6 +119,12 @@ func (self *Obs) GetHypo() string {
 
 func (self *Obs) String() string {
 	rel := "Observation Table: \n"
+	rel += "\t|"
+	for i := 0; i < len(self.D); i++ {
+		rel += fmt.Sprintf("%s\t", self.D[i].String())
+	}
+	rel += "\n"
+	rel += "---------------------------------------\n"
 	for i := 0; i < len(self.SL); i++ {
 		rel += fmt.Sprintf("|%s\t|", self.SL[i].Index.String())
 		for j := 0; j < len(self.D); j++ {
