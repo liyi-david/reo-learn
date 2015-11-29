@@ -16,6 +16,13 @@ import "fmt"
 
 func main() {
 	s := GetOracle()
+	/*
+		var tin sul.InputSeq = sul.InputSeq{
+			&sul.Input{map[string]bool{"A": true, "B": true}, false},
+			&sul.Input{map[string]bool{"A": true, "B": true}, false},
+		}
+		fmt.Println(s.MQuery(tin))
+	*/
 	obs := learn.LStar(s)
 	fmt.Println(obs.GetHypo())
 	fmt.Println(sul.Counter())
