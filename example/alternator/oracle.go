@@ -33,12 +33,12 @@ func GetOracle() *sul.Oracle {
 		// generating stop ports
 		r.StopPorts = reo.GenerateStopPort(8)
 		r.Start = func() {
-			go reo.ReplicatorChannel(r.MidPorts["M6"], reo.Ports{r.MidPorts["M0"], r.MidPorts["M1"]}, r.StopPorts[0])
-			go reo.ReplicatorChannel(r.MidPorts["M7"], reo.Ports{r.MidPorts["M2"], r.MidPorts["M3"]}, r.StopPorts[1])
+			go reo.ReplicatorChannel(r.MidPorts["M6"], r.MidPorts["M0"], r.MidPorts["M1"], r.StopPorts[0])
+			go reo.ReplicatorChannel(r.MidPorts["M7"], r.MidPorts["M2"], r.MidPorts["M3"], r.StopPorts[1])
 			go reo.MergerChannel(r.MidPorts["M4"], r.MidPorts["M5"], r.OutPorts["C"], r.StopPorts[2])
-			go reo.SyncdrainChannel(r.InPorts["M1"], r.OutPorts["M2"], r.StopPorts[3])
-			go reo.SyncChannel(r.InPorts["M0"], r.OutPorts["M4"], r.StopPorts[4])
-			go reo.FifoChannel(r.InPorts["M3"], r.OutPorts["M5"], r.StopPorts[5])
+			go reo.SyncdrainChannel(r.MidPorts["M1"], r.MidPorts["M2"], r.StopPorts[3])
+			go reo.SyncChannel(r.MidPorts["M0"], r.MidPorts["M4"], r.StopPorts[4])
+			go reo.FifoChannel(r.MidPorts["M3"], r.MidPorts["M5"], r.StopPorts[5])
 			go reo.BufferChannel(r.InPorts["A"], r.MidPorts["M6"], r.StopPorts[6])
 			go reo.BufferChannel(r.InPorts["B"], r.MidPorts["M7"], r.StopPorts[7])
 		}
