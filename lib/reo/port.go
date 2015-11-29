@@ -55,26 +55,6 @@ func (self Port) Write(c string) {
 	self.Main <- c
 }
 
-type Ports []Port
-
-func (self Ports) WaitWrite() {
-	for i := 0; i < len(self); i++ {
-		self[i].Slave <- "write"
-	}
-}
-
-func (self Ports) ConfirmWrite() {
-	for i := 0; i < len(self); i++ {
-		<-self[i].Slave
-	}
-}
-
-func (self Ports) Write(c string) {
-	for i := 0; i < len(self); i++ {
-		self[i].Write(c)
-	}
-}
-
 func MakePort() Port {
 	m := make(chan string)
 	s := make(chan string)
@@ -100,16 +80,14 @@ func (self Port) SyncWrite(c string) {
 func (p Port) TryRead(buf chan string) chan bool {
 	stopflag := make(chan bool)
 	go func() {
-		select {
-		case <-p.Slave:
-			// FIXME there must be something strange here
-			// Two "waiting finish" are emiited
-			// thats why we have a deadlock
-			p.ConfirmRead()
-			// fmt.Println("[Try Read] Waiting Comfirmed")
-			c := p.Read()
-			buf <- c
-		case <-time.After(time.Millisecond * Delay):
+		status := TimedStepExec(
+			time.Millisecond*Delay,
+			Operation{"read", p.Slave, ""},
+			Operation{"write", p.Slave, "read"},
+			Operation{"read", p.Main, "buf"},
+			Operation{"write", buf, "buf"},
+		)
+		if !status {
 			buf <- "<NONE>"
 		}
 		close(stopflag)
@@ -120,49 +98,18 @@ func (p Port) TryRead(buf chan string) chan bool {
 func (p Port) LossyWrite(c string) chan bool {
 	stopflag := make(chan bool)
 	go func() {
-		select {
-		case p.Slave <- "write":
-			p.ConfirmWrite()
-			p.Write(c)
-		case <-time.After(time.Millisecond * Delay):
-			// nothing done.
-		}
+		TimedStepExec(
+			time.Millisecond*Delay,
+			Operation{"write", p.Slave, "write"},
+			Operation{"read", p.Slave, ""},
+			Operation{"write", p.Main, c},
+		)
 		close(stopflag)
 	}()
 	return stopflag
 }
 
-func (p Port) UselessRead(stop chan bool) {
-	select {
-	case <-p.Slave:
-		select {
-		case <-stop:
-		case p.Slave <- "read":
-			select {
-			case <-stop:
-			case <-p.Main:
-			}
-		}
-	case <-stop:
-	}
-}
-
-func (p Port) UselessWrite(stop chan bool) {
-	select {
-	case p.Slave <- "write":
-		select {
-		case <-stop:
-		case <-p.Slave:
-			select {
-			case <-stop:
-			case p.Main <- "":
-			}
-		}
-	case <-stop:
-	}
-}
-
-func GenerateStopPort(n int) Ports {
+func GenerateStopPort(n int) []Port {
 	stopports := []Port{}
 	stopflag := make(chan string)
 	for i := 0; i < n; i++ {

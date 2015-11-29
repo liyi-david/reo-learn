@@ -1,5 +1,8 @@
 package reo
 
+// import "fmt"
+import "sync"
+
 // FIXME maybe we need to send a stop signal to any potential
 // blocking operation? any SyncRead may leads to this kind of bugs
 // NOTE when later some more complicated example would be trapped
@@ -8,52 +11,58 @@ package reo
 // select ...
 
 func SyncChannel(in, out, stop Port) {
+	defer close(stop.Slave)
 	for {
-		select {
-		case <-stop.Main:
-			close(stop.Slave)
+		status := StepExec(
+			stop.Main,
+			//Operation{"debug", in.Slave, "SYNC LISTENING"},
+			Operation{"read", in.Slave, ""},
+			//Operation{"debug", in.Slave, "SYNC READ TRIGGED"},
+			Operation{"write", out.Slave, "write"},
+			Operation{"write", in.Slave, "read"},
+			Operation{"read", out.Slave, ""},
+			Operation{"read", in.Main, "datum"},
+			Operation{"write", out.Main, "datum"},
+		)
+		if !status {
 			return
-		case <-in.Slave:
-			out.WaitWrite()
-			in.ConfirmRead()
-			out.ConfirmWrite()
-			out.Write(in.Read())
 		}
 	}
 }
 
 func SyncdrainChannel(in1, in2, stop Port) {
+	defer close(stop.Slave)
 	for {
-		select {
-		case <-stop.Main:
-			close(stop.Slave)
+		status := StepExec(
+			stop.Main,
+			Operation{"read", in1.Slave, ""},
+			Operation{"read", in2.Slave, ""},
+			Operation{"write", in1.Slave, "read"},
+			Operation{"write", in2.Slave, "read"},
+			Operation{"read", in1.Main, ""},
+			Operation{"read", in2.Main, ""},
+		)
+		if !status {
 			return
-		case <-in1.Slave:
-			select {
-			case <-stop.Main:
-				close(stop.Slave)
-				return
-			case <-in2.Slave:
-			}
 		}
-		in2.WaitRead()
-		in1.ConfirmRead()
-		in2.ConfirmRead()
-		in1.Read()
-		in2.Read()
 	}
 }
 
 func FifoChannel(in, out, stop Port) {
+	defer close(stop.Slave)
 	for {
-		select {
-		case <-stop.Main:
-			close(stop.Slave)
+		status := StepExec(
+			stop.Main,
+			Operation{"read", in.Slave, ""},
+			Operation{"write", in.Slave, "read"},
+			Operation{"read", in.Main, "datum"},
+			// following are the syncwrite part
+			Operation{"write", out.Slave, "write"},
+			Operation{"read", out.Slave, ""},
+			Operation{"write", out.Main, "datum"},
+		)
+		if !status {
 			return
-		case <-in.Slave:
-			in.ConfirmRead()
-			c := in.Read()
-			out.SyncWrite(c)
 		}
 	}
 }
@@ -80,56 +89,114 @@ func LossysyncChannel(in, out, stop Port) {
 }
 
 func MergerChannel(in1, in2, out, stop Port) {
+	defer close(stop.Slave)
 	for {
 		// considering the syntax of select, here we use
 		// <-in.slave instead of in.WaitRead()
 		select {
 		case <-stop.Main:
-			close(stop.Slave)
 			return
 		case <-in1.Slave:
-			out.WaitWrite()
-			in1.ConfirmRead()
-			out.ConfirmWrite()
-			out.Write(in1.Read())
+			status := StepExec(
+				stop.Main,
+				Operation{"write", out.Slave, "write"},
+				Operation{"write", in1.Slave, "read"},
+				Operation{"read", out.Slave, ""},
+				Operation{"read", in1.Main, "datum"},
+				Operation{"write", out.Main, "datum"},
+			)
+			if !status {
+				return
+			}
 		case <-in2.Slave:
-			out.WaitWrite()
-			in2.ConfirmRead()
-			out.ConfirmWrite()
-			out.Write(in2.Read())
+			status := StepExec(
+				stop.Main,
+				Operation{"write", out.Slave, "write"},
+				Operation{"write", in2.Slave, "read"},
+				Operation{"read", out.Slave, ""},
+				Operation{"read", in2.Main, "datum"},
+				Operation{"write", out.Main, "datum"},
+			)
+			if !status {
+				return
+			}
 		}
 	}
 }
 
-func ReplicatorChannel(in Port, out Ports, stop Port) {
+func ReplicatorChannel(in, out1, out2 Port, stop Port) {
+	defer close(stop.Slave)
 	for {
-		select {
-		case <-stop.Main:
-			close(stop.Slave)
+		status := StepExec(
+			stop.Main,
+			Operation{"read", in.Slave, ""},
+			//Operation{"debug", in.Slave, "REPLICATOR FIN READ"},
+			Operation{"write", out1.Slave, "write"},
+			//Operation{"debug", in.Slave, "REPLICATOR FIN FIRST SHAKEHAND"},
+			Operation{"write", out2.Slave, "write"},
+			Operation{"write", in.Slave, "read"},
+			Operation{"read", out1.Slave, ""},
+			Operation{"read", out2.Slave, ""},
+			Operation{"read", in.Main, "datum"},
+			Operation{"write", out1.Main, "datum"},
+			Operation{"write", out2.Main, "datum"},
+		)
+		if !status {
 			return
-		case <-in.Slave:
-			out.WaitWrite()
-			in.ConfirmRead()
-			out.ConfirmWrite()
-			out.Write(in.Read())
 		}
 	}
 }
 
 func BufferChannel(in, out, stop Port) {
+	defer close(stop.Slave)
 	buf := []string{}
-	for {
-		select {
-		case <-stop.Main:
-			close(stop.Slave)
-			return
-		case <-in.Slave:
-			in.ConfirmRead()
-			buf = append(buf, in.Read())
-		case out.Slave <- "write":
-			out.ConfirmWrite()
-			out.Write(buf[0])
-			buf = buf[1:]
+	var wg sync.WaitGroup
+	// listening input
+	go func() {
+		defer wg.Done()
+		c := make(chan string, 1)
+		for {
+			status := StepExec(
+				stop.Main,
+				Operation{"read", in.Slave, ""},
+				Operation{"write", in.Slave, "read"},
+				Operation{"read", in.Main, "datum"},
+				Operation{"write", c, "datum"},
+			)
+			if !status {
+				return
+			} else {
+				buf = append(buf, <-c)
+				// fmt.Println("PUSHED", buf)
+			}
 		}
-	}
+	}()
+	// listening output
+	go func() {
+		defer wg.Done()
+		for {
+			if len(buf) == 0 {
+				select {
+				case <-stop.Main:
+					return
+				default:
+					continue
+				}
+			}
+			status := StepExec(
+				stop.Main,
+				Operation{"write", out.Slave, "write"},
+				Operation{"read", out.Slave, ""},
+				Operation{"write", out.Main, buf[0]},
+			)
+			if !status {
+				return
+			} else {
+				// fmt.Println("WRITTEN", buf[0])
+				buf = buf[1:]
+			}
+		}
+	}()
+	wg.Add(2)
+	wg.Wait()
 }
