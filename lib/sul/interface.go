@@ -26,21 +26,33 @@ type Output map[string]SingleOutput
 type InputSeq []*Input
 type OutputSeq []Output
 
+func (self *Input) String() string {
+	rel := ""
+	if self.IsTime {
+		return "T"
+	} else {
+		for key, val := range self.Datum {
+			if val {
+				rel += key + ","
+			}
+		}
+		if rel == "" {
+			return "ϵ"
+		} else {
+			return rel[:len(rel)-1]
+		}
+	}
+}
+
 func (self InputSeq) String() string {
 	rel := ""
 	for _, d := range self {
-		if d.IsTime {
-			rel += "T,"
-		} else {
-			for key, val := range d.Datum {
-				if val {
-					rel += key + ","
-				}
-			}
-		}
+		rel += d.String() + "-"
 	}
 	if rel == "" {
 		rel += "ϵ"
+	} else {
+		rel = rel[:len(rel)-1]
 	}
 	return rel
 }
@@ -127,35 +139,18 @@ func (self *SulInst) Stop() {
 	// at least one element since a connector usually
 	// contains at least one channel
 	close(self.StopPorts[0].Main)
-	fmt.Println("STOP FLAG SET ON")
+	// fmt.Println("STOP FLAG SET ON")
 	// we need more iterations to stop all channels
 	// cmflag is used to terminate the monitor goroutine
 	// the monitor goroutine is used to deal with the
 	// waiting SyncRead/SyncWrite operations
 	cmflag := make(chan bool)
-	go self.monitor(cmflag)
 	// wait until all the channels terminate
 	for _, p := range self.StopPorts {
 		<-p.Slave
 	}
+	// fmt.Println("STOP WAIT FIN")
 	close(cmflag)
-}
-
-func (self *SulInst) monitor(stop chan bool) {
-	for {
-		select {
-		case <-stop:
-			return
-		default:
-			// keep writing things and reading things
-			for _, p := range self.InPorts {
-				p.UselessWrite(stop)
-			}
-			for _, p := range self.OutPorts {
-				p.UselessRead(stop)
-			}
-		}
-	}
 }
 
 func (self *Oracle) GetInputs() []*Input {
@@ -230,6 +225,7 @@ func (self *Oracle) SeqSimulate(ins InputSeq) OutputSeq {
 			if data == "<NONE>" {
 				curr[name] = SingleOutput{"", true}
 			} else if data == "" {
+				fmt.Println("FATAL ERROR: empty data fetched.")
 			} else {
 				curr[name] = SingleOutput{data, false}
 			}
@@ -253,7 +249,7 @@ func (self *Oracle) MQuery(in InputSeq) Output {
 	// TODO we should use cache technique to improve
 	// the effiency of MQuery, otherwise this would make
 	// it really slow
-	// fmt.Println("Membership Query.")
+	// fmt.Println("Membership Query. " + in.String())
 	mqcounter++
 	outputs := self.SeqSimulate(in)
 	if len(outputs) == 0 {
