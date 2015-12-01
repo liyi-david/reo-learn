@@ -1,0 +1,283 @@
+L* Iteration
+TABLE FILLED WITH LEN: 0
+TABLE FILLED WITH LEN: 5
+TABLE FILLED WITH LEN: 35
+Hypotheis Constructed
+Partition Division
+[[0 1 5 6 10 11 15 26 30 31 35] [2 7 12 16 17 18 19 20 22 24 32] [3 8 13 21 23 25 28 33] [4 9 14 34] [27] [29]]
+[[0 1 5 6 10 11 15 26 30 31 35]]
+Partition Division
+[[0 1 5 6 10 11 15 26 30 31 35] [2 7 12 16 17 18 19 20 22 24 32] [3 8 13 21 23 25 28 33] [4 9 14 34] [27] [29]]
+[[2 7 12 16 17 18 19 20 22 24 32]]
+Partition Division
+[[0 1 5 6 10 11 15 26 30 31 35] [2 7 12 16 17 18 19 20 22 24 32] [3 8 13 21 23 25 28 33] [4 9 14 34] [27] [29]]
+[[3 8 13 21 23 25 28 33]]
+Partition Division
+[[0 1 5 6 10 11 15 26 30 31 35] [2 7 12 16 17 18 19 20 22 24 32] [3 8 13 21 23 25 28 33] [4 9 14 34] [27] [29]]
+[[4 9 14 34]]
+Partition Division
+[[0 1 5 6 10 11 15 26 30 31 35] [2 7 12 16 17 18 19 20 22 24 32] [3 8 13 21 23 25 28 33] [4 9 14 34] [27] [29]]
+[[27]]
+Partition Division
+[[0 1 5 6 10 11 15 26 30 31 35] [2 7 12 16 17 18 19 20 22 24 32] [3 8 13 21 23 25 28 33] [4 9 14 34] [27] [29]]
+[[29]]
+Hypothesis Acquired: 
+> state 0 with edges: 
+[0] -> state 0
+[1] -> state 2
+[2] -> state 3
+[3] -> state 4
+[4] -> state 0
+> state 2 with edges: 
+[0] -> state 0
+[1] -> state 2
+[2] -> state 3
+[3] -> state 4
+[4] -> state 0
+> state 3 with edges: 
+[0] -> state 0
+[1] -> state 2
+[2] -> state 3
+[3] -> state 4
+[4] -> state 0
+> state 4 with edges: 
+[0] -> state 0
+[1] -> state 2
+[2] -> state 3
+[3] -> state 4
+[4] -> state 0
+> state 27 with edges: 
+[0] -> state 0
+[1] -> state 2
+[2] -> state 3
+[3] -> state 4
+[4] -> state 0
+> state 29 with edges: 
+[0] -> state 0
+[1] -> state 2
+[2] -> state 3
+[3] -> state 4
+[4] -> state 0
+Hypothesis's description is finished.
+1290
+Observation Table: 
+	|ϵ	A	B	A,B	T	
+---------------------------------------
+|ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|ϵ-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|ϵ-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|ϵ-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|ϵ-A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|ϵ-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|A-ϵ	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-T	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-ϵ	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|B-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|B-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-T	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|A,B-A	|ϵ	ϵ	C:A,	C:A,	ϵ	
+|A,B-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B-A,B	|C:A,	C:A,	C:A,	C:A,	C:A,	
+|A,B-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|T-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|T-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|T-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|T-A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|T-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+---------------------------------------
+|ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|ϵ-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|ϵ-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|ϵ-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|ϵ-A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|ϵ-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|A-ϵ	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-T	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-ϵ	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|B-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|B-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-T	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|A,B-A	|ϵ	ϵ	C:A,	C:A,	ϵ	
+|A,B-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B-A,B	|C:A,	C:A,	C:A,	C:A,	C:A,	
+|A,B-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|T-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|T-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|T-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|T-A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|T-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|ϵ-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|ϵ-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|ϵ-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|ϵ-A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|ϵ-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|A-ϵ	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-T	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-ϵ	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|B-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|B-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-T	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|A,B-A	|ϵ	ϵ	C:A,	C:A,	ϵ	
+|A,B-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B-A,B	|C:A,	C:A,	C:A,	C:A,	C:A,	
+|A,B-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|T-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|T-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|T-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|T-A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|T-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|ϵ-ϵ-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|ϵ-ϵ-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|ϵ-ϵ-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|ϵ-ϵ-A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|ϵ-ϵ-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|ϵ-A-ϵ	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|ϵ-A-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|ϵ-A-B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|ϵ-A-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|ϵ-A-T	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|ϵ-B-ϵ	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|ϵ-B-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|ϵ-B-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|ϵ-B-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|ϵ-B-T	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|ϵ-A,B-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|ϵ-A,B-A	|ϵ	ϵ	C:A,	C:A,	ϵ	
+|ϵ-A,B-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|ϵ-A,B-A,B	|C:A,	C:A,	C:A,	C:A,	C:A,	
+|ϵ-A,B-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|ϵ-T-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|ϵ-T-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|ϵ-T-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|ϵ-T-A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|ϵ-T-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|A-ϵ-ϵ	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-ϵ-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-ϵ-B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-ϵ-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-ϵ-T	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A-ϵ	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A-B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A-T	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-B-ϵ	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-B-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-B-B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-B-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-B-T	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A,B-ϵ	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A,B-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A,B-B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A,B-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-A,B-T	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-T-ϵ	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-T-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-T-B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-T-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A-T-T	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-ϵ-ϵ	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|B-ϵ-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-ϵ-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|B-ϵ-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-ϵ-T	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|B-A-ϵ	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-A-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-A-B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-A-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-A-T	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-B-ϵ	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|B-B-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-B-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|B-B-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-B-T	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|B-A,B-ϵ	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-A,B-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-A,B-B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-A,B-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-A,B-T	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-T-ϵ	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|B-T-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-T-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|B-T-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|B-T-T	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B-ϵ-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|A,B-ϵ-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A,B-ϵ-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B-ϵ-A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|A,B-ϵ-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|A,B-A-ϵ	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A,B-A-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A,B-A-B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|A,B-A-A,B	|ϵ	ϵ	C:A,	C:A,	ϵ	
+|A,B-A-T	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A,B-B-ϵ	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B-B-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A,B-B-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B-B-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A,B-B-T	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B-A,B-ϵ	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|A,B-A,B-A	|ϵ	ϵ	C:A,	C:A,	ϵ	
+|A,B-A,B-B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|A,B-A,B-A,B	|C:A,	C:A,	C:A,	C:A,	C:A,	
+|A,B-A,B-T	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|A,B-T-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|A,B-T-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|A,B-T-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|A,B-T-A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|A,B-T-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|T-ϵ-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|T-ϵ-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|T-ϵ-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|T-ϵ-A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|T-ϵ-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|T-A-ϵ	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|T-A-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|T-A-B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|T-A-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|T-A-T	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|T-B-ϵ	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|T-B-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|T-B-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|T-B-A,B	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|T-B-T	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|T-A,B-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|T-A,B-A	|ϵ	ϵ	C:A,	C:A,	ϵ	
+|T-A,B-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|T-A,B-A,B	|C:A,	C:A,	C:A,	C:A,	C:A,	
+|T-A,B-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|T-T-ϵ	|ϵ	ϵ	ϵ	C:A,	ϵ	
+|T-T-A	|ϵ	ϵ	ϵ	ϵ	ϵ	
+|T-T-B	|ϵ	C:A,	ϵ	C:A,	ϵ	
+|T-T-A,B	|C:B,	C:B,	C:B,	C:B,	C:B,	
+|T-T-T	|ϵ	ϵ	ϵ	C:A,	ϵ	
+
