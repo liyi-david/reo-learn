@@ -39,8 +39,10 @@ func GetOracle() *sul.Oracle {
 			go reo.SyncdrainChannel(r.MidPorts["M1"], r.MidPorts["M2"], r.StopPorts[3])
 			go reo.SyncChannel(r.MidPorts["M0"], r.MidPorts["M4"], r.StopPorts[4])
 			go reo.FifoChannel(r.MidPorts["M3"], r.MidPorts["M5"], r.StopPorts[5])
-			go reo.BufferChannel(r.InPorts["A"], r.MidPorts["M6"], r.StopPorts[6])
-			go reo.BufferChannel(r.InPorts["B"], r.MidPorts["M7"], r.StopPorts[7])
+			go reo.SyncChannel(r.InPorts["A"], r.MidPorts["M6"], r.StopPorts[6])
+			go reo.SyncChannel(r.InPorts["B"], r.MidPorts["M7"], r.StopPorts[7])
+			//go reo.BufferChannel(r.InPorts["A"], r.MidPorts["M6"], r.StopPorts[6])
+			//go reo.BufferChannel(r.InPorts["B"], r.MidPorts["M7"], r.StopPorts[7])
 		}
 		return r
 	}
