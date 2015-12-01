@@ -249,7 +249,7 @@ func (self *Oracle) MQuery(in InputSeq) Output {
 	// TODO we should use cache technique to improve
 	// the effiency of MQuery, otherwise this would make
 	// it really slow
-	// fmt.Println("Membership Query. " + in.String())
+	//fmt.Println("Membership Query. " + in.String())
 	mqcounter++
 	outputs := self.SeqSimulate(in)
 	if len(outputs) == 0 {
