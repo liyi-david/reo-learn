@@ -38,7 +38,7 @@ func (self *Obs) direct_hypothesis() {
 
 func (self *Obs) fillTable() {
 	defer fmt.Println("TABLE FILLED WITH LEN:", self.SpLoc)
-	for i, _ := range self.SL {
+	for i := len(self.SL) - 1; i >= 0; i-- {
 		// if a fillTable operation is executed, the hypothesis
 		// need to be reconstructed
 		self.SL[i].AccessLine = -1
@@ -66,7 +66,6 @@ func (self *Obs) TableClose() {
 	defer self.direct_hypothesis()
 	for self.fillTable(); ; self.fillTable() {
 		// check if the table is closed now
-		fmt.Println(self)
 		flag := true
 		for i = self.SpLoc + 1; i < len(self.SL); i++ {
 			for j = 0; j <= self.SpLoc; j++ {
@@ -78,9 +77,11 @@ func (self *Obs) TableClose() {
 			}
 			if j > self.SpLoc {
 				flag = false
-				break
+				// TODO to make it faster we need to use break
+				// break
 			}
 		}
+		fmt.Println(self)
 		if flag {
 			// the obstable has been enclosed
 			return
