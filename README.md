@@ -18,3 +18,8 @@ All the codes are written under Google Go.
 ## several questions
 
 * reo's semantics when a write operation from components is blocked?
+
+## TODO
+
+* tree optimization in MQuery
+* debug of StepExec
