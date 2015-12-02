@@ -9,7 +9,7 @@ package main
 // main code but the library we're going to import
 import . "./example/alternator"
 
-//import . "./example/fifo"
+// import . "./example/fifo"
 import "./lib/learn"
 import "./lib/sul"
 import "log"
@@ -22,8 +22,8 @@ func main() {
 	// set up multicores
 	runtime.GOMAXPROCS(4)
 	s := GetOracle()
-	// sul.CloseLog()
-	// sul.CloseReoLog()
+	sul.CloseLog()
+	sul.CloseReoLog()
 	logger.Println("MAIN PROC START")
 	sul.SetReoDelay(5)
 
