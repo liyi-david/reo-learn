@@ -8,8 +8,35 @@ package sul
 import (
 	"../reo"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
+	"os"
 	"time"
 )
+
+var logger *log.Logger = log.New(os.Stderr, "SUL - ", 2)
+var ibound = 3
+
+func SetLog(w io.Writer) {
+	logger = log.New(w, "SUL", 2)
+}
+
+func CloseLog() {
+	SetLog(ioutil.Discard)
+}
+
+func CloseReoLog() {
+	reo.CloseLog()
+}
+
+func SetReoDelay(t time.Duration) {
+	reo.SetDelay(t)
+}
+
+func SetBound(b int) {
+	ibound = b
+}
 
 type Input struct {
 	Datum  map[string]bool
@@ -37,7 +64,7 @@ func (self *Input) String() string {
 			}
 		}
 		if rel == "" {
-			return "ϵ"
+			return "Ø"
 		} else {
 			return rel[:len(rel)-1]
 		}
@@ -189,7 +216,9 @@ func (self *Oracle) SeqSimulate(ins InputSeq) OutputSeq {
 	var stopgroup []chan bool
 	// use waitgroup to make sure all processes finished
 	// before we continue dealing with data
-	for _, in := range ins {
+	for index, in := range ins {
+		// this log line is used to divide different behaviors in reolib
+		reo.GetLogger().Println("[SEQ SIM] ITERATE", index, "======================================")
 		stopgroup = []chan bool{}
 		if in.IsTime {
 			time.Sleep(self.TimeUnit)
@@ -249,14 +278,31 @@ func (self *Oracle) MQuery(in InputSeq) Output {
 	// TODO we should use cache technique to improve
 	// the effiency of MQuery, otherwise this would make
 	// it really slow
-	//fmt.Println("Membership Query. " + in.String())
+	logger.Println("[MQUERY]", in.String(), "COUNTER: ", mqcounter)
 	mqcounter++
-	outputs := self.SeqSimulate(in)
-	if len(outputs) == 0 {
-		panic("Fatal Error: SeqSimulate returns an empty array.")
-	} else {
-		return outputs[len(outputs)-1]
+	var rec Output
+	var ct = 0
+	var count = 0
+	for ct <= ibound {
+		count++
+		reo.GetLogger().Println("[MQUERY] ITERATE", count, "---------------------------------------")
+		seq := self.SeqSimulate(in)
+		if len(seq) == 0 {
+			// a panic happens
+			logger.Println("[MQUERY] PANIC CATCHED")
+			continue
+		} else {
+			t := seq[len(seq)-1]
+			if ct > 0 && t.EqualTo(&rec) {
+				ct++
+			} else {
+				// ct = 0 : the first iteration || not equal : means there's an error
+				ct = 1
+				rec = t
+			}
+		}
 	}
+	return rec
 }
 
 // TODO: EQuery should accept an argument
