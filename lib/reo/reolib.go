@@ -1,7 +1,10 @@
 package reo
 
-// import "fmt"
 import "sync"
+import "log"
+import "io"
+import "io/ioutil"
+import "os"
 
 // FIXME maybe we need to send a stop signal to any potential
 // blocking operation? any SyncRead may leads to this kind of bugs
@@ -10,9 +13,24 @@ import "sync"
 // FIXME maybe there're lots of WaitRead that need to replaced by
 // select ...
 
+var logger *log.Logger = log.New(os.Stderr, "REO - ", 2)
+
+func SetLog(w io.Writer) {
+	logger = log.New(w, "REO", 2)
+}
+
+func GetLogger() *log.Logger {
+	return logger
+}
+
+func CloseLog() {
+	SetLog(ioutil.Discard)
+}
+
 func SyncChannel(in, out, stop Port) {
 	defer close(stop.Slave)
 	for {
+		c := make(chan string, 1)
 		status := StepExec(
 			stop.Main,
 			//Operation{"debug", in.Slave, "SYNC LISTENING"},
@@ -23,10 +41,12 @@ func SyncChannel(in, out, stop Port) {
 			Operation{"read", out.Slave, ""},
 			Operation{"read", in.Main, "datum"},
 			Operation{"write", out.Main, "datum"},
+			Operation{"write", c, "datum"},
 		)
 		if !status {
 			return
 		}
+		logger.Println("[SYNC] TRANS", <-c)
 	}
 }
 
@@ -45,6 +65,7 @@ func SyncdrainChannel(in1, in2, stop Port) {
 		if !status {
 			return
 		}
+		logger.Println("[SYNCDRAIN] TRIGGED")
 	}
 }
 
@@ -93,6 +114,7 @@ func MergerChannel(in1, in2, out, stop Port) {
 	for {
 		// considering the syntax of select, here we use
 		// <-in.slave instead of in.WaitRead()
+		c := make(chan string, 1)
 		select {
 		case <-stop.Main:
 			return
@@ -104,6 +126,7 @@ func MergerChannel(in1, in2, out, stop Port) {
 				Operation{"read", out.Slave, ""},
 				Operation{"read", in1.Main, "datum"},
 				Operation{"write", out.Main, "datum"},
+				Operation{"write", c, "datum"},
 			)
 			if !status {
 				return
@@ -116,11 +139,13 @@ func MergerChannel(in1, in2, out, stop Port) {
 				Operation{"read", out.Slave, ""},
 				Operation{"read", in2.Main, "datum"},
 				Operation{"write", out.Main, "datum"},
+				Operation{"write", c, "datum"},
 			)
 			if !status {
 				return
 			}
 		}
+		logger.Println("[MERGER] TRANS", <-c)
 	}
 }
 
@@ -144,10 +169,30 @@ func ReplicatorChannel(in, out1, out2 Port, stop Port) {
 		if !status {
 			return
 		}
+		logger.Println("[REPLICATOR] TRANS")
 	}
 }
 
-func BufferChannel(in, out, stop Port) {
+func OutputChannel(in, out, stop Port) {
+	defer close(stop.Slave)
+	for {
+		c := make(chan string, 1)
+		status := StepExec(
+			stop.Main,
+			Operation{"read", in.Slave, ""},
+			Operation{"write", in.Slave, "read"},
+			Operation{"read", in.Main, "datum"},
+			Operation{"write", out.Main, "datum"},
+			Operation{"write", c, "datum"},
+		)
+		if !status {
+			return
+		}
+		logger.Println("[OUTPUT] TRANS", <-c)
+	}
+}
+
+func BufferChannel(size int, in, out, stop Port) {
 	defer close(stop.Slave)
 	buf := []string{}
 	var wg sync.WaitGroup
@@ -166,8 +211,11 @@ func BufferChannel(in, out, stop Port) {
 			if !status {
 				return
 			} else {
-				buf = append(buf, <-c)
-				// fmt.Println("PUSHED", buf)
+				t := <-c
+				if len(buf) < size {
+					buf = append(buf, t)
+				}
+				logger.Println("[BUFFER] PUSHED", t)
 			}
 		}
 	}()
@@ -192,7 +240,7 @@ func BufferChannel(in, out, stop Port) {
 			if !status {
 				return
 			} else {
-				// fmt.Println("WRITTEN", buf[0])
+				logger.Println("[BUFFER] WRITTEN", buf[0])
 				buf = buf[1:]
 			}
 		}

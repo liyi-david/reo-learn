@@ -18,7 +18,11 @@ type Port struct {
 
 // how many milliseconds we will wait until a
 // TryRead() operations finishes
-const Delay = 1
+var Delay time.Duration = 5
+
+func SetDelay(delay time.Duration) {
+	Delay = delay
+}
 
 /*
 
@@ -80,15 +84,19 @@ func (self Port) SyncWrite(c string) {
 func (p Port) TryRead(buf chan string) chan bool {
 	stopflag := make(chan bool)
 	go func() {
+		c := make(chan string, 1)
 		status := TimedStepExec(
 			time.Millisecond*Delay,
-			Operation{"read", p.Slave, ""},
-			Operation{"write", p.Slave, "read"},
 			Operation{"read", p.Main, "buf"},
-			Operation{"write", buf, "buf"},
+			Operation{"write", c, "buf"},
 		)
 		if !status {
 			buf <- "<NONE>"
+			logger.Println("<TRY READ>", "TIMEOUT")
+		} else {
+			s := <-c
+			logger.Println("<TRY READ>", "TRANS", s)
+			buf <- s
 		}
 		close(stopflag)
 	}()
@@ -98,12 +106,15 @@ func (p Port) TryRead(buf chan string) chan bool {
 func (p Port) LossyWrite(c string) chan bool {
 	stopflag := make(chan bool)
 	go func() {
-		TimedStepExec(
+		s := TimedStepExec(
 			time.Millisecond*Delay,
 			Operation{"write", p.Slave, "write"},
 			Operation{"read", p.Slave, ""},
 			Operation{"write", p.Main, c},
 		)
+		if !s {
+			logger.Println("<TRY WRITE>", "TIMEOUT", c)
+		}
 		close(stopflag)
 	}()
 	return stopflag

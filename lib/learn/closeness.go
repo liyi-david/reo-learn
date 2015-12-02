@@ -43,6 +43,11 @@ func (self *Obs) fillTable() {
 		// need to be reconstructed
 		self.SL[i].AccessLine = -1
 		for j, d := range self.D {
+			// first we check if the result is already existing
+			// NOTE if insert order of D is changed, this part then need FIXME
+			if len(self.SL[i].Result) > j && self.SL[i].Result[j] != nil {
+				continue
+			}
 			str := append(self.SL[i].Index, d...)
 			rel := self.orac.MQuery(str)
 			if len(self.SL[i].Result) <= j {
@@ -61,7 +66,7 @@ func (self *Obs) TableClose() {
 	defer self.direct_hypothesis()
 	for self.fillTable(); ; self.fillTable() {
 		// check if the table is closed now
-		//fmt.Println(self)
+		fmt.Println(self)
 		flag := true
 		for i = self.SpLoc + 1; i < len(self.SL); i++ {
 			for j = 0; j <= self.SpLoc; j++ {
