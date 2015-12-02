@@ -1,6 +1,5 @@
 package reo
 
-import "fmt"
 import "time"
 
 type Operation struct {
@@ -25,42 +24,62 @@ func (self Flagproc) Var(name string) string {
 	}
 }
 
-func (self Flagproc) Execute() bool {
+func (self *Flagproc) Execute() (result, ok bool) {
+	defer func() {
+		// FIXME recover from unhandled panic
+		recover()
+	}()
+	ok = true
+	result = false
 	for _, o := range self.oprs {
 		if o.opr == "read" {
 			select {
 			case <-self.flag:
-				return false
+				// logger.Println("{STEPEXEC}", "READ INTERRUPTED", o.name)
+				return false, true
 			case t := <-o.chn:
-				// fmt.Println("DATA READ: " + t + " TO " + o.name)
+				if t != "read" && t != "write" {
+					logger.Println("{STEPEXEC}", "READ", t, "TO", o.name)
+				}
 				self.vars[o.name] = t
 			}
 		} else if o.opr == "debug" {
-			fmt.Println("DEBUG", o.name)
+			logger.Println("{STEPEXEC}", o.name)
 		} else {
 			// operation should be write
 			select {
 			case <-self.flag:
-				return false
+				return false, true
 			case o.chn <- self.Var(o.name):
 			}
 		}
 	}
-	return true
+	return true, true
 }
 
 func StepExec(flag chan string, oprs ...Operation) bool {
 	proc := Flagproc{flag, map[string]string{}, oprs}
-	return proc.Execute()
+	for {
+		r, ok := proc.Execute()
+		if ok {
+			return r
+		}
+	}
 }
 
 func TimedStepExec(timeout time.Duration, oprs ...Operation) bool {
-	flag := make(chan string)
-	proc := Flagproc{flag, map[string]string{}, oprs}
-	go func() {
-		<-time.After(timeout)
-		close(flag)
-	}()
-	status := proc.Execute()
-	return status
+	for {
+		flag := make(chan string)
+		proc := Flagproc{flag, map[string]string{}, oprs}
+		go func() {
+			<-time.After(timeout)
+			close(flag)
+		}()
+		r, ok := proc.Execute()
+		if ok {
+			return r
+		} else {
+			logger.Println(r)
+		}
+	}
 }
