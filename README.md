@@ -23,3 +23,5 @@ All the codes are written under Google Go.
 
 * tree optimization in MQuery
 * debug of StepExec
+* solve the errors in table
+** A-A,B : ϵ  C:B,  C:B,  C:B,  C:B
