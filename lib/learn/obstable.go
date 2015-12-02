@@ -125,11 +125,16 @@ func (self *Obs) String() string {
 	}
 	rel += "\n"
 	rel += "---------------------------------------\n"
+	// every line
 	for i := 0; i < len(self.SL); i++ {
 		rel += fmt.Sprintf("|%s\t|", self.SL[i].Index.String())
 		for j := 0; j < len(self.D); j++ {
 			// fmt.Println(self.SL[i].Result)
 			rel += fmt.Sprintf("%s\t", self.SL[i].Result[j].String())
+		}
+		// check if the current line has its corresponding state
+		if i > self.SpLoc && self.SL[i].AccessLine == -1 {
+			rel += "\t [UNCLOSED]"
 		}
 		rel += "\n"
 		if i == self.SpLoc {
