@@ -9,22 +9,40 @@ package main
 // main code but the library we're going to import
 import . "./example/alternator"
 
-// import . "./example/fifo"
+//import . "./example/fifo"
 import "./lib/learn"
 import "./lib/sul"
-import "fmt"
+import "log"
+import "os"
+import "runtime"
+
+var logger = log.New(os.Stderr, "TOP - ", 0)
 
 func main() {
+	// set up multicores
+	runtime.GOMAXPROCS(4)
 	s := GetOracle()
+	// sul.CloseLog()
+	// sul.CloseReoLog()
+	logger.Println("MAIN PROC START")
+	sul.SetReoDelay(5)
+
+	// following are test code for MQuery
 	/*
-		var tin sul.InputSeq = sul.InputSeq{
-			&sul.Input{map[string]bool{"A": true, "B": true}, false},
-			&sul.Input{map[string]bool{"A": true, "B": true}, false},
+		for {
+			var tin sul.InputSeq = sul.InputSeq{
+				&sul.Input{map[string]bool{"A": true, "B": false}, false},
+				&sul.Input{map[string]bool{"A": false, "B": true}, false},
+			}
+			r := s.MQuery(tin)
+			logger.Println("RESULT:", r)
+			if r.String() == "ϵ" {
+				break
+			}
 		}
-		fmt.Println(s.MQuery(tin))
 	*/
 	obs := learn.LStar(s)
-	fmt.Println(obs.GetHypo())
-	fmt.Println(sul.Counter())
-	fmt.Println(obs)
+	logger.Println(obs.GetHypo())
+	logger.Println(sul.Counter())
+	logger.Println(obs)
 }
