@@ -130,6 +130,7 @@ type Oracle struct {
 	OutPorts     []string
 	Inputs       []*Input
 	TimeUnit     time.Duration
+	Cache        *tnode
 	GenerateInst func() *SulInst
 }
 
@@ -265,9 +266,11 @@ func (self *Oracle) SeqSimulate(ins InputSeq) OutputSeq {
 }
 
 var mqcounter int = 0
+var rdcounter int = 0
 
 func CounterReset() {
 	mqcounter = 0
+	rdcounter = 0
 }
 
 func Counter() int {
@@ -275,18 +278,28 @@ func Counter() int {
 }
 
 func (self *Oracle) MQuery(in InputSeq) Output {
-	// TODO we should use cache technique to improve
-	// the effiency of MQuery, otherwise this would make
-	// it really slow
+	// we use cache technique to improve the effiency of MQuery,
+	// otherwise this would make it really slow
+	if self.Cache == nil {
+		self.Cache = makenode()
+	} else {
+		r := self.Cache.search(in)
+		if r != nil {
+			rdcounter++
+			logger.Println("[MQUERY]", in.String(), "REDUCE: ", rdcounter)
+			return *r
+		}
+	}
 	logger.Println("[MQUERY]", in.String(), "COUNTER: ", mqcounter)
 	mqcounter++
 	var rec Output
 	var ct = 0
 	var count = 0
+	var seq OutputSeq
 	for ct <= ibound {
 		count++
 		reo.GetLogger().Println("[MQUERY] ITERATE", count, "---------------------------------------")
-		seq := self.SeqSimulate(in)
+		seq = self.SeqSimulate(in)
 		if len(seq) == 0 {
 			// a panic happens
 			logger.Println("[MQUERY] PANIC CATCHED")
@@ -302,6 +315,7 @@ func (self *Oracle) MQuery(in InputSeq) Output {
 			}
 		}
 	}
+	self.Cache.insert(in, seq)
 	return rec
 }
 
