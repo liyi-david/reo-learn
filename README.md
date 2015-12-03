@@ -24,5 +24,4 @@ All the codes are written under Google Go.
 * tree optimization in MQuery
 * debug of StepExec
 * solve the errors in table
-  * $A-A,B-\emptyset : \varepsilon$
   * ![](http://latex.codecogs.com/gif.latex?A-A,B-\\emptyset:\\varepsilon)
