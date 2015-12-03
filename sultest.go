@@ -22,17 +22,21 @@ func main() {
 	// set up multicores
 	runtime.GOMAXPROCS(4)
 	s := GetOracle()
-	sul.CloseLog()
+	// ---------------- CONFIGURATION ----------------------
+	// sul.CloseLog()
 	sul.CloseReoLog()
-	logger.Println("MAIN PROC START")
-	sul.SetReoDelay(5)
+	sul.SetReoDelay(1)
+	sul.SetBound(1)
+	// -------------- CONFIGURATION END --------------------
 
+	logger.Println("MAIN PROC START")
 	// following are test code for MQuery
 	/*
 		for {
 			var tin sul.InputSeq = sul.InputSeq{
 				&sul.Input{map[string]bool{"A": true, "B": false}, false},
-				&sul.Input{map[string]bool{"A": false, "B": true}, false},
+				&sul.Input{map[string]bool{"A": true, "B": true}, false},
+				&sul.Input{map[string]bool{"A": false, "B": false}, false},
 			}
 			r := s.MQuery(tin)
 			logger.Println("RESULT:", r)
