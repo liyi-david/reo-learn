@@ -108,8 +108,6 @@ func (p Port) LossyWrite(c string) chan bool {
 	go func() {
 		s := TimedStepExec(
 			time.Millisecond*Delay,
-			Operation{"write", p.Slave, "write"},
-			Operation{"read", p.Slave, ""},
 			Operation{"write", p.Main, c},
 		)
 		if !s {

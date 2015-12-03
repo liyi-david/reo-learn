@@ -203,8 +203,6 @@ func BufferChannel(size int, in, out, stop Port) {
 		for {
 			status := StepExec(
 				stop.Main,
-				Operation{"read", in.Slave, ""},
-				Operation{"write", in.Slave, "read"},
 				Operation{"read", in.Main, "datum"},
 				Operation{"write", c, "datum"},
 			)
