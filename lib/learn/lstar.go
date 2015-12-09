@@ -42,7 +42,7 @@ func LStar(orac *sul.Oracle) *Obs {
 		c, cexist = orac.EQuery(obs)
 		if cexist {
 			// analyze the counter-example
-			obs.AddSuffix(CEAnalyze(c))
+			obs.AddSuffix(obs.CEAnalyze(c))
 		}
 	}
 	return obs
