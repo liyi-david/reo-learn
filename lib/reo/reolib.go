@@ -71,12 +71,15 @@ func SyncdrainChannel(in1, in2, stop Port) {
 
 func FifoChannel(in, out, stop Port) {
 	defer close(stop.Slave)
+	c := make(chan string, 1)
 	for {
 		status := StepExec(
 			stop.Main,
 			Operation{"read", in.Slave, ""},
 			Operation{"write", in.Slave, "read"},
 			Operation{"read", in.Main, "datum"},
+			Operation{"write", c, "datum"},
+			Operation{"debug", c, "[FIFO] BUFFERED"},
 			// following are the syncwrite part
 			Operation{"write", out.Slave, "write"},
 			Operation{"read", out.Slave, ""},
@@ -84,6 +87,8 @@ func FifoChannel(in, out, stop Port) {
 		)
 		if !status {
 			return
+		} else {
+			logger.Println("[FIFO] RELEASED", <-c)
 		}
 	}
 }
@@ -212,8 +217,11 @@ func BufferChannel(size int, in, out, stop Port) {
 				t := <-c
 				if len(buf) < size {
 					buf = append(buf, t)
+					logger.Println("[BUFFER] PUSHED", t)
+				} else {
+					logger.Println("[BUFFER] FULL", t)
 				}
-				logger.Println("[BUFFER] PUSHED", t)
+
 			}
 		}
 	}()

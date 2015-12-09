@@ -112,6 +112,8 @@ func (p Port) LossyWrite(c string) chan bool {
 		)
 		if !s {
 			logger.Println("<TRY WRITE>", "TIMEOUT", c)
+		} else {
+			logger.Println("<TRY WRITE>", "TRANS", c)
 		}
 		close(stopflag)
 	}()

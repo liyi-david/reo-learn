@@ -39,7 +39,7 @@ func (self *Flagproc) Execute() (result, ok bool) {
 				return false, true
 			case t := <-o.chn:
 				if t != "read" && t != "write" {
-					logger.Println("{STEPEXEC}", "READ", t, "TO", o.name)
+					// logger.Println("{STEPEXEC}", "READ", t, "TO", o.name)
 				}
 				self.vars[o.name] = t
 			}
