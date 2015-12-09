@@ -25,3 +25,5 @@ All the codes are written under Google Go.
 * debug of StepExec
 * solve the errors in table
   * ![](http://latex.codecogs.com/gif.latex?A-A,B-\\emptyset:\\varepsilon)
+  * A,B-A,B-A | C:B, C:B,  C:A,  C:A,  ϵ
+    * bug in merger channel leads to this bug
