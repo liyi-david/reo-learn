@@ -15,6 +15,8 @@ import (
 	"time"
 )
 
+/********************* Basic Configurations **********************/
+
 var logger *log.Logger = log.New(os.Stderr, "SUL - ", 2)
 var ibound = 3
 
@@ -37,6 +39,8 @@ func SetReoDelay(t time.Duration) {
 func SetBound(b int) {
 	ibound = b
 }
+
+/********************* Definitions of Input/Output **********************/
 
 type Input struct {
 	Datum  map[string]bool
@@ -97,6 +101,23 @@ func (self Output) String() string {
 	return rel
 }
 
+func (self Input) EqualTo(i Input) bool {
+	if i.IsTime != self.IsTime {
+		return false
+	}
+	if i.IsTime == true {
+		return true
+	}
+	// suppose all the keys in i and self are the same ones
+	// otherwise this will be difficult to handle
+	for key, val := range self.Datum {
+		if val != i.Datum[key] {
+			return false
+		}
+	}
+	return true
+}
+
 func (self SingleOutput) EqualTo(so SingleOutput) bool {
 	if self.IsEmpty {
 		return so.IsEmpty
@@ -114,6 +135,8 @@ func (self *Output) EqualTo(o *Output) bool {
 	}
 	return true
 }
+
+/********************* Definition of SulInst ******************/
 
 // Instance of System Under Test
 type SulInst struct {
@@ -204,6 +227,16 @@ func (self *Oracle) GetInputs() []*Input {
 	rel = append(rel, tick)
 	self.Inputs = rel
 	return rel
+}
+
+func (self *Oracle) GetInputIndex(item Input) int {
+	ins := self.GetInputs()
+	for i := 0; i < len(ins); i++ {
+		if ins[i].EqualTo(item) {
+			return i
+		}
+	}
+	panic("there's an undefined action " + item.String())
 }
 
 func (self *Oracle) SeqSimulate(ins InputSeq) OutputSeq {
@@ -320,10 +353,8 @@ func (self *Oracle) MQuery(in InputSeq) Output {
 	return rec
 }
 
-// TODO: EQuery should accept an argument
-// descirbing the hypothesis
 type Executable interface {
-	Run(InputSeq) Output
+	Run(InputSeq) (InputSeq, Output)
 }
 
 func (self Oracle) EQuery(hypo Executable) (InputSeq, bool) {
