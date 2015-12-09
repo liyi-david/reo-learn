@@ -92,16 +92,16 @@ func (self *Obs) expandLp() {
 	self.SL = append(self.SL, newLp...)
 }
 
-func (self *Obs) Run(in sul.InputSeq) sul.Output {
+func (self *Obs) Run(in sul.InputSeq) (sul.InputSeq, sul.Output) {
 	// TODO
-	return sul.Output{}
+	return sul.InputSeq{}, sul.Output{}
 }
 
 func (self *Obs) AddSuffix(suf sul.InputSeq) {
 	// TODO
 }
 
-func (self *Obs) GetHypo() string {
+func (self *Obs) GetHypoStr() string {
 	rel := "Hypothesis Acquired: \n"
 	acts := self.orac.GetInputs()
 	for i := 0; i <= self.SpLoc; i++ {
