@@ -23,30 +23,31 @@ func main() {
 	runtime.GOMAXPROCS(4)
 	s := GetOracle()
 	// ---------------- CONFIGURATION ----------------------
-	// sul.CloseLog()
-	sul.CloseReoLog()
-	sul.SetReoDelay(1)
-	sul.SetBound(1)
+	//sul.CloseLog()
+	//sul.CloseReoLog()
+	sul.SetReoDelay(1000)
+	sul.SetBound(0)
 	// -------------- CONFIGURATION END --------------------
 
 	logger.Println("MAIN PROC START")
 	// following are test code for MQuery
-	/*
+	var debug = true
+	if debug {
 		for {
 			var tin sul.InputSeq = sul.InputSeq{
-				&sul.Input{map[string]bool{"A": true, "B": false}, false},
 				&sul.Input{map[string]bool{"A": true, "B": true}, false},
-				&sul.Input{map[string]bool{"A": false, "B": false}, false},
+				&sul.Input{map[string]bool{"A": true, "B": true}, false},
+				&sul.Input{map[string]bool{"A": true, "B": false}, false},
+				&sul.Input{map[string]bool{"A": true, "B": false}, true},
 			}
 			r := s.MQuery(tin)
 			logger.Println("RESULT:", r)
-			if r.String() == "ϵ" {
-				break
-			}
+			break
 		}
-	*/
+		return
+	}
 	obs := learn.LStar(s)
-	logger.Println(obs.GetHypo())
+	logger.Println(obs.GetHypoStr())
 	logger.Println(sul.Counter())
 	logger.Println(obs)
 }
