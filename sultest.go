@@ -23,16 +23,17 @@ func main() {
 	runtime.GOMAXPROCS(4)
 	s := GetOracle()
 	// ---------------- CONFIGURATION ----------------------
-	//sul.CloseLog()
-	//sul.CloseReoLog()
-	sul.SetReoDelay(1000)
-	sul.SetBound(0)
+	sul.CloseLog()
+	sul.CloseReoLog()
+	sul.SetReoDelay(5)
+	sul.SetBound(1)
 	// -------------- CONFIGURATION END --------------------
 
 	logger.Println("MAIN PROC START")
 	// following are test code for MQuery
-	var debug = true
+	var debug = false
 	if debug {
+		counter := 0
 		for {
 			var tin sul.InputSeq = sul.InputSeq{
 				&sul.Input{map[string]bool{"A": true, "B": true}, false},
@@ -41,8 +42,11 @@ func main() {
 				&sul.Input{map[string]bool{"A": true, "B": false}, true},
 			}
 			r := s.MQuery(tin)
-			logger.Println("RESULT:", r)
-			break
+			logger.Println("RESULT:", r, counter)
+			counter++
+			if r.String() != "C:B," {
+				break
+			}
 		}
 		return
 	}
