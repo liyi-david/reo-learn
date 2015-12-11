@@ -6,11 +6,8 @@ import "io"
 import "io/ioutil"
 import "os"
 
-// FIXME maybe we need to send a stop signal to any potential
-// blocking operation? any SyncRead may leads to this kind of bugs
 // NOTE when later some more complicated example would be trapped
 // into deadlocks plz kindly check this
-// FIXME maybe there're lots of WaitRead that need to replaced by
 // select ...
 
 var logger *log.Logger = log.New(os.Stderr, "REO - ", 2)
@@ -57,8 +54,10 @@ func SyncdrainChannel(in1, in2, stop Port) {
 			stop.Main,
 			Operation{"read", in1.Slave, ""},
 			Operation{"read", in2.Slave, ""},
+			Operation{"debug", in1.Slave, "sync first hand-shake finished"},
 			Operation{"write", in1.Slave, "read"},
 			Operation{"write", in2.Slave, "read"},
+			Operation{"debug", in1.Slave, "sync second hand-shake finished"},
 			Operation{"read", in1.Main, ""},
 			Operation{"read", in2.Main, ""},
 		)
@@ -114,45 +113,168 @@ func LossysyncChannel(in, out, stop Port) {
 	}
 }
 
+/* semantics of merger channel:
+a) first hand-shake can be applied by both inputs and they are not
+   mutual exclusive
+*/
+
 func MergerChannel(in1, in2, out, stop Port) {
 	defer close(stop.Slave)
-	for {
-		// considering the syntax of select, here we use
-		// <-in.slave instead of in.WaitRead()
-		c := make(chan string, 1)
+	var wg sync.WaitGroup
+	var lock sync.Mutex
+	var step int = 0
+	// we need some assistant function to deal with step
+	pushData := func(d string) {
+		logger.Println("start pushing data")
 		select {
 		case <-stop.Main:
+			logger.Println("pushdata timeout")
 			return
-		case <-in1.Slave:
-			status := StepExec(
-				stop.Main,
-				Operation{"write", out.Slave, "write"},
-				Operation{"write", in1.Slave, "read"},
-				Operation{"read", out.Slave, ""},
-				Operation{"read", in1.Main, "datum"},
-				Operation{"write", out.Main, "datum"},
-				Operation{"write", c, "datum"},
-			)
-			if !status {
-				return
-			}
-		case <-in2.Slave:
-			status := StepExec(
-				stop.Main,
-				Operation{"write", out.Slave, "write"},
-				Operation{"write", in2.Slave, "read"},
-				Operation{"read", out.Slave, ""},
-				Operation{"read", in2.Main, "datum"},
-				Operation{"write", out.Main, "datum"},
-				Operation{"write", c, "datum"},
-			)
-			if !status {
-				return
-			}
+		case out.Main <- d:
+			step = 0
+			logger.Println("data pushed.", d)
 		}
-		logger.Println("[MERGER] TRANS", <-c)
 	}
+
+	listener := func(in Port, label string) {
+		defer wg.Done()
+		// start working
+		for {
+			// first hand-shake with input port
+			select {
+			case <-stop.Main:
+				return
+			case <-in.Slave:
+				// first hand-shake with output port
+				lock.Lock()
+				if step == 0 {
+					select {
+					case <-stop.Main:
+						lock.Unlock()
+						return
+					case out.Slave <- "write":
+						step++
+					}
+				}
+				lock.Unlock()
+				// otherwise nothing has to be done
+			}
+			logger.Println("first handshake", label, step)
+			// second hand-shake with output port
+			select {
+			case <-stop.Main:
+				return
+			case in.Slave <- "read":
+				// second hand-shake with input port
+				lock.Lock()
+				if step == 0 {
+					select {
+					case <-stop.Main:
+						lock.Unlock()
+						return
+					case out.Slave <- "write":
+						step++
+					}
+				}
+				lock.Unlock()
+				lock.Lock()
+				if step == 1 {
+					select {
+					case <-stop.Main:
+						lock.Unlock()
+						return
+					case <-out.Slave:
+						step++
+					}
+				}
+				lock.Unlock()
+				// otherwise nothing has to be done
+			}
+			logger.Println("second handshake", label, step)
+			// final hand-shake with input port
+			select {
+			case <-stop.Main:
+				return
+			case d := <-in.Main:
+				// final hand-shake with output
+				lock.Lock()
+				if step == 0 {
+					select {
+					case <-stop.Main:
+						lock.Unlock()
+						return
+					case out.Slave <- "write":
+						step++
+					}
+				}
+				lock.Unlock()
+				lock.Lock()
+				if step == 1 {
+					select {
+					case <-stop.Main:
+						lock.Unlock()
+						return
+					case <-out.Slave:
+						step++
+					}
+				}
+				lock.Unlock()
+				// now we have step == 2
+				lock.Lock()
+				if step == 2 {
+					pushData(d)
+				}
+				lock.Unlock()
+			}
+			logger.Println("FINAL handshake", label, step)
+		}
+	}
+
+	wg.Add(2)
+	go listener(in1, "in1")
+	go listener(in2, "in2")
+	wg.Wait()
 }
+
+//func NMergerChannel(in1, in2, out, stop Port) {
+//defer close(stop.Slave)
+//for {
+//// considering the syntax of select, here we use
+//// <-in.slave instead of in.WaitRead()
+//c := make(chan string, 1)
+//select {
+//case <-stop.Main:
+//return
+//case <-in1.Slave:
+//status := StepExec(
+//stop.Main,
+//Operation{"write", out.Slave, "write"},
+//Operation{"write", in1.Slave, "read"},
+//Operation{"read", out.Slave, ""},
+//Operation{"read", in1.Main, "datum"},
+//Operation{"write", out.Main, "datum"},
+//Operation{"write", c, "datum"},
+//)
+//if !status {
+//return
+//}
+//case <-in2.Slave:
+//status := StepExec(
+//stop.Main,
+//Operation{"write", out.Slave, "write"},
+//Operation{"write", in2.Slave, "read"},
+//Operation{"read", out.Slave, ""},
+//Operation{"read", in2.Main, "datum"},
+//Operation{"write", out.Main, "datum"},
+//Operation{"write", c, "datum"},
+//)
+//if !status {
+//return
+//}
+//}
+//logger.Println("[MERGER] TRANS", <-c)
+//}
+//}
 
 func ReplicatorChannel(in, out1, out2 Port, stop Port) {
 	defer close(stop.Slave)
@@ -164,9 +286,9 @@ func ReplicatorChannel(in, out1, out2 Port, stop Port) {
 			Operation{"write", out1.Slave, "write"},
 			//Operation{"debug", in.Slave, "REPLICATOR FIN FIRST SHAKEHAND"},
 			Operation{"write", out2.Slave, "write"},
-			Operation{"write", in.Slave, "read"},
 			Operation{"read", out1.Slave, ""},
 			Operation{"read", out2.Slave, ""},
+			Operation{"write", in.Slave, "read"},
 			Operation{"read", in.Main, "datum"},
 			Operation{"write", out1.Main, "datum"},
 			Operation{"write", out2.Main, "datum"},
