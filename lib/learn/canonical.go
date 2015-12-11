@@ -1,7 +1,5 @@
 package learn
 
-import "fmt"
-
 func arraycompare(a, b []int) bool {
 	if len(a) != len(b) {
 		return false
@@ -38,8 +36,8 @@ func psucc(parts [][]int, dist []int) []int {
 // part w.r.t to their successor
 // the function returns several sub-partitions
 func (self *Obs) partitionDivide(p [][]int, index int) [][]int {
-	fmt.Println("Partition Division")
-	fmt.Println(p)
+	logger.Println("Partition Division")
+	logger.Println(p)
 	// map maps an action to its following state (corresponding index)
 	newpts := [][]int{}
 	newdists := [][]int{}
@@ -60,7 +58,7 @@ func (self *Obs) partitionDivide(p [][]int, index int) [][]int {
 			newdists = append(newdists, currdist)
 		}
 	}
-	fmt.Println(newpts)
+	logger.Println(newpts)
 	return newpts
 }
 

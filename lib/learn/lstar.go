@@ -1,7 +1,6 @@
 package learn
 
 import "../sul"
-import "fmt"
 
 /*
 	Created by Li Yi @ Nov 20
@@ -31,7 +30,7 @@ func LStar(orac *sul.Oracle) *Obs {
 	// cexist indicates if there's a counter-example found in last round
 	// it's initialized as true otherwise the loop will never be executed
 	for cexist := true; cexist; {
-		fmt.Println("L* Iteration")
+		logger.Println("L* Iteration")
 		// enclose the table
 		obs.TableClose()
 		for sc := obs.Canonical(); !sc; sc = obs.Canonical() {

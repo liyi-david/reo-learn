@@ -1,9 +1,7 @@
 package learn
 
-import "fmt"
-
 func (self *Obs) direct_hypothesis() {
-	defer fmt.Println("Hypotheis Constructed")
+	defer logger.Println("Hypotheis Constructed")
 	self.states = []int{}
 	// start iteration through all lines in Sp
 	// removing the dumplicated lines
@@ -37,7 +35,7 @@ func (self *Obs) direct_hypothesis() {
 }
 
 func (self *Obs) fillTable() {
-	defer fmt.Println("TABLE FILLED WITH LEN:", self.SpLoc)
+	defer logger.Println("TABLE FILLED WITH LEN:", self.SpLoc)
 	for i := len(self.SL) - 1; i >= 0; i-- {
 		// if a fillTable operation is executed, the hypothesis
 		// need to be reconstructed
@@ -77,11 +75,10 @@ func (self *Obs) TableClose() {
 			}
 			if j > self.SpLoc {
 				flag = false
-				// TODO to make it faster we need to use break
-				// break
+				break
 			}
 		}
-		fmt.Println(self)
+		logger.Println(self)
 		if flag {
 			// the obstable has been enclosed
 			return

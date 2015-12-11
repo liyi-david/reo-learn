@@ -3,11 +3,25 @@ package learn
 import "../sul"
 import "fmt"
 import "strconv"
+import "log"
+import "os"
+import "io"
+import "io/ioutil"
 
 /*
 	Created By Li Yi @ Nov 17
 	first of all, we have to define some data structures
 */
+
+var logger *log.Logger = log.New(os.Stderr, "LEARN - ", 2)
+
+func SetLog(w io.Writer) {
+	logger = log.New(w, "SUL", 2)
+}
+
+func CloseLog() {
+	SetLog(ioutil.Discard)
+}
 
 // we use ObsLine to store a single line in Obs table
 
@@ -93,12 +107,18 @@ func (self *Obs) expandLp() {
 }
 
 func (self *Obs) Run(in sul.InputSeq) (sul.InputSeq, sul.Output) {
-	// TODO
-	return sul.InputSeq{}, sul.Output{}
+	var loc = 0
+	var rel *sul.Output
+	for i := 0; i < len(in); i++ {
+		inputindex := self.orac.GetInputIndex(*in[i])
+		loc = self.SL[loc].Dist[inputindex]
+		rel = self.SL[loc].Result[inputindex]
+	}
+	return self.SL[loc].Index, *rel
 }
 
 func (self *Obs) AddSuffix(suf sul.InputSeq) {
-	// TODO
+	self.D = append(self.D, suf)
 }
 
 func (self *Obs) GetHypoStr() string {
@@ -107,9 +127,11 @@ func (self *Obs) GetHypoStr() string {
 	for i := 0; i <= self.SpLoc; i++ {
 		if self.SL[i].AccessLine == i {
 			// then this is a state
-			rel += "> state " + strconv.Itoa(i) + " with edges: \n"
+			rel += "> state " + strconv.Itoa(i) + ": "
+			rel += self.SL[i].Index.String()
+			rel += "  with edges: \n"
 			for j := 0; j < len(acts); j++ {
-				rel += fmt.Sprintf("[%d] -> state %d\n", j, self.SL[i].Dist[j])
+				rel += fmt.Sprintf("[%s]\t -> state %d\n", acts[j].String(), self.SL[i].Dist[j])
 			}
 		}
 	}
