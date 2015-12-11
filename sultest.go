@@ -19,16 +19,18 @@ import "runtime"
 var logger = log.New(os.Stderr, "TOP - ", 0)
 
 func main() {
+	// ---------------- CONFIGURATION ----------------------
 	// set up multicores
 	runtime.GOMAXPROCS(4)
-	s := GetOracle()
-	// ---------------- CONFIGURATION ----------------------
-	sul.CloseLog()
-	sul.CloseReoLog()
+	// configurations in simulation
 	sul.SetReoDelay(5)
 	sul.SetBound(1)
+	// logs on/off
+	sul.CloseLog()
+	sul.CloseReoLog()
+	learn.CloseLog()
 	// -------------- CONFIGURATION END --------------------
-
+	s := GetOracle()
 	logger.Println("MAIN PROC START")
 	// following are test code for MQuery
 	var debug = false
@@ -53,5 +55,4 @@ func main() {
 	obs := learn.LStar(s)
 	logger.Println(obs.GetHypoStr())
 	logger.Println(sul.Counter())
-	logger.Println(obs)
 }
