@@ -1,0 +1,274 @@
+Hypotheis Constructed
+Partition Division
+[[0 1 5 6 10 11 15 26 30 31 35] [2 7 12 16 17 20 27 32] [3 8 13 21 23 25 28 33] [4 9 14 18 19 22 24
+34] [29]]
+[[0 1 5 6 10 11 15 26 30 31 35]]
+Partition Division
+[[0 1 5 6 10 11 15 26 30 31 35] [2 7 12 16 17 20 27 32] [3 8 13 21 23 25 28 33] [4 9 14 18 19 22 24
+34] [29]]
+[[2 7 12 16 17 20 27 32]]
+Partition Division
+[[0 1 5 6 10 11 15 26 30 31 35] [2 7 12 16 17 20 27 32] [3 8 13 21 23 25 28 33] [4 9 14 18 19 22 24
+34] [29]]
+[[3 8 13 21 23 25 28 33]]
+Partition Division
+[[0 1 5 6 10 11 15 26 30 31 35] [2 7 12 16 17 20 27 32] [3 8 13 21 23 25 28 33] [4 9 14 18 19 22 24
+34] [29]]
+[[4 9 14 18 19 22 24 34]]
+Partition Division
+[[0 1 5 6 10 11 15 26 30 31 35] [2 7 12 16 17 20 27 32] [3 8 13 21 23 25 28 33] [4 9 14 18 19 22 24
+34] [29]]
+[[29]]
+TOP - Hypothesis Acquired: 
+> state 0 with edges: 
+[0] -> state 0
+[1] -> state 2
+[2] -> state 3
+[3] -> state 4
+[4] -> state 0
+> state 2 with edges: 
+[0] -> state 0
+[1] -> state 2
+[2] -> state 3
+[3] -> state 4
+[4] -> state 0
+> state 3 with edges: 
+[0] -> state 0
+[1] -> state 2
+[2] -> state 3
+[3] -> state 4
+[4] -> state 0
+> state 4 with edges: 
+[0] -> state 0
+[1] -> state 2
+[2] -> state 3
+[3] -> state 4
+[4] -> state 0
+> state 29 with edges: 
+[0] -> state 0
+[1] -> state 2
+[2] -> state 3
+[3] -> state 4
+[4] -> state 0
+Hypothesis's description is finished.
+TOP - 1080
+TOP - Observation Table: 
+  |Ø  A B A,B T 
+---------------------------------------
+|ϵ  |ϵ  ϵ ϵ C:A,  ϵ 
+|Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|T  |ϵ  ϵ ϵ C:A,  ϵ 
+|Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|T  |ϵ  ϵ ϵ C:A,  ϵ 
+|Ø-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|Ø-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|Ø-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|Ø-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|Ø-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|A-Ø  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A-T  |ϵ  ϵ C:A,  C:A,  ϵ 
+|B-Ø  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-A  |C:B, C:B,  C:B,  C:B,  C:B,  
+|B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|B-T  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|A,B-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A,B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B-A,B  |C:A, C:A,  C:A,  C:A,  C:A,  
+|A,B-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|T-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|T-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|T-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|T-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|T-T  |ϵ  ϵ ϵ C:A,  ϵ 
+---------------------------------------
+|Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|T  |ϵ  ϵ ϵ C:A,  ϵ 
+|Ø-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|Ø-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|Ø-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|Ø-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|Ø-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|A-Ø  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A-T  |ϵ  ϵ C:A,  C:A,  ϵ 
+|B-Ø  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-A  |C:B, C:B,  C:B,  C:B,  C:B,  
+|B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|B-T  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|A,B-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A,B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B-A,B  |C:A, C:A,  C:A,  C:A,  C:A,  
+|A,B-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|T-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|T-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|T-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|T-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|T-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|Ø-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|Ø-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|Ø-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|Ø-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|Ø-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|A-Ø  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A-T  |ϵ  ϵ C:A,  C:A,  ϵ 
+|B-Ø  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-A  |C:B, C:B,  C:B,  C:B,  C:B,  
+|B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|B-T  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|A,B-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A,B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B-A,B  |C:A, C:A,  C:A,  C:A,  C:A,  
+|A,B-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|T-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|T-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|T-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|T-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|T-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|Ø-Ø-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|Ø-Ø-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|Ø-Ø-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|Ø-Ø-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|Ø-Ø-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|Ø-A-Ø  |ϵ  ϵ C:A,  C:A,  ϵ 
+|Ø-A-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|Ø-A-B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|Ø-A-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|Ø-A-T  |ϵ  ϵ C:A,  C:A,  ϵ 
+|Ø-B-Ø  |ϵ  C:A,  ϵ C:A,  ϵ 
+|Ø-B-A  |C:B, C:B,  C:B,  C:B,  C:B,  
+|Ø-B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|Ø-B-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|Ø-B-T  |ϵ  C:A,  ϵ C:A,  ϵ 
+|Ø-A,B-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|Ø-A,B-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|Ø-A,B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|Ø-A,B-A,B  |C:A, C:A,  C:A,  C:A,  C:A,  
+|Ø-A,B-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|Ø-T-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|Ø-T-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|Ø-T-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|Ø-T-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|Ø-T-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|A-Ø-Ø  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-Ø-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-Ø-B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A-Ø-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A-Ø-T  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-A-Ø  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-A-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-A-B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A-A-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A-A-T  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-B-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|A-B-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A-B-A,B  |C:A, C:A,  C:A,  C:A,  C:A,  
+|A-B-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|A-A,B-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|A-A,B-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-A,B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A-A,B-A,B  |C:A, C:A,  C:A,  C:A,  C:A,  
+|A-A,B-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|A-T-Ø  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-T-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-T-B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A-T-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A-T-T  |ϵ  ϵ C:A,  C:A,  ϵ 
+|B-Ø-Ø  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-Ø-A  |C:B, C:B,  C:B,  C:B,  C:B,  
+|B-Ø-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-Ø-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|B-Ø-T  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-A-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|B-A-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|B-A-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-A-A,B  |C:A, C:A,  C:A,  C:A,  C:A,  
+|B-A-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|B-B-Ø  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-B-A  |C:B, C:B,  C:B,  C:B,  C:B,  
+|B-B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-B-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|B-B-T  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-A,B-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|B-A,B-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|B-A,B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-A,B-A,B  |C:A, C:A,  C:A,  C:A,  C:A,  
+|B-A,B-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|B-T-Ø  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-T-A  |C:B, C:B,  C:B,  C:B,  C:B,  
+|B-T-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-T-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|B-T-T  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B-Ø-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|A,B-Ø-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A,B-Ø-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B-Ø-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A,B-Ø-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|A,B-A-Ø  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A,B-A-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A,B-A-B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A,B-A-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A,B-A-T  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A,B-B-Ø  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B-B-A  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A,B-B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B-B-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A,B-B-T  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B-A,B-Ø  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A,B-A,B-A  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A,B-A,B-B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A,B-A,B-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A,B-A,B-T  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A,B-T-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|A,B-T-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A,B-T-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B-T-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|A,B-T-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|T-Ø-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|T-Ø-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|T-Ø-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|T-Ø-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|T-Ø-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|T-A-Ø  |ϵ  ϵ C:A,  C:A,  ϵ 
+|T-A-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|T-A-B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|T-A-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|T-A-T  |ϵ  ϵ C:A,  C:A,  ϵ 
+|T-B-Ø  |ϵ  C:A,  ϵ C:A,  ϵ 
+|T-B-A  |C:B, C:B,  C:B,  C:B,  C:B,  
+|T-B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|T-B-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|T-B-T  |ϵ  C:A,  ϵ C:A,  ϵ 
+|T-A,B-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|T-A,B-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|T-A,B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|T-A,B-A,B  |C:A, C:A,  C:A,  C:A,  C:A,  
+|T-A,B-T  |ϵ  ϵ ϵ C:A,  ϵ 
+|T-T-Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|T-T-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|T-T-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|T-T-A,B  |C:B, C:B,  C:B,  C:B,  C:B,  
+|T-T-T  |ϵ  ϵ ϵ C:A,  ϵ 
