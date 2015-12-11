@@ -306,24 +306,23 @@ func CounterReset() {
 	rdcounter = 0
 }
 
-func Counter() int {
-	return mqcounter
+func Counter() (int, int) {
+	return mqcounter, rdcounter
 }
 
 func (self *Oracle) MQuery(in InputSeq) Output {
 	// we use cache technique to improve the effiency of MQuery,
 	// otherwise this would make it really slow
-	/*
-		if self.Cache == nil {
-			self.Cache = makenode()
-		} else {
-			r := self.Cache.search(in)
-			if r != nil {
-				rdcounter++
-				logger.Println("[MQUERY]", in.String(), "REDUCE: ", rdcounter)
-				return *r
-			}
-		}*/
+	if self.Cache == nil {
+		self.Cache = makenode()
+	} else {
+		r := self.Cache.search(in)
+		if r != nil {
+			rdcounter++
+			logger.Println("[MQUERY]", in.String(), "REDUCE: ", rdcounter)
+			return *r
+		}
+	}
 	logger.Println("[MQUERY]", in.String(), "COUNTER: ", mqcounter)
 	mqcounter++
 	var rec Output
@@ -349,7 +348,7 @@ func (self *Oracle) MQuery(in InputSeq) Output {
 			}
 		}
 	}
-	// self.Cache.insert(in, seq)
+	self.Cache.insert(in, seq)
 	return rec
 }
 
