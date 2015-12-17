@@ -7,8 +7,8 @@ All the codes are written under Google Go.
 # project structure
 
 * lib
-  * reo - this library includes the definition of Ports, basic Reo Channels, etc.
-  * sul - 
+  * reo - Ports, basic Reo Channels, etc.
+  * sul - SUL(System Under Learn), Oracles, Membership Query, and *Equivalence Query*
   * learn
 
 * example
@@ -20,14 +20,10 @@ All the codes are written under Google Go.
 * reo's semantics when a write operation from components is blocked?
 
 ## TODO
-
-* tree optimization in MQuery
-* debug of StepExec
-* solve the errors in table
-  * ![](http://latex.codecogs.com/gif.latex?A-A,B-\\emptyset:\\varepsilon)
-  * A,B-A,B-A | C:B, C:B,  C:A,  C:A,  ϵ
-    * bug in merger channel leads to this bug
+- write the paper ...
+- realize the EQuery function
 
 ## logs
 
 - **Dec 11 2015** problems on Merger are solved
+- **Dec 17 2015** rewrite the expandLp(). with the new expand function, the performance has been improved greatly.
