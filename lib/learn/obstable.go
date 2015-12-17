@@ -93,6 +93,21 @@ type Obs struct {
 // also we call call it one-step expansion
 func (self *Obs) expandLp() {
 	// refresh the amount of Sp
+	// remove redundant states in SL
+	newSL := []ObsLine{}
+	for i, _ := range self.SL {
+		flag := true
+		for j := 0; j < len(newSL); j++ {
+			if newSL[j].EqualTo(self.SL[i]) {
+				flag = false
+				break
+			}
+		}
+		if flag {
+			newSL = append(newSL, self.SL[i])
+		}
+	}
+	self.SL = newSL
 	self.SpLoc = len(self.SL) - 1
 	newLp := []ObsLine{}
 	acts := self.orac.GetInputs()
