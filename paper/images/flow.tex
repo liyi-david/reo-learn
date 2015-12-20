@@ -1,0 +1,29 @@
+% Define block styles
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, 
+text width=4em, text centered, rounded corners, minimum height=3em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, minimum height=2em, node distance = 2.5cm]
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}[node distance = 1.5cm, auto]
+    % Place nodes
+    \node [block] (reomodel) {REO Models};
+    \node [cloud, left of=reomodel] (human) {Human};
+    \node [block, below left = of reomodel] (tsamodel) {TSA};
+    \node [block, below right = of reomodel] (mealymodel) {Mealy Machines};
+    %\node [cloud, left = of tsamodel] (verification) {Verification};
+    %\node [cloud, right = of mealymodel] (blackbox) {Blackbox};
+    % Draw edges
+    \path [line] (reomodel) -- (tsamodel);
+    \path [line] (reomodel) -- (mealymodel);
+    %\path [line] (tsamodel) -- (evaluate);
+    \path [line] (mealymodel) -- (tsamodel);
+    \path [line] (mealymodel) |-  (reomodel);
+    %\path [line] (update) |- (tsamodel);
+    %\path [line] (decide) -- node {no}(stop);
+    %\path [line,dashed] (human) -- (reomodel);
+  \end{tikzpicture}
+  \caption{Our Idea}
+  \label{fig:idea}
+\end{figure}

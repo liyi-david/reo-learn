@@ -1,0 +1,17 @@
+\begin{thebibliography}{1}
+
+\bibitem{DBLP:journals/iandc/Angluin87}
+D.~Angluin.
+\newblock Learning regular sets from queries and counterexamples.
+\newblock {\em Inf. Comput.}, 75(2):87--106, 1987.
+
+\bibitem{DBLP:conf/fase/RaffeltS06}
+H.~Raffelt and B.~Steffen.
+\newblock Learnlib: {A} library for automata learning and experimentation.
+\newblock In L.~Baresi and R.~Heckel, editors, {\em Fundamental Approaches to
+  Software Engineering, 9th International Conference, {FASE} 2006, Held as Part
+  of the Joint European Conferences on Theory and Practice of Software, {ETAPS}
+  2006, Vienna, Austria, March 27-28, 2006, Proceedings}, volume 3922 of {\em
+  Lecture Notes in Computer Science}, pages 377--380. Springer, 2006.
+
+\end{thebibliography}
