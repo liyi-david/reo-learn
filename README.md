@@ -14,6 +14,7 @@ All the codes are written under Google Go.
 * example
   * fifo
   * alternator
+  * 2-buffer (mainly used to test the counter-example processing algorithm)
 
 ## several questions
 
@@ -21,9 +22,12 @@ All the codes are written under Google Go.
 
 ## TODO
 - write the paper ...
-- realize the EQuery function
+- realize the EQuery function **finished**
+- put time channels in
+- there's problem in 2-buffer. in the second round, obstables cannot be displayed properly
 
 ## logs
 
 - **Dec 11 2015** problems on Merger are solved
 - **Dec 17 2015** rewrite the expandLp(). with the new expand function, the performance has been improved greatly.
+- **Dec 22 2015** *Equivalence Query* online now. Also the counter-example analyzing function has passed the test
