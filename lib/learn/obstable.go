@@ -113,27 +113,40 @@ func (self *Obs) expandLp() {
 	acts := self.orac.GetInputs()
 	for i, _ := range self.SL {
 		self.SL[i].Dist = []int{}
-		for j, d := range acts {
+		for _, d := range acts {
 			newLp = append(newLp, NewLine(append(self.SL[i].Index, d)))
-			self.SL[i].Dist = append(self.SL[i].Dist, self.SpLoc+1+j)
+			self.SL[i].Dist = append(self.SL[i].Dist, len(self.SL)+len(newLp)-1)
 		}
 	}
 	self.SL = append(self.SL, newLp...)
 }
 
-func (self *Obs) Run(in sul.InputSeq) (sul.InputSeq, sul.Output) {
+func (self *Obs) SeqRun(in sul.InputSeq) ([]sul.InputSeq, []sul.Output) {
 	var loc = 0
 	var rel *sul.Output
+	indarr, outarr := []sul.InputSeq{}, []sul.Output{}
 	for i := 0; i < len(in); i++ {
 		inputindex := self.orac.GetInputIndex(*in[i])
-		loc = self.SL[loc].Dist[inputindex]
 		rel = self.SL[loc].Result[inputindex]
+		loc = self.SL[loc].Dist[inputindex]
+		indarr = append(indarr, self.SL[loc].Index)
+		outarr = append(outarr, *rel)
 	}
-	return self.SL[loc].Index, *rel
+	return indarr, outarr
+}
+
+func (self *Obs) Run(in sul.InputSeq) (sul.InputSeq, sul.Output) {
+	seqs, outs := self.SeqRun(in)
+	tail := len(seqs) - 1
+	if tail < 0 {
+		panic("hypothesis cannot be executed with no input")
+	}
+	return seqs[tail], outs[tail]
 }
 
 func (self *Obs) AddSuffix(suf sul.InputSeq) {
 	self.D = append(self.D, suf)
+	logger.Println("[SUFFIX ADD]", suf)
 }
 
 func (self *Obs) GetHypoStr() string {
@@ -146,7 +159,7 @@ func (self *Obs) GetHypoStr() string {
 			rel += self.SL[i].Index.String()
 			rel += "  with edges: \n"
 			for j := 0; j < len(acts); j++ {
-				rel += fmt.Sprintf("[%s]\t -> state %d\n", acts[j].String(), self.SL[i].Dist[j])
+				rel += fmt.Sprintf("[%s]\t -> state %2d with output %s \n", acts[j].String(), self.SL[i].Dist[j], self.SL[i].Result[j].String())
 			}
 		}
 	}
@@ -167,7 +180,11 @@ func (self *Obs) String() string {
 		rel += fmt.Sprintf("|%s\t|", self.SL[i].Index.String())
 		for j := 0; j < len(self.D); j++ {
 			// fmt.Println(self.SL[i].Result)
-			rel += fmt.Sprintf("%s\t", self.SL[i].Result[j].String())
+			var nxt = ""
+			if i <= self.SpLoc {
+				nxt = fmt.Sprintf("#%d", self.SL[i].Dist[j])
+			}
+			rel += fmt.Sprintf("%s%s\t", self.SL[i].Result[j].String(), nxt)
 		}
 		// check if the current line has its corresponding state
 		if i > self.SpLoc && self.SL[i].AccessLine == -1 {

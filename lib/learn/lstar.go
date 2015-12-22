@@ -29,7 +29,8 @@ func LStar(orac *sul.Oracle) *Obs {
 	c := sul.InputSeq{}
 	// cexist indicates if there's a counter-example found in last round
 	// it's initialized as true otherwise the loop will never be executed
-	for cexist := true; cexist; {
+	var i = 0
+	for cexist := true; cexist; i++ {
 		logger.Println("L* Iteration")
 		// enclose the table
 		obs.TableClose()
@@ -37,6 +38,8 @@ func LStar(orac *sul.Oracle) *Obs {
 			obs.SuffixClose()
 			obs.TableClose()
 		}
+		logger.Println("Hypothesis Iteration", i)
+		logger.Println(obs.GetHypoStr())
 		// looking up for counter-examples
 		c, cexist = orac.EQuery(obs)
 		if cexist {
