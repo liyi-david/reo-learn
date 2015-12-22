@@ -7,9 +7,11 @@ package main
 // GetOracle, this way of importing is more easy because
 // we can change the system-under-learn without changing
 // main code but the library we're going to import
-import . "./example/alternator"
 
-// import . "./example/fifo"
+import buf2 "./example/2-buffer"
+import altn "./example/alternator"
+import fifo "./example/fifo"
+
 import "./lib/learn"
 import "./lib/sul"
 import "log"
@@ -28,20 +30,29 @@ func main() {
 	// logs on/off
 	sul.CloseLog()
 	sul.CloseReoLog()
-	learn.CloseLog()
+	// learn.CloseLog()
 	// -------------- CONFIGURATION END --------------------
-	s := GetOracle()
-	logger.Println("MAIN PROC START")
+	var sulname = "buf2"
+	var s *sul.Oracle
+	switch sulname {
+	case "buf2":
+		s = buf2.GetOracle()
+		break
+	case "altn":
+		s = altn.GetOracle()
+		break
+	case "fifo":
+		s = fifo.GetOracle()
+		break
+	}
+	// -------------- ACTIVE LEARNING START --------------------
 	// following are test code for MQuery
 	var debug = false
 	if debug {
 		counter := 0
 		for {
 			var tin sul.InputSeq = sul.InputSeq{
-				&sul.Input{map[string]bool{"A": true, "B": true}, false},
-				&sul.Input{map[string]bool{"A": true, "B": true}, false},
 				&sul.Input{map[string]bool{"A": true, "B": false}, false},
-				&sul.Input{map[string]bool{"A": true, "B": false}, true},
 			}
 			r := s.MQuery(tin)
 			logger.Println("RESULT:", r, counter)
