@@ -19,6 +19,7 @@ import (
 
 var logger *log.Logger = log.New(os.Stderr, "SUL - ", 2)
 var ibound = 3
+var ebound = 4
 
 func SetLog(w io.Writer) {
 	logger = log.New(w, "SUL", 2)
@@ -38,6 +39,10 @@ func SetReoDelay(t time.Duration) {
 
 func SetBound(b int) {
 	ibound = b
+}
+
+func SetEquivBound(b int) {
+	ebound = b
 }
 
 /********************* Definitions of Input/Output **********************/
@@ -335,7 +340,7 @@ func (self *Oracle) MQuery(in InputSeq) Output {
 		seq = self.SeqSimulate(in)
 		if len(seq) == 0 {
 			// a panic happens
-			logger.Println("[MQUERY] PANIC CATCHED")
+			logger.Println("[MQUERY] PANIC CAUGHT")
 			continue
 		} else {
 			t := seq[len(seq)-1]
@@ -354,10 +359,55 @@ func (self *Oracle) MQuery(in InputSeq) Output {
 
 type Executable interface {
 	Run(InputSeq) (InputSeq, Output)
+	SeqRun(InputSeq) ([]InputSeq, []Output)
 }
 
 func (self Oracle) EQuery(hypo Executable) (InputSeq, bool) {
-	// TODO
+	// FIXME bound is set for iteration depth, but who will tell us its value ?
+	var bound = ebound
+	/*
+		  1. generate a series of all permutation
+		  2. TODO check if these sequences are in the tree
+			   - if true, just ignore them
+				 - if false, use SeqRun to generate it's corresponding hypo-execution
+				   to compare and see if we can find a counter-example
+	*/
+	seqs := []InputSeq{InputSeq{}}
+	acts := self.GetInputs()
+	// FIXME coud we encapsulate this part into a single function? this may lead to better
+	// performance
+	for i := 0; i < bound; i++ {
+		nseqs := []InputSeq{}
+		for j := 0; j < len(seqs); j++ {
+			for k := 0; k < len(acts); k++ {
+				// check if the sequence is existing in the tree
+				curr := InputSeq{}
+				// NOTE still not sure what cause the problem
+				curr = append(curr, seqs[j]...)
+				curr = append(curr, acts[k])
+				nseqs = append(nseqs, curr)
+			}
+		}
+		seqs = nseqs
+	}
+	// existing-check and generation of it's corresponding execution under hypothesis
+	for i := 0; i < len(seqs); i++ {
+		if self.Cache.search(seqs[i]) == nil {
+			_, hypout := hypo.SeqRun(seqs[i])
+			sysout := self.SeqSimulate(seqs[i])
+			logger.Println("[EQUERY] HypoCheck", seqs[i], hypout, sysout)
+			for j := 0; j < len(hypout); j++ {
+				if hypout[j].String() != sysout[j].String() {
+					// counter-example found
+					// FIXME further analysis maybe required
+					logger.Println("[EQUERY] counter-example found", seqs[i][:j+1], "with")
+					logger.Println("         hypout:", hypout)
+					logger.Println("         sysout:", sysout)
+					return seqs[i][:j+1], true
+				}
+			}
+		}
+	}
 	return InputSeq{}, false
 }
 
