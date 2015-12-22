@@ -1,0 +1,150 @@
+LEARN - 23:14:45 L* Iteration
+LEARN - 23:14:46 TABLE FILLED WITH LEN: 0
+LEARN - 23:14:46 Observation Table: 
+
+|Ø  A B A,B T 
+---------------------------------------
+|ϵ  |ϵ#1  ϵ#2 ϵ#3 C:A,#4  ϵ#5 
+---------------------------------------
+|Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|A  |ϵ  ϵ C:A,  C:A,  ϵ    [UNCLOSED]
+|B  |ϵ  C:A,  ϵ C:A,  ϵ    [UNCLOSED]
+|A,B  |ϵ  ϵ ϵ C:A,  ϵ    [UNCLOSED]
+|T  |ϵ  ϵ ϵ C:A,  ϵ    [UNCLOSED]
+
+LEARN - 23:14:49 TABLE FILLED WITH LEN: 2
+LEARN - 23:14:49 Observation Table: 
+|Ø  A B A,B T 
+---------------------------------------
+|ϵ  |ϵ#3  ϵ#4 ϵ#5 C:A,#6  ϵ#7 
+|A  |ϵ#8  ϵ#9 C:A,#10 C:A,#11 ϵ#12  
+|B  |ϵ#13 C:A,#14 ϵ#15  C:A,#16 ϵ#17  
+---------------------------------------
+|Ø  |ϵ  ϵ ϵ C:A,  ϵ 
+|A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|A,B  |ϵ  ϵ ϵ C:A,  ϵ 
+|T  |ϵ  ϵ ϵ C:A,  ϵ 
+|A-Ø  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-A  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-B  |ϵ  ϵ ϵ C:A,  ϵ 
+|A-A,B  |ϵ  ϵ C:A,  C:A,  ϵ 
+|A-T  |ϵ  ϵ C:A,  C:A,  ϵ 
+|B-Ø  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-A  |ϵ  ϵ ϵ C:A,  ϵ 
+|B-B  |ϵ  C:A,  ϵ C:A,  ϵ 
+|B-A,B  |ϵ  ϵ ϵ C:A,  ϵ 
+|B-T  |ϵ  C:A,  ϵ C:A,  ϵ 
+
+LEARN - 23:14:49 Hypotheis Constructed
+LEARN - 23:14:49 Partition Division
+LEARN - 23:14:49 [[0] [1] [2]]
+LEARN - 23:14:49 [[0]]
+LEARN - 23:14:49 Partition Division
+LEARN - 23:14:49 [[0] [1] [2]]
+LEARN - 23:14:49 [[1]]
+LEARN - 23:14:49 Partition Division
+LEARN - 23:14:49 [[0] [1] [2]]
+LEARN - 23:14:49 [[2]]
+LEARN - 23:14:49 Hypothesis Iteration 0
+LEARN - 23:14:49 Hypothesis Acquired: 
+> state 0: ϵ  with edges: 
+[Ø]  -> state  0 with output ϵ 
+[A]  -> state  1 with output ϵ 
+[B]  -> state  2 with output ϵ 
+[A,B]  -> state  0 with output C:A, 
+[T]  -> state  0 with output ϵ 
+> state 1: A  with edges: 
+[Ø]  -> state  1 with output ϵ 
+[A]  -> state  1 with output ϵ 
+[B]  -> state  0 with output C:A, 
+[A,B]  -> state  1 with output C:A, 
+[T]  -> state  1 with output ϵ 
+> state 2: B  with edges: 
+[Ø]  -> state  2 with output ϵ 
+[A]  -> state  0 with output C:A, 
+[B]  -> state  2 with output ϵ 
+[A,B]  -> state  0 with output C:A, 
+[T]  -> state  2 with output ϵ 
+Hypothesis's description is finished.
+LEARN - 23:14:55 A-A-B-B
+LEARN - 23:14:55 hypothesis execution accessseq: A-A -> A
+LEARN - 23:14:55 mquery:  A-B-B -> ϵ
+LEARN - 23:14:55 hypothesis execution accessseq: A -> A
+LEARN - 23:14:55 mquery:  A-A-B-B -> C:A,
+LEARN - 23:14:55 [SUFFIX ADD] B-B
+LEARN - 23:14:55 L* Iteration
+LEARN - 23:14:56 TABLE FILLED WITH LEN: 2
+LEARN - 23:14:56 %!v(PANIC=runtime error: index out of range)
+LEARN - 23:14:58 TABLE FILLED WITH LEN: 3
+LEARN - 23:14:58 %!v(PANIC=runtime error: index out of range)
+LEARN - 23:14:58 Hypotheis Constructed
+LEARN - 23:14:58 Partition Division
+LEARN - 23:14:58 [[0] [1 3] [2]]
+LEARN - 23:14:58 [[0]]
+LEARN - 23:14:58 Partition Division
+LEARN - 23:14:58 [[0] [1 3] [2]]
+LEARN - 23:14:58 [[1] [3]]
+LEARN - 23:14:58 Partition Division
+LEARN - 23:14:58 [[0] [1 3] [2]]
+LEARN - 23:14:58 [[2]]
+LEARN - 23:14:58 Partition Division
+LEARN - 23:14:58 [[1] [3]]
+LEARN - 23:14:58 [[1]]
+LEARN - 23:14:58 Partition Division
+LEARN - 23:14:58 [[1] [3]]
+LEARN - 23:14:58 [[3]]
+LEARN - 23:14:58 Hypothesis Iteration 1
+LEARN - 23:14:58 Hypothesis Acquired: 
+> state 0: ϵ  with edges: 
+[Ø]  -> state  0 with output ϵ 
+[A]  -> state  1 with output ϵ 
+[B]  -> state  2 with output ϵ 
+[A,B]  -> state  0 with output C:A, 
+[T]  -> state  0 with output ϵ 
+> state 1: A  with edges: 
+[Ø]  -> state  1 with output ϵ 
+[A]  -> state  3 with output ϵ 
+[B]  -> state  0 with output C:A, 
+[A,B]  -> state  1 with output C:A, 
+[T]  -> state  1 with output ϵ 
+> state 2: B  with edges: 
+[Ø]  -> state  2 with output ϵ 
+[A]  -> state  0 with output C:A, 
+[B]  -> state  2 with output ϵ 
+[A,B]  -> state  0 with output C:A, 
+[T]  -> state  2 with output ϵ 
+> state 3: A-A  with edges: 
+[Ø]  -> state  3 with output ϵ 
+[A]  -> state  3 with output ϵ 
+[B]  -> state  1 with output C:A, 
+[A,B]  -> state  3 with output C:A, 
+[T]  -> state  3 with output ϵ 
+Hypothesis's description is finished.
+TOP - Hypothesis Acquired: 
+> state 0: ϵ  with edges: 
+[Ø]  -> state  0 with output ϵ 
+[A]  -> state  1 with output ϵ 
+[B]  -> state  2 with output ϵ 
+[A,B]  -> state  0 with output C:A, 
+[T]  -> state  0 with output ϵ 
+> state 1: A  with edges: 
+[Ø]  -> state  1 with output ϵ 
+[A]  -> state  3 with output ϵ 
+[B]  -> state  0 with output C:A, 
+[A,B]  -> state  1 with output C:A, 
+[T]  -> state  1 with output ϵ 
+> state 2: B  with edges: 
+[Ø]  -> state  2 with output ϵ 
+[A]  -> state  0 with output C:A, 
+[B]  -> state  2 with output ϵ 
+[A,B]  -> state  0 with output C:A, 
+[T]  -> state  2 with output ϵ 
+> state 3: A-A  with edges: 
+[Ø]  -> state  3 with output ϵ 
+[A]  -> state  3 with output ϵ 
+[B]  -> state  1 with output C:A, 
+[A,B]  -> state  3 with output C:A, 
+[T]  -> state  3 with output ϵ 
+Hypothesis's description is finished.
+TOP - 117 129
