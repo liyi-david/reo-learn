@@ -54,10 +54,10 @@ func SyncdrainChannel(in1, in2, stop Port) {
 			stop.Main,
 			Operation{"read", in1.Slave, ""},
 			Operation{"read", in2.Slave, ""},
-			Operation{"debug", in1.Slave, "sync first hand-shake finished"},
+			Operation{"debug", in1.Slave, "SYNCDRAIN first hand-shake finished"},
 			Operation{"write", in1.Slave, "read"},
 			Operation{"write", in2.Slave, "read"},
-			Operation{"debug", in1.Slave, "sync second hand-shake finished"},
+			Operation{"debug", in1.Slave, "SYNCDRAIN second hand-shake finished"},
 			Operation{"read", in1.Main, ""},
 			Operation{"read", in2.Main, ""},
 		)
@@ -125,14 +125,14 @@ func MergerChannel(in1, in2, out, stop Port) {
 	var step int = 0
 	// we need some assistant function to deal with step
 	pushData := func(d string) {
-		logger.Println("start pushing data")
+		logger.Println("[MERGER] start pushing data")
 		select {
 		case <-stop.Main:
-			logger.Println("pushdata timeout")
+			logger.Println("[MERGER] pushdata timeout")
 			return
 		case out.Main <- d:
 			step = 0
-			logger.Println("data pushed.", d)
+			logger.Println("[MERGER] data pushed.", d)
 		}
 	}
 
@@ -159,7 +159,7 @@ func MergerChannel(in1, in2, out, stop Port) {
 				lock.Unlock()
 				// otherwise nothing has to be done
 			}
-			logger.Println("first handshake", label, step)
+			logger.Println("[MERGER] first handshake", label, step)
 			// second hand-shake with output port
 			select {
 			case <-stop.Main:
@@ -190,7 +190,7 @@ func MergerChannel(in1, in2, out, stop Port) {
 				lock.Unlock()
 				// otherwise nothing has to be done
 			}
-			logger.Println("second handshake", label, step)
+			logger.Println("[MERGER] second handshake", label, step)
 			// final hand-shake with input port
 			select {
 			case <-stop.Main:
@@ -226,7 +226,7 @@ func MergerChannel(in1, in2, out, stop Port) {
 				}
 				lock.Unlock()
 			}
-			logger.Println("FINAL handshake", label, step)
+			logger.Println("[MERGER] FINAL handshake", label, step)
 		}
 	}
 
