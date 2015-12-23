@@ -147,6 +147,9 @@ func (self *Obs) Run(in sul.InputSeq) (sul.InputSeq, sul.Output) {
 func (self *Obs) AddSuffix(suf sul.InputSeq) {
 	self.D = append(self.D, suf)
 	logger.Println("[SUFFIX ADD]", suf)
+	if len(suf) == 0 {
+		panic("fatal error: empty suffixes added")
+	}
 }
 
 func (self *Obs) GetHypoStr() string {
@@ -181,7 +184,10 @@ func (self *Obs) String() string {
 		for j := 0; j < len(self.D); j++ {
 			// fmt.Println(self.SL[i].Result)
 			var nxt = ""
-			if i <= self.SpLoc {
+			// NOTE in one line, there could be more columns than actions
+			// especially when some suffixed are added. so we use j < len(self.SL[i].Dist) to make sure
+			// panics won't happen
+			if i <= self.SpLoc && j < len(self.SL[i].Dist) {
 				nxt = fmt.Sprintf("#%d", self.SL[i].Dist[j])
 			}
 			rel += fmt.Sprintf("%s%s\t", self.SL[i].Result[j].String(), nxt)

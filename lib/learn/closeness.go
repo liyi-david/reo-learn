@@ -60,9 +60,18 @@ func (self *Obs) fillTable() {
 
 func (self *Obs) TableClose() {
 	var i, j int
+	var lastnumlines = -1
 	// after close the table, we need to construct a hypothesis
 	defer self.direct_hypothesis()
 	for self.fillTable(); ; self.fillTable() {
+		// NOTE if after a iteration there're no change in obstable
+		// something **must** be wrong
+		if len(self.SL) == lastnumlines {
+			panic("fatal error: lines unchanged during an iteration")
+		} else {
+			lastnumlines = len(self.SL)
+		}
+
 		// check if the table is closed now
 		flag := true
 		for i = self.SpLoc + 1; i < len(self.SL); i++ {
