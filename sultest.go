@@ -25,10 +25,10 @@ func main() {
 	// set up multicores
 	runtime.GOMAXPROCS(4)
 	// configurations in simulation
-	sul.SetReoDelay(5)
-	sul.SetBound(1)
+	sul.SetReoDelay(10)
+	sul.SetBound(2)
 	// logs on/off
-	sul.CloseLog()
+	// sul.CloseLog()
 	sul.CloseReoLog()
 	// learn.CloseLog()
 	// -------------- CONFIGURATION END --------------------
@@ -47,17 +47,21 @@ func main() {
 	}
 	// -------------- ACTIVE LEARNING START --------------------
 	// following are test code for MQuery
-	var debug = false
+	var debug = true
 	if debug {
 		counter := 0
 		for {
 			var tin sul.InputSeq = sul.InputSeq{
+				&sul.Input{map[string]bool{"A": false, "B": false}, false},
+				&sul.Input{map[string]bool{"A": false, "B": true}, false},
+				&sul.Input{map[string]bool{"A": false, "B": false}, false},
 				&sul.Input{map[string]bool{"A": true, "B": false}, false},
 			}
-			r := s.MQuery(tin)
+			r := s.SeqSimulate(tin)
 			logger.Println("RESULT:", r, counter)
 			counter++
-			if r.String() != "C:B," {
+
+			if len(r[3]) == 0 {
 				break
 			}
 		}
