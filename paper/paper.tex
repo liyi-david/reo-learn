@@ -7,6 +7,8 @@
 % positioning is used for below lef = of
 \usetikzlibrary{shapes,arrows, positioning}
 
+\input{images/reodef.tex}
+
 \title{Active Learning : From Blackbox To Timed Connectors}
 \author{
 \IEEEauthorblockN{Yi Li\IEEEauthorrefmark{1} and Meng Sun\IEEEauthorrefmark{1}}
@@ -84,7 +86,18 @@ question deserves careful consideration if we are taking an external view.
 Generally, equivalence query has been proved impossible in blackbox
 models\cite{DBLP:journals/iandc/Angluin87}. However, in this
 section, we're showing that in certain circumstances, equivalence query can be implemented with
- no approximation.
+no approximation.
+
+Since equivalence queries are used to search for counter-examples, firstly let's see what makes
+counter-examples even existing after the \emph{Table Close} algorithm.
+
+\begin{figure}[h]
+  \begin{center}
+    \input{./images/2buf.tex}
+  \end{center}
+  \caption{<+caption text+>}
+  \label{fig:buf2}
+\end{figure}<++>
 \section{Case Studies}
 
 \section{Conclusion and Future Work}
