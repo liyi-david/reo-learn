@@ -1,0 +1,16 @@
+\begin{tikzpicture}
+
+  \ionode{(P-A)}{(0,0)}{}
+  \ionode{(P-B)}{(3,1)}{}
+  \mixednode{(P-M1)}{(1,0)}{}
+  \mixednode{(P-M2)}{(2,0)}{}
+  \mixednode{(P-M3)}{(3,0)}{}
+  \ionode{(P-C)}{(4,0)}{}
+
+  \fifoe{(P-A)}{(P-M1)}{}
+  \fifoe{(P-M1)}{(P-M2)}{}
+  \fifoe{(P-M2)}{(P-M3)}{}
+  \syncdrain{(P-B)}{(P-M3)}{}
+  \sync{(P-M3)}{(P-C)}{}
+
+\end{tikzpicture}
