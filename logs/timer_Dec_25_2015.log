@@ -1,0 +1,69 @@
+> state 0: ϵ  with edges: 
+[Ø]  -> state  0 with output ϵ 
+[A]  -> state  7 with output ϵ 
+[B]  -> state  9 with output ϵ 
+[A,B]  -> state  1 with output ϵ 
+[T]  -> state  3 with output ϵ 
+> state 1: A,B  with edges: 
+[Ø]  -> state  1 with output ϵ 
+[A]  -> state  1 with output ϵ 
+[B]  -> state  1 with output ϵ 
+[A,B]  -> state  1 with output ϵ 
+[T]  -> state  2 with output ϵ 
+> state 2: A,B-T  with edges: 
+[Ø]  -> state  2 with output ϵ 
+[A]  -> state  2 with output ϵ 
+[B]  -> state  2 with output ϵ 
+[A,B]  -> state  2 with output ϵ 
+[T]  -> state  0 with output C:A, 
+> state 3: T  with edges: 
+[Ø]  -> state  3 with output ϵ 
+[A]  -> state  8 with output ϵ 
+[B]  -> state 10 with output ϵ 
+[A,B]  -> state  2 with output ϵ 
+[T]  -> state  4 with output ϵ 
+> state 4: T-T  with edges: 
+[Ø]  -> state  4 with output ϵ 
+[A]  -> state  5 with output ϵ 
+[B]  -> state  6 with output ϵ 
+[A,B]  -> state  0 with output C:A, 
+[T]  -> state  4 with output ϵ 
+> state 5: T-T-A  with edges: 
+[Ø]  -> state  5 with output ϵ 
+[A]  -> state  5 with output ϵ 
+[B]  -> state  5 with output C:A, 
+[A,B]  -> state  5 with output C:A, 
+[T]  -> state  5 with output ϵ 
+> state 6: T-T-B  with edges: 
+[Ø]  -> state  6 with output ϵ 
+[A]  -> state  6 with output C:A, 
+[B]  -> state  6 with output ϵ 
+[A,B]  -> state  6 with output C:A, 
+[T]  -> state  6 with output ϵ 
+> state 7: A  with edges: 
+[Ø]  -> state  7 with output ϵ 
+[A]  -> state  7 with output ϵ 
+[B]  -> state  1 with output ϵ 
+[A,B]  -> state  1 with output ϵ 
+[T]  -> state  8 with output ϵ 
+> state 8: T-A  with edges: 
+[Ø]  -> state  8 with output ϵ 
+[A]  -> state  8 with output ϵ 
+[B]  -> state  2 with output ϵ 
+[A,B]  -> state  2 with output ϵ 
+[T]  -> state  5 with output ϵ 
+> state 9: B  with edges: 
+[Ø]  -> state  9 with output ϵ 
+[A]  -> state  1 with output ϵ 
+[B]  -> state  9 with output ϵ 
+[A,B]  -> state  1 with output ϵ 
+[T]  -> state 10 with output ϵ 
+> state 10: T-B  with edges: 
+[Ø]  -> state 10 with output ϵ 
+[A]  -> state  2 with output ϵ 
+[B]  -> state 10 with output ϵ 
+[A,B]  -> state  2 with output ϵ 
+[T]  -> state  6 with output ϵ 
+Hypothesis's description is finished.
+TOP - 458 2358
+
