@@ -11,6 +11,7 @@ package main
 import buf2 "./example/2-buffer"
 import altn "./example/alternator"
 import fifo "./example/fifo"
+import timer "./example/timer"
 
 import "./lib/learn"
 import "./lib/sul"
@@ -32,7 +33,7 @@ func main() {
 	sul.CloseReoLog()
 	// learn.CloseLog()
 	// -------------- CONFIGURATION END --------------------
-	var sulname = "buf2"
+	var sulname = "time"
 	var s *sul.Oracle
 	switch sulname {
 	case "buf2":
@@ -44,10 +45,12 @@ func main() {
 	case "fifo":
 		s = fifo.GetOracle()
 		break
+	case "time":
+		s = timer.GetOracle()
 	}
 	// -------------- ACTIVE LEARNING START --------------------
 	// following are test code for MQuery
-	var debug = true
+	var debug = false
 	if debug {
 		counter := 0
 		for {
