@@ -1,13 +1,23 @@
 \documentclass[conference, a4paper]{IEEEtran}
 
 % used for flow charts
+\usepackage{pgf}
 \usepackage{tikz}
+\usepackage{reotex}
+
+\usepackage{amssymb}
+\usepackage{cite}
+\usepackage[normalem]{ulem}
 % FIXME finally no todos should exist in this draft
 \usepackage[textsize=tiny]{todonotes}
 % positioning is used for below lef = of
-\usetikzlibrary{shapes,arrows, positioning}
+\usetikzlibrary{shapes,arrows,automata,positioning}
+% some tikz-styles on reo channels, not required in papers that have nothing to do with Reo
 
-\input{images/reodef.tex}
+% declaration of environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+
 
 \title{Active Learning : From Blackbox To Timed Connectors}
 \author{
@@ -43,8 +53,8 @@ series of impressive works.
 However, most of these works are based on models, instead of binaries. Then it comes a well-known
 problem: \emph{how can we obtain these models?}
 
-The application of machine learning in formal models has a long history. There are several main
-orientations: extraction of formal models and learning-guided verification technique.
+To solve this problem, many techniques in model constructing were proposed, for instance in
+\cite{DBLP:journals/mt/Daelemans10, DBLP:journals/iandc/Angluin87, DBLP:conf/fase/RaffeltS06}.
 
 % it seems that we need a graph to describe how we're doing this work
 \todo{better graph}
@@ -57,6 +67,14 @@ from binaries with no source code needed.
 
 \subsection{Reo Coordination Language}
 \label{sec:reo}
+
+\begin{figure}[h]
+  \begin{center}
+    \input{./images/basic.tex}
+  \end{center}
+  \caption{Basic Reo Channels}
+  \label{fig:basic}
+\end{figure}
 
 \subsection{Active Learning and Mealy Machines}
 
@@ -71,6 +89,20 @@ automata, and the automata is also finite. Unfortunately, when checking the furt
 Reo connectors' input, we find that it's not the case.
 
 \todo{an example as graph}
+
+\subsection{Parameterized Mealy Machine}
+\begin{definition}[Parameterized Mealy Machine]
+  A \emph{Parameterized Mealy Machine} is defined as a function $\mathcal{PM}(\Sigma)=\langle S(\Sigma), s_0,
+  \delta(\Sigma), \lambda(\Sigma)\rangle$ that maps an alphabet to its corresponding Mealy Machine.
+  \begin{itemize}
+    \item[-] $\Sigma$ is a \emph{finite} input/output alphabet
+    \item[-] $S$ is a function that maps a \emph{finite} alphabet to a \emph{finite} set of
+      states. We use $S(\Sigma)$ to denote the state set.
+    \item[-] $s_0$ is the initial state. It satisfies $\forall \Sigma,s_0\in S(\Sigma)$
+    \item[-] $\delta$ 
+  \end{itemize}
+\end{definition}
+
 \begin{figure}[h]
 \caption{Infinite States in a Reo Model}
 \label{fig:reoinfinite}
@@ -88,16 +120,54 @@ models\cite{DBLP:journals/iandc/Angluin87}. However, in this
 section, we're showing that in certain circumstances, equivalence query can be implemented with
 no approximation.
 
-Since equivalence queries are used to search for counter-examples, firstly let's see what makes
-counter-examples even existing after the \emph{Table Close} algorithm.
+Equivalence queries are used to search for counter-examples. But what makes counter-examples even
+existing? In Reo models, we believe that \emph{FIFO} channels and \emph{Timer} channels are to
+blame. Here we present a brief example. To make things eaiser, we have only untimed Reo here.
 
 \begin{figure}[h]
   \begin{center}
-    \input{./images/2buf.tex}
+    \input{./images/3buf.tex}
   \end{center}
-  \caption{<+caption text+>}
-  \label{fig:buf2}
-\end{figure}<++>
+  \caption{A Switching Connector $S$ with Three Buffers}
+  \label{fig:buf3}
+\end{figure}
+
+A \emph{Switching} connector in \figurename \ref{fig:buf3} has two source-ends $A,B$ and one
+sink-end $C$. In a nutshell, datum come from $A$ and be stored temporarily in buffers. These datum
+will never flow out until signals come to $B$. With the Mealy-Machine semantics given, the semantics
+of \emph{Switching} connectors can be defined as following \figurename \ref{fig:buf3semantics}.
+
+\begin{figure}[h]
+  \begin{center}
+    \input{./images/3bufsemantics.tex}
+  \end{center}
+  \caption{\emph{Gate} as Mealy Machine $\mathcal{M}(S)$}
+  \label{fig:buf3semantics}
+\end{figure}
+
+According to the production of Mealy-Machines, 8 different states should be found in
+$\mathcal{M}(S)$. We use $q_{abc}$ to denote them. $q_{001}$ indicates that the last buffer is
+filled and others are empty, and $q_{111}$ means that there are no space in any buffer. It's
+obvious that some states like $q_{100}$ is unreachable.
+
+\begin{definition}[Similar]
+  In a mealy machine, two states are similar iff. they have the same output signature.
+\end{definition}
+
+\begin{theorem}[Bound of Counter-Example]
+  \label{the:cebound} Assume that an observation table has already been closed with maximum
+  query length \todo{find a better phrase?} $l$. An counter-example of length $l+2$ would be
+  found iff. there're possible counter-examples.
+\end{theorem}
+\begin{IEEEproof}
+  Sketch of this proof are shown in several points:
+  \begin{enumerate}
+    \item Hypothesises are subgraphs of the semantics graph.
+    \item Inputs on reverse edges are complementary.
+    \item 
+  \end{enumerate}
+\end{IEEEproof}
+
 \section{Case Studies}
 
 \section{Conclusion and Future Work}
