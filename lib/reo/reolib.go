@@ -5,6 +5,7 @@ import "log"
 import "io"
 import "io/ioutil"
 import "os"
+import "time"
 
 // NOTE when later some more complicated example would be trapped
 // into deadlocks plz kindly check this
@@ -88,6 +89,41 @@ func FifoChannel(in, out, stop Port) {
 			return
 		} else {
 			logger.Println("[FIFO] RELEASED", <-c)
+		}
+	}
+}
+
+func timer(t time.Duration) chan string {
+	r := make(chan string)
+	go func() {
+		// use time.After
+		<-time.After(t)
+		close(r)
+	}()
+	return r
+}
+
+func TimerChannel(in, out Port, t time.Duration, stop Port) {
+	defer close(stop.Slave)
+	c := make(chan string, 1)
+	for {
+		status := StepExec(
+			stop.Main,
+			Operation{"read", in.Slave, ""},
+			Operation{"write", in.Slave, "read"},
+			Operation{"read", in.Main, "datum"},
+			Operation{"write", c, "datum"},
+			Operation{"debug", c, "[FIFO] BUFFERED"},
+			Operation{"read", timer(t), ""},
+			// following are the syncwrite part
+			Operation{"write", out.Slave, "write"},
+			Operation{"read", out.Slave, ""},
+			Operation{"write", out.Main, "datum"},
+		)
+		if !status {
+			return
+		} else {
+			logger.Println("[TIMER] RELEASED", <-c)
 		}
 	}
 }
