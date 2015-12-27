@@ -17,6 +17,7 @@
 % declaration of environments
 \newtheorem{theorem}{Theorem}
 \newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
 
 
 \title{Active Learning : From Blackbox To Timed Connectors}
@@ -90,28 +91,86 @@ Reo connectors' input, we find that it's not the case.
 
 \todo{an example as graph}
 
-\subsection{Parameterized Mealy Machine}
-\begin{definition}[Parameterized Mealy Machine]
-  A \emph{Parameterized Mealy Machine} is defined as a function $\mathcal{PM}(\Sigma)=\langle S(\Sigma), s_0,
-  \delta(\Sigma), \lambda(\Sigma)\rangle$ that maps an alphabet to its corresponding Mealy Machine.
-  \begin{itemize}
-    \item[-] $\Sigma$ is a \emph{finite} input/output alphabet
-    \item[-] $S$ is a function that maps a \emph{finite} alphabet to a \emph{finite} set of
-      states. We use $S(\Sigma)$ to denote the state set.
-    \item[-] $s_0$ is the initial state. It satisfies $\forall \Sigma,s_0\in S(\Sigma)$
-    \item[-] $\delta$ 
-  \end{itemize}
-\end{definition}
-
 \begin{figure}[h]
-\caption{Infinite States in a Reo Model}
-\label{fig:reoinfinite}
+  \caption{Infinite States in a Reo Model}
+  \label{fig:reoinfinite}
 \end{figure}
 
 While focusing on behavior of connectors, Reo doesn't give detail depiction on behavior of
 components. As shown in \figurename \ref{fig:reoinfinite}, connectors are able to reject any datum
 if they are not ready. But what will happen outside the connector, if the datum is rejected? This
 question deserves careful consideration if we are taking an external view.
+
+\subsection{Parameterized Mealy Machine}
+\begin{definition}[Parameterized Mealy Machine]
+  A \emph{Parameterized Mealy Machine} is defined as a function $\mathcal{PM}(\Sigma)=\langle
+  S(\Sigma), s_0, I(\Sigma), O(\Sigma), \delta(\Sigma), \lambda(\Sigma)\rangle$ that maps an
+  alphabet to its corresponding Mealy Machine. 
+  \begin{itemize}
+    \item[-] $\Sigma$ is a \emph{finite} datum alphabet (hereafter referred to as an alphabet)
+    \item[-] $S$ is a function that maps an alphabet to a \emph{finite} set of
+      states. We use $S(\Sigma)$ to denote the state set.
+    \item[-] $I(\Sigma)$ maps an alphabet to a set of input actions.
+    \item[-] $O(\Sigma)$ maps an alphabet to a set of output actions.
+    \item[-] $s_0$ is the initial state. It satisfies $\forall \Sigma,s_0\in S(\Sigma)$
+    \item[-] $\delta$ maps a \emph{finite} datum alphabet to an \emph{output function}. We use
+      $\delta(\Sigma):S(\Sigma)\times I(\Sigma)\rightarrow O(\Sigma)$ to denote the output function.
+    \item[-] $\lambda$ maps an alphabet to a \emph{transition function}. We use
+      $\lambda(\Sigma):S(\Sigma)\times I(\Sigma)\rightarrow S(\Sigma)$ to denote the transiton
+      function.
+  \end{itemize}
+\end{definition}
+
+Now we can use Parameterized Mealy Machines to define a new semantics to Reo.
+\begin{example}[PMM Semantics of FIFO channel $PM_{FIFO}$]
+  The semantics of FIFO channel with source end $A$ and sink end $B$ can be defined as follows
+  \begin{itemize}
+    \item[-] $S(\Sigma)=\{q_0\}\cup\{q_d|d\in\Sigma\}$
+    \item[-] $I(\Sigma)=\{(A:d)|d\in\Sigma\cup \{\bot\}\}$
+    \item[-] $O(\Sigma)=\{(B:d)|d\in\Sigma\cup\{\bot\}\}$
+    \item[-] transition function
+      \begin{displaymath}
+        \delta(\Sigma)(s,i)=\left\{
+        \begin{array}[h]{ll}
+          q_d & s=q_0\land i=(A:d) \\
+          q_d & s=q_{d'}\land i=(A:d) \\
+          q_0 & s=q_d\land i=(A:\bot) \\
+        \end{array}
+        \right.
+      \end{displaymath}
+    \item[-] output function
+      \begin{displaymath}
+        \delta(\Sigma)(s,i)=\left\{
+        \begin{array}[h]{ll}
+          q_d & s=q_0\land i=(A:d) \\
+          q_d & s=q_{d'}\land i=(A:d) \\
+          q_0 & s=q_d\land i=(A:\bot) \\
+        \end{array}
+        \right.
+      \end{displaymath}
+  \end{itemize}
+\end{example}
+
+\begin{figure}[h]
+  \begin{center}
+    \input{./images/pmmfifo.tex}
+  \end{center}
+  \caption{PMM-based Semantics of FIFO, where $\Sigma=\{a,b\}$}
+  \label{fig:pmmfifo}
+\end{figure}
+
+\todo{finish the definition ..}
+\begin{definition}[Production of Parameterized Mealy Machines]
+  Now we're going to define the production of two parameterized mealy Machine
+  \[
+  Prod(PM_1,PM_2)=PM_3
+  \]
+  as follows,
+  \begin{itemize}
+    \item[-] $\forall\Sigma,PM_3.I(\Sigma)=PM_1.I(\Sigma)\cup PM_2.I(\Sigma)$
+    \item
+  \end{itemize}
+\end{definition}
 
 \section{From Blackbox to Timed Connectors}
 \subsection{Equivalence Query}
@@ -176,7 +235,6 @@ obvious that some states like $q_{100}$ is unreachable.
 
 \bibliographystyle{abbrv}
 \bibliography{bib}
-
 
 % FIXME remove this
 \listoftodos
