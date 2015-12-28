@@ -8,6 +8,8 @@
 \usepackage{amssymb}
 \usepackage{cite}
 \usepackage[normalem]{ulem}
+% for a smile-face character
+\usepackage{wasysym}
 % FIXME finally no todos should exist in this draft
 \usepackage[textsize=tiny]{todonotes}
 % positioning is used for below lef = of
@@ -18,6 +20,11 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{definition}{Definition}
 \newtheorem{example}{Example}
+
+% personal characters
+\newcommand{\rblock}[0]{\circleddash}
+\newcommand{\rread}[0]{\smiley}
+\newcommand{\rnoread}[0]{\frownie}
 
 
 \title{Active Learning : From Blackbox To Timed Connectors}
@@ -104,47 +111,60 @@ question deserves careful consideration if we are taking an external view.
 \subsection{Parameterized Mealy Machine}
 \begin{definition}[Parameterized Mealy Machine]
   A \emph{Parameterized Mealy Machine} is defined as a function $\mathcal{PM}(\Sigma)=\langle
-  S(\Sigma), s_0, I(\Sigma), O(\Sigma), \delta(\Sigma), \lambda(\Sigma)\rangle$ that maps an
+  S(\Sigma), s_0, I, O, \delta(\Sigma), \lambda(\Sigma)\rangle$ that maps an
   alphabet to its corresponding Mealy Machine. 
   \begin{itemize}
     \item[-] $\Sigma$ is a \emph{finite} datum alphabet (hereafter referred to as an alphabet)
     \item[-] $S$ is a function that maps an alphabet to a \emph{finite} set of
       states. We use $S(\Sigma)$ to denote the state set.
-    \item[-] $I(\Sigma)$ maps an alphabet to a set of input actions.
-    \item[-] $O(\Sigma)$ maps an alphabet to a set of output actions.
+    \item[-] $I$ is a finite set of source-ends.
+    \item[-] $O$ is a finite set of sink-ends.
     \item[-] $s_0$ is the initial state. It satisfies $\forall \Sigma,s_0\in S(\Sigma)$
     \item[-] $\delta$ maps a \emph{finite} datum alphabet to an \emph{output function}. We use
-      $\delta(\Sigma):S(\Sigma)\times I(\Sigma)\rightarrow O(\Sigma)$ to denote the output function.
+      $\delta(\Sigma):S(\Sigma)\times Input(\Sigma,I)\rightarrow Output(\Sigma, O)$ to denote the output function.
     \item[-] $\lambda$ maps an alphabet to a \emph{transition function}. We use
-      $\lambda(\Sigma):S(\Sigma)\times I(\Sigma)\rightarrow S(\Sigma)$ to denote the transiton
+      $\lambda(\Sigma):S(\Sigma)\times Input(\Sigma,I)\rightarrow S(\Sigma)$ to denote the transiton
       function.
   \end{itemize}
 \end{definition}
+
+In the definition above, \emph{Input} and \emph{Output} are used to generate input actions and output actions by the corresponding alphabets and ends.
+\todo{How to say?}
+\[
+Input(\Sigma,I)=\{\}
+\]
+\[
+Output(\Sigma,I)=\{\}
+\]
 
 Now we can use Parameterized Mealy Machines to define a new semantics to Reo.
 \begin{example}[PMM Semantics of FIFO channel $PM_{FIFO}$]
   The semantics of FIFO channel with source end $A$ and sink end $B$ can be defined as follows
   \begin{itemize}
     \item[-] $S(\Sigma)=\{q_0\}\cup\{q_d|d\in\Sigma\}$
-    \item[-] $I(\Sigma)=\{(A:d)|d\in\Sigma\cup \{\bot\}\}$
-    \item[-] $O(\Sigma)=\{(B:d)|d\in\Sigma\cup\{\bot\}\}$
-    \item[-] transition function
-      \begin{displaymath}
-        \delta(\Sigma)(s,i)=\left\{
-        \begin{array}[h]{ll}
-          q_d & s=q_0\land i=(A:d) \\
-          q_d & s=q_{d'}\land i=(A:d) \\
-          q_0 & s=q_d\land i=(A:\bot) \\
-        \end{array}
-        \right.
-      \end{displaymath}
+    \item[-] $I=\{A\}$
+    \item[-] $O=\{B\}$
+    \item[-] $s_0=q_0$
     \item[-] output function
       \begin{displaymath}
         \delta(\Sigma)(s,i)=\left\{
         \begin{array}[h]{ll}
-          q_d & s=q_0\land i=(A:d) \\
-          q_d & s=q_{d'}\land i=(A:d) \\
-          q_0 & s=q_d\land i=(A:\bot) \\
+          (B:\bot) & s=q_0\land i=(A:\_,B:\rnoread) \\
+          (B:d) & s=q_0\land i=(A:d,B:\rread)\\
+          \rblock & s=q_0\land i=(A:\bot,B:\rread) \\
+          (B:d) & s=q_d\land i=(A:\_,B:\rread)\\
+          \rblock & s=q_d\land i=(A:d,B:\rnoread) \\
+          (B:\bot) & s=q_d\land i=(A:\_,B:\rnoread) \\     
+        \end{array}
+        \right.
+      \end{displaymath}
+    \item[-] transition function
+      \begin{displaymath}
+        \lambda(\Sigma)(s,i)=\left\{
+        \begin{array}[h]{ll}
+          q_d & s=q_0\land i=(A:d,B:\rnoread) \\
+          q_d & s=q_{d'}\land i=(A:d,B:\rread) \\
+          q_0 & otherwise \\
         \end{array}
         \right.
       \end{displaymath}
@@ -161,14 +181,36 @@ Now we can use Parameterized Mealy Machines to define a new semantics to Reo.
 
 \todo{finish the definition ..}
 \begin{definition}[Production of Parameterized Mealy Machines]
-  Now we're going to define the production of two parameterized mealy Machine
+  Now we're going to define the production operator \emph{prod} of two parameterized mealy machines as,
   \[
-  Prod(PM_1,PM_2)=PM_3
+  prod(PM_1,PM_2)=PM_3
   \]
-  as follows,
+  as follows, 
   \begin{itemize}
-    \item[-] $\forall\Sigma,PM_3.I(\Sigma)=PM_1.I(\Sigma)\cup PM_2.I(\Sigma)$
-    \item
+  	\item[-] $\forall\Sigma, PM_3.S(\Sigma)=PM_1.S(\Sigma)\times PM_2.S(\Sigma)$
+    \item[-] $PM_3.I=PM_1.I\cup PM_2.I-PM_1.O\cup PM_2.O$
+    \item[-] $PM_3.O=PM_1.O\cup PM_2.O-PM_1.I\cup PM_2.I$
+    \item[-] $PM_3.s_0=(PM_1.s_0, PM_2.s_0)$
+    \item[-] $\forall\Sigma, PM_3.\delta(\Sigma)((s_1,s_2), i)=$
+      \begin{displaymath}
+        \left\{
+        \begin{array}[h]{ll}
+          q_d & s=q_0\land i=(A:d,B:\rnoread) \\
+          q_d & s=q_{d'}\land i=(A:d,B:\rread) \\
+          q_0 & otherwise \\
+        \end{array}
+        \right.
+      \end{displaymath}
+    \item[-] $\forall\Sigma, PM_3.\lambda(\Sigma)((s_1,s_2),i)=$
+      \begin{displaymath}
+        \left\{
+        \begin{array}[h]{ll}
+          q_d & s=q_0\land i=(A:d,B:\rnoread) \\
+          q_d & s=q_{d'}\land i=(A:d,B:\rread) \\
+          q_0 & otherwise \\
+        \end{array}
+        \right.
+      \end{displaymath}
   \end{itemize}
 \end{definition}
 
@@ -228,6 +270,8 @@ obvious that some states like $q_{100}$ is unreachable.
 \end{IEEEproof}
 
 \section{Case Studies}
+\subsection{Alternator}
+\subsection{Timed TODO}
 
 \section{Conclusion and Future Work}
 
