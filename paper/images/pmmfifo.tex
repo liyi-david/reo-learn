@@ -1,0 +1,21 @@
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.9cm,
+                    semithick]
+  \ionode{(P-A)}{(-4,0)}{(-4,0.5) node {$A$}}
+  \ionode{(P-B)}{(-2,0)}{(-2, 0.5) node {$B$}}
+  
+  \fifoe{(P-A)}{(P-B)}{}
+
+  \tikzstyle{every state}=[fill=black,draw=none,text=white,font=\small]
+  \tikzstyle{red}=[fill=red]
+
+  \node[initial,state] (Q0)                     {$q_{0}$};
+  \node[state]         (QA)  [right of = Q0]    {$q_{a}$};
+  \node[state]         (QB)  [above of = Q0]    {$q_{b}$};
+
+  \path (Q0) edge  [bend left]   node {$\frac{\{A:a\}}{\varnothing}$} (QA)
+             edge  [bend left]   node {$\frac{\{A:b\}}{\varnothing}$} (QB)
+        (QA) edge  [bend left]   node {} (Q0)
+        (QB) edge  [bend left]   node {} (Q0)
+  ;
+\end{tikzpicture}
+
