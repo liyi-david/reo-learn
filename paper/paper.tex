@@ -88,8 +88,7 @@ from binaries with no source code needed.
 
 \section{Timed Connectors as Mealy Machines}
 
-Reo Coordination Model, obviously, is not a \emph{proper model} for learning. 
-
+\subsection{External Behavior of Reo Connectors}
 So far as we can tell, most
 works\cite{DBLP:conf/fase/RaffeltS06, DBLP:journals/corr/ChenHLLTWW15} on automata learning are not
 capable of infinite models. \todo{reason?} Considering the semantics defined in section
@@ -109,7 +108,18 @@ components. As shown in \figurename \ref{fig:reoinfinite}, connectors are able t
 if they are not ready. But what will happen outside the connector, if the datum is rejected? This
 question deserves careful consideration if we are taking an external view.
 
+\subsection{Time Axis}
+Time is involved in several extension of Reo like timed Reo, hybrid Reo, etc.\todo{citations}
+Generally, these models are designed to handle real-time behavior where time is defined in
+$\mathbb{R}$. However, we also found a lot of works where authors use rational time to make things
+easier\todo{citations}.
+
 \subsection{Parameterized Mealy Machine}
+We present a model named \emph{parameterized mealy machine} to represent timed connectors. This
+model is supposed to behave as a middle representation. Connectors are defined as parameterized
+mealy machines, and composed via its production operator. Then original mealy-machine model will be
+taken as semantics of PMM model.
+
 \begin{definition}[Parameterized Mealy Machine]
   A \emph{Parameterized Mealy Machine} is defined as a function $\mathcal{PM}(\Sigma)=\langle
   S(\Sigma), s_0, I, O, \delta(\Sigma), \lambda(\Sigma)\rangle$ that maps an
@@ -132,8 +142,9 @@ question deserves careful consideration if we are taking an external view.
 In the definition above, \emph{Input} and \emph{Output} are used to generate input actions and output actions by the corresponding alphabets and ends.
 \todo{How to say?}
 \[
-Input(\Sigma,I)=\{\}
+Input(\Sigma,I)=\{\}\cup\{T\}
 \]
+where we use $T$ to denote the time action.
 \[
 Output(\Sigma,I)=\{\}
 \]
@@ -180,7 +191,6 @@ Now we can use Parameterized Mealy Machines to define a new semantics to Reo.
   \label{fig:pmmfifo}
 \end{figure}
 
-\todo{finish the definition ..}
 \begin{definition}[Production of Parameterized Mealy Machines]
   Now we're going to define the production operator \emph{prod} of two parameterized mealy machines as,
   \[
@@ -218,6 +228,7 @@ Now we can use Parameterized Mealy Machines to define a new semantics to Reo.
 \end{definition}
 
 \section{From Blackbox to Timed Connectors}
+\subsection{Adapted L* Algorithm}
 \subsection{Equivalence Query}
 Generally, equivalence query has been proved impossible in blackbox
 models\cite{DBLP:journals/iandc/Angluin87}. However, in this
@@ -254,9 +265,7 @@ $\mathcal{M}(S)$. We use $q_{abc}$ to denote them. $q_{001}$ indicates that the 
 filled and others are empty, and $q_{111}$ means that there are no space in any buffer. It's
 obvious that some states like $q_{100}$ is unreachable.
 
-\begin{definition}[Similar]
-  In a mealy machine, two states are similar iff. they have the same output signature.
-\end{definition}
+We say if two states are \emph{similiar} iff. they have the same output signature.
 
 \begin{theorem}[Bound of Counter-Example]
   \label{the:cebound} Assume that an observation table has already been closed with maximum
