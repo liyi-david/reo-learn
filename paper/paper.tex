@@ -90,7 +90,8 @@ from binaries with no source code needed.
 
 Reo Coordination Model, obviously, is not a \emph{proper model} for learning. 
 
-So far as we can tell, most works\cite{DBLP:conf/fase/RaffeltS06} on automata learning are not
+So far as we can tell, most
+works\cite{DBLP:conf/fase/RaffeltS06, DBLP:journals/corr/ChenHLLTWW15} on automata learning are not
 capable of infinite models. \todo{reason?} Considering the semantics defined in section
 \ref{sec:reo}, it's apparent that every finite connector has a corresponding constraint
 automata, and the automata is also finite. Unfortunately, when checking the further definition of
@@ -185,32 +186,34 @@ Now we can use Parameterized Mealy Machines to define a new semantics to Reo.
   \[
   prod(PM_1,PM_2)=PM_3
   \]
-  as follows, 
+  as follows. Here we assume that $PM_2.O\cap PM_1.I=\varnothing$
   \begin{itemize}
   	\item[-] $\forall\Sigma, PM_3.S(\Sigma)=PM_1.S(\Sigma)\times PM_2.S(\Sigma)$
-    \item[-] $PM_3.I=PM_1.I\cup PM_2.I-PM_1.O\cup PM_2.O$
-    \item[-] $PM_3.O=PM_1.O\cup PM_2.O-PM_1.I\cup PM_2.I$
+    \item[-] $PM_3.I=PM_1.I\cup PM_2.I-PM_1.O$
+    \item[-] $PM_3.O=PM_1.O\cup PM_2.O-PM_2.I$
     \item[-] $PM_3.s_0=(PM_1.s_0, PM_2.s_0)$
     \item[-] $\forall\Sigma, PM_3.\delta(\Sigma)((s_1,s_2), i)=$
       \begin{displaymath}
         \left\{
         \begin{array}[h]{ll}
-          q_d & s=q_0\land i=(A:d,B:\rnoread) \\
-          q_d & s=q_{d'}\land i=(A:d,B:\rread) \\
-          q_0 & otherwise \\
+          (Out_1 + Out_2)|_{PM_3.O} & \rblock\land Out_2\neq\rblock \\
+          \rblock & otherwise \\
         \end{array}
         \right.
       \end{displaymath}
-    \item[-] $\forall\Sigma, PM_3.\lambda(\Sigma)((s_1,s_2),i)=$
-      \begin{displaymath}
-        \left\{
-        \begin{array}[h]{ll}
-          q_d & s=q_0\land i=(A:d,B:\rnoread) \\
-          q_d & s=q_{d'}\land i=(A:d,B:\rread) \\
-          q_0 & otherwise \\
-        \end{array}
-        \right.
-      \end{displaymath}
+      where we have
+      \begin{itemize}
+        \item[*] $In_1 = i|_{PM_1.I}$
+        \item[*] $Out_1 = PM_1.\delta(\Sigma)(s_1,In_1)$
+        \item[*] $In_2 = (Out_1 + i)|_{PM_2.I}$
+        \item[*] $Out_2 = PM_2.\delta(\Sigma)(s_2,In_2)$
+      \end{itemize}
+    \item[-] $\forall\Sigma, PM_3.\lambda(\Sigma)((s_1,s_2),i)=(s_1',s_2')$
+      where we have
+      \begin{itemize}
+        \item[*] $s_1' = PM_1.\lambda(\Sigma)(s_1,In_1)$
+        \item[*] $s_2' = PM_2.\lambda(\Sigma)(s_2,In_2)$
+      \end{itemize}
   \end{itemize}
 \end{definition}
 
