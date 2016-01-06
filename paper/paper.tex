@@ -75,6 +75,7 @@ from binaries with no source code needed.
 
 \subsection{Reo Coordination Language}
 \label{sec:reo}
+Reo Coordination Language\cite{DBLP:journals/mscs/Arbab04}
 
 \begin{figure}[h]
   \begin{center}
@@ -108,14 +109,35 @@ components. As shown in \figurename \ref{fig:reoinfinite}, connectors are able t
 if they are not ready. But what will happen outside the connector, if the datum is rejected? This
 question deserves careful consideration if we are taking an external view.
 
-\subsection{Time Axis}
-Time is involved in several extension of Reo like timed Reo, hybrid Reo, etc.\todo{citations}
+\subsection{Time Domain}
+Time is involved in several extension of Reo like timed Reo, hybrid Reo, etc.
 Generally, these models are designed to handle real-time behavior where time is defined in
 $\mathbb{R}$. However, we also found a lot of works where authors use rational time to make things
 easier\todo{citations}.
 
+In this paper, we choose the rational number field $\mathbb{Q}$ as our time domain, which simplifies
+discretization of timed behaviors greatly.
+
+As presented in section \ref{sec:reo}, all real-time behavior in timed Reo comes with the
+\emph{t-timer} channels, and the number of these channels are apparently finite. We use
+$t_i\in\mathbb{Q}$ to denote the delays of these timer channels, and now we can define a precision
+function $prec$.
+\[
+prec(t_1,\cdots,t_n) = \max_T\{\forall t_i.\exists n_i\in\mathbb{N}.t_i=n_i\cdot T\}
+\]
+It's easy to prove that such a $T$ is always existing.
+
+In real systems, the concept \emph{time precision} is widely used with the name ``clock-period''.
+Most of the time, we know the clock-cycle of some hardware components, even without any idea of its
+structure. With such precision $T$ given, it's reasonable to assume that all $t$-timers are actually
+$nT$-timers. In following sections, we'll use $n$-timers instead.
+
+Besides, we're going to add a single ``T'' action in mealy machines. It indicates that a transition
+will take a time unit to finish, and all outputs would come out after that.
+
 \subsection{Parameterized Mealy Machine}
-We present a model named \emph{parameterized mealy machine} to represent timed connectors. This
+We present a model named \emph{parameterized mealy machine} to represent timed connectors
+(hereinafter referred to as PMM). This
 model is supposed to behave as a middle representation. Connectors are defined as parameterized
 mealy machines, and composed via its production operator. Then original mealy-machine model will be
 taken as semantics of PMM model.
@@ -125,7 +147,7 @@ taken as semantics of PMM model.
   S(\Sigma), s_0, I, O, \delta(\Sigma), \lambda(\Sigma)\rangle$ that maps an
   alphabet to its corresponding Mealy Machine. 
   \begin{itemize}
-    \item[-] $\Sigma$ is a \emph{finite} datum alphabet (hereafter referred to as an alphabet)
+    \item[-] $\Sigma$ is a \emph{finite} datum alphabet (hereinafter referred to as an alphabet)
     \item[-] $S$ is a function that maps an alphabet to a \emph{finite} set of
       states. We use $S(\Sigma)$ to denote the state set.
     \item[-] $I$ is a finite set of source-ends.
@@ -226,6 +248,8 @@ Now we can use Parameterized Mealy Machines to define a new semantics to Reo.
       \end{itemize}
   \end{itemize}
 \end{definition}
+
+\todo{example of production, maybe fifo+timer}
 
 \section{From Blackbox to Timed Connectors}
 \subsection{Adapted L* Algorithm}
