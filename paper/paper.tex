@@ -132,13 +132,14 @@ Most of the time, we know the clock-cycle of some hardware components, even with
 structure. With such precision $T$ given, it's reasonable to assume that all $t$-timers are actually
 $nT$-timers. In following sections, we'll use $n$-timers instead.
 
-Besides, we're going to add a single ``T'' action in mealy machines. It indicates that a transition
+Besides, we're going to add a ``T'' action in mealy machines. It indicates that a transition
 will take a time unit to finish, and all outputs would come out after that.
 
 \subsection{Parameterized Mealy Machine}
 We present a model named \emph{parameterized mealy machine} to represent timed connectors
-(hereinafter referred to as PMM). This
-model is supposed to behave as a middle representation. Connectors are defined as parameterized
+(hereinafter referred to as PMM). 
+
+This model is supposed to behave as a middle representation. Connectors are defined as parameterized
 mealy machines, and composed via its production operator. Then original mealy-machine model will be
 taken as semantics of PMM model.
 
