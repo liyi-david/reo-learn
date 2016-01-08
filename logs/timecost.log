@@ -1,0 +1,27 @@
+# 2-buffer
+
+Time Cost in [SeqSimulate]: 169.16065969600018
+Time Cost in [SeqRun]: 0.0040008740000000015
+
+real  2m49.201s
+user  4m7.098s
+sys 0m51.269s
+
+# alternator
+
+Time Cost in [SeqSimulate]: 126.46814613299988
+Time Cost in [SeqRun]: 0.003405461000000002
+
+real  2m6.504s
+user  2m45.114s
+sys 0m25.974s
+
+# fifo channel
+
+Time Cost in [SeqSimulate]: 41.571831111
+Time Cost in [SeqRun]: 0.0004321850000000001
+
+real  0m41.579s
+user  0m41.715s
+sys 0m0.141s
+
