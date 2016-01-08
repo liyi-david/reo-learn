@@ -1,18 +1,14 @@
-package alternator
+package expfifo
 
 import "../../lib/sul"
 import "../../lib/reo"
 import "time"
 
-/*
-	[ARCHITECTURE]
-*/
-
 func GetOracle() *sul.Oracle {
 	o := new(sul.Oracle)
-	o.InPorts = []string{"A", "B"}
+	o.InPorts = []string{"A"}
 	o.MidPorts = []string{"M0", "M1", "M2", "M3", "M4", "M5"}
-	o.OutPorts = []string{"C"}
+	o.OutPorts = []string{"B"}
 	o.TimeUnit = 40 * time.Millisecond
 	o.GenerateInst = func() *sul.SulInst {
 		r := new(sul.SulInst)
