@@ -141,6 +141,19 @@ func (self *Output) EqualTo(o *Output) bool {
 	return true
 }
 
+func (self OutputSeq) EqualTo(o OutputSeq) bool {
+	if len(self) != len(o) {
+		return false
+	} else {
+		for i := 0; i < len(o); i++ {
+			if !self[i].EqualTo(&o[i]) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
 /********************* Definition of SulInst ******************/
 
 // Instance of System Under Test
@@ -244,7 +257,8 @@ func (self *Oracle) GetInputIndex(item Input) int {
 	panic("there's an undefined action " + item.String())
 }
 
-func (self *Oracle) SeqSimulate(ins InputSeq) OutputSeq {
+// NOTE this function is used to process directly simultion on suls
+func (self *Oracle) SeqSimulateIteration(ins InputSeq) OutputSeq {
 	inst := self.GenerateInst()
 	inst.OutBufs = map[string]chan string{}
 	// initialization of buffers
@@ -303,6 +317,33 @@ func (self *Oracle) SeqSimulate(ins InputSeq) OutputSeq {
 	return out
 }
 
+func (self *Oracle) SeqSimulate(ins InputSeq) OutputSeq {
+	var ct = 0
+	var count = 0
+	var seq OutputSeq
+	var rec OutputSeq = OutputSeq{}
+
+	for ct <= ibound {
+		count++
+		reo.GetLogger().Println("[SEQSIMULATE] ITERATE", count, "---------------------------------------")
+		seq = self.SeqSimulateIteration(ins)
+		if len(seq) == 0 {
+			// a panic happens
+			logger.Println("[SEQSIMULATE] PANIC CAUGHT")
+			continue
+		} else {
+			if ct > 0 && seq.EqualTo(rec) {
+				ct++
+			} else {
+				// ct = 0 : the first iteration || not equal : means there's an error
+				ct = 1
+				rec = seq
+			}
+		}
+	}
+	return seq
+}
+
 var mqcounter int = 0
 var rdcounter int = 0
 
@@ -330,31 +371,10 @@ func (self *Oracle) MQuery(in InputSeq) Output {
 	}
 	logger.Println("[MQUERY]", in.String(), "COUNTER: ", mqcounter)
 	mqcounter++
-	var rec Output
-	var ct = 0
-	var count = 0
-	var seq OutputSeq
-	for ct <= ibound {
-		count++
-		reo.GetLogger().Println("[MQUERY] ITERATE", count, "---------------------------------------")
-		seq = self.SeqSimulate(in)
-		if len(seq) == 0 {
-			// a panic happens
-			logger.Println("[MQUERY] PANIC CAUGHT")
-			continue
-		} else {
-			t := seq[len(seq)-1]
-			if ct > 0 && t.EqualTo(&rec) {
-				ct++
-			} else {
-				// ct = 0 : the first iteration || not equal : means there's an error
-				ct = 1
-				rec = t
-			}
-		}
-	}
+
+	seq := self.SeqSimulate(in)
 	self.Cache.insert(in, seq)
-	return rec
+	return seq[len(seq)-1]
 }
 
 type Executable interface {
