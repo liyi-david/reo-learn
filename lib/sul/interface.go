@@ -348,6 +348,22 @@ func (self *Oracle) SeqSimulateIteration(ins InputSeq) OutputSeq {
 }
 
 func (self *Oracle) SeqSimulate(ins InputSeq) OutputSeq {
+	// we use cache technique to improve the effiency of MQuery,
+	// otherwise this would make it really slow
+	if self.Cache == nil {
+		self.Cache = makenode()
+	} else {
+		r, ok := self.Cache.search(ins)
+		if ok {
+			rdcounter++
+			logger.Println("[SEQSIMULATE]", ins.String(), "REDUCE: ", rdcounter)
+			return r
+		}
+	}
+
+	logger.Println("[SEQSIMULATE]", ins.String(), "COUNTER: ", mqcounter)
+	mqcounter++
+
 	var ct = 0
 	var count = 0
 	var seq OutputSeq
@@ -373,31 +389,17 @@ func (self *Oracle) SeqSimulate(ins InputSeq) OutputSeq {
 		}
 	}
 
+	// save simulation result to cache
+	if treeopt {
+		self.Cache.insert(ins, seq)
+	}
+
 	mquerytime += time.Now().Sub(starttime).Seconds()
 	return seq
 }
 
 func (self *Oracle) MQuery(in InputSeq) Output {
-	// we use cache technique to improve the effiency of MQuery,
-	// otherwise this would make it really slow
-	if self.Cache == nil {
-		self.Cache = makenode()
-	} else {
-		r := self.Cache.search(in)
-		if r != nil {
-			rdcounter++
-			logger.Println("[MQUERY]", in.String(), "REDUCE: ", rdcounter)
-			return *r
-		}
-	}
-
-	logger.Println("[MQUERY]", in.String(), "COUNTER: ", mqcounter)
-	mqcounter++
-
 	seq := self.SeqSimulate(in)
-	if treeopt {
-		self.Cache.insert(in, seq)
-	}
 	return seq[len(seq)-1]
 }
 
@@ -436,7 +438,8 @@ func (self Oracle) EQuery(hypo Executable) (InputSeq, bool) {
 	}
 	// existing-check and generation of it's corresponding execution under hypothesis
 	for i := 0; i < len(seqs); i++ {
-		if self.Cache.search(seqs[i]) == nil {
+		_, ok := self.Cache.search(seqs[i])
+		if !ok {
 			_, hypout := hypo.SeqRun(seqs[i])
 			sysout := self.SeqSimulate(seqs[i])
 			logger.Println("[EQUERY] HypoCheck", seqs[i], hypout, sysout)
@@ -450,6 +453,9 @@ func (self Oracle) EQuery(hypo Executable) (InputSeq, bool) {
 					return seqs[i][:j+1], true
 				}
 			}
+		} else {
+			// optimization counter
+			rdcounter++
 		}
 	}
 	return InputSeq{}, false

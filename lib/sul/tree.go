@@ -25,16 +25,18 @@ func (self *tnode) insert(iseq InputSeq, oseq OutputSeq) {
 	}
 }
 
-func (self *tnode) search(iseq InputSeq) *Output {
+func (self *tnode) search(iseq InputSeq) (OutputSeq, bool) {
 	p := self
+	rel := OutputSeq{}
 	for i := 0; i < len(iseq); i++ {
 		index := iseq[i].String()
 		next, ok := p.child[index]
 		if !ok {
-			return nil
+			return rel, false
 		} else {
 			p = next
+			rel = append(rel, p.result)
 		}
 	}
-	return &p.result
+	return rel, true
 }
