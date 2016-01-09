@@ -257,6 +257,36 @@ func (self *Oracle) GetInputIndex(item Input) int {
 	panic("there's an undefined action " + item.String())
 }
 
+/********************************* PERFORMANCE ANALYSIS ******************************************/
+// counter of membership query
+var mqcounter int = 0
+var rdcounter int = 0
+
+func CounterReset() {
+	mqcounter = 0
+	rdcounter = 0
+}
+
+func Counter() (int, int) {
+	return mqcounter, rdcounter
+}
+
+// time-cost analysis
+var mquerytime float64 = 0
+
+func MembershipTime() float64 {
+	return mquerytime
+}
+
+// tree-optimization switch
+var treeopt = true
+
+func ToggleTreeOptimization() {
+	treeopt = !treeopt
+}
+
+/************************************************************************************************/
+
 // NOTE this function is used to process directly simultion on suls
 func (self *Oracle) SeqSimulateIteration(ins InputSeq) OutputSeq {
 	inst := self.GenerateInst()
@@ -322,6 +352,7 @@ func (self *Oracle) SeqSimulate(ins InputSeq) OutputSeq {
 	var count = 0
 	var seq OutputSeq
 	var rec OutputSeq = OutputSeq{}
+	starttime := time.Now()
 
 	for ct <= ibound {
 		count++
@@ -341,19 +372,9 @@ func (self *Oracle) SeqSimulate(ins InputSeq) OutputSeq {
 			}
 		}
 	}
+
+	mquerytime += time.Now().Sub(starttime).Seconds()
 	return seq
-}
-
-var mqcounter int = 0
-var rdcounter int = 0
-
-func CounterReset() {
-	mqcounter = 0
-	rdcounter = 0
-}
-
-func Counter() (int, int) {
-	return mqcounter, rdcounter
 }
 
 func (self *Oracle) MQuery(in InputSeq) Output {
@@ -369,11 +390,14 @@ func (self *Oracle) MQuery(in InputSeq) Output {
 			return *r
 		}
 	}
+
 	logger.Println("[MQUERY]", in.String(), "COUNTER: ", mqcounter)
 	mqcounter++
 
 	seq := self.SeqSimulate(in)
-	self.Cache.insert(in, seq)
+	if treeopt {
+		self.Cache.insert(in, seq)
+	}
 	return seq[len(seq)-1]
 }
 
