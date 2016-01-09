@@ -9,13 +9,17 @@
   \tikzstyle{red}=[fill=red]
 
   \node[initial,state] (Q0)                     {$q_{0}$};
-  \node[state]         (QA)  [right of = Q0]    {$q_{a}$};
-  \node[state]         (QB)  [above of = Q0]    {$q_{b}$};
+  \node[state]         (QA)  [above right = of Q0]    {$q_{a}$};
+  \node[state]         (QB)  [below right = of Q0]    {$q_{b}$};
 
-  \path (Q0) edge  [bend left]   node {$\frac{\{A:a\}}{\varnothing}$} (QA)
-             edge  [bend left]   node {$\frac{\{A:b\}}{\varnothing}$} (QB)
-        (QA) edge  [bend left]   node {} (Q0)
-        (QB) edge  [bend left]   node {} (Q0)
+  \path
+  (Q0)
+  edge  [bend left]   node {$\frac{\{A:a, B:\rnoread\}}{\varnothing}$} (QA)
+  edge  [bend left]   node {$\frac{\{A:b, B:\rnoread\}}{\varnothing}$} (QB)
+  (QA)
+  edge  [bend left]   node {$\frac{\{A:\bot,B:\rread\}}{\{B:a\}}$} (Q0)
+  (QB)
+  edge  [bend left]   node {$\frac{\{A:\bot,B:\rread\}}{\{B:b\}}$} (Q0)
   ;
 \end{tikzpicture}
 

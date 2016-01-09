@@ -206,6 +206,7 @@ Now we can use Parameterized Mealy Machines to define a new semantics to Reo.
   \end{itemize}
 \end{example}
 
+\todo{modify this image}
 \begin{figure}[h]
   \begin{center}
     \input{./images/pmmfifo.tex}
@@ -259,6 +260,10 @@ Now we can use Parameterized Mealy Machines to define a new semantics to Reo.
 \subsection{Closeness}
 
 \subsection{Perfomance Optimization}
+In the learning algorithm, the most time-consuming operations are membership queries and
+equivanlence queries. 
+
+\todo{analysis table}
 
 \subsection{Counter-Examples}
 Generally, equivalence query has been proved impossible in blackbox
@@ -312,9 +317,72 @@ We say if two states are \emph{similiar} iff. they have the same output signatur
   \end{enumerate}
 \end{IEEEproof}
 
-\section{Case Studies}
-\subsection{Alternator}
-\subsection{Timed TODO}
+\section{Experiments}
+Both \emph{Reo Coordination Models} and \emph{Adapted L* Algorithm} are implemented in Golang.
+\todo{cite}
+Golang (or Google Go) is a rising programming language started by Google Inc. The language is widely
+known for its elegant design and impressive efficiency. Moreover, the concurrency model of Golang
+comes from CSP\cite{DBLP:books/ph/Hoare85}. As a channel-based model, CSP shares a similar idea with
+Reo and makes our implementation much more natural.
+
+We have programmed Reo channels as a new package in Golang. The package is well-written for not only
+formal verification but also practical use.
+
+All the following experiments are coded under Golang \emph{1.2.1} and executed on a laptop with 8GB
+of RAM and a Core i7-3630 CPU.
+
+\subsection{Case Studies}
+\subsection{Performance Optimization}
+As a well-known learning algorithm, L* has proved its efficiency in models without time.
+However, when dealing with timed connectors, the algorithm failed to meet our expectation.
+
+\begin{table}[h]
+  \renewcommand{\arraystretch}{1.3}
+  \caption{Time-Cost Analysis}
+  \label{tabel:timecost}
+  \centering
+  \begin{tabular}{l||rrr}
+    \hline
+    & FIFO & Alternator & Gate \\
+    \hline\hline
+    Membership Query(s) & 41.571 & 126.468 & 169.161 \\
+    Hypothesis Query(s) & 0.001 & 0.003 & 0.004 \\
+    Total Time(s) & 41.715 & 165.114 & 247.098\\
+    Membership Query(\%) & 99.6 & 76.6 & 68.5\\
+    \hline
+  \end{tabular}
+\end{table}
+
+As shown in Table \ref{tabel:timecost}, time comsumption mainly comes from membership queries.
+Since time is involved in our model, it's inevitably that simulation takes time to behave normally.
+Even worse, since our models are treated as blackbox, there's little room for optimization. The only
+way to reduce time cost is trying not to call the simulation process. Basic ideas are listed as
+follows:
+
+\begin{itemize}
+  \item When constructing \emph{Obs} tables, there are lots of redundant calls to membership
+    queries. For example, a sequence with prefix 'aa' and suffix 'b' is exactly same as another one
+    with prefix 'a' and suffix 'ab'.
+  \item Simulation on mealy machines can provide multi-step output. Consequently, if we has
+    simulated an 'abc' sequence, there's no reason to perform simulation on an 'ab' sequence.
+\end{itemize}
+
+To reduce these repeated simulation, we use a cache to save all simulation results. 
+\begin{table}[h]
+  \renewcommand{\arraystretch}{1.3}
+  \caption{Reduction of Membership Queries}
+  \label{tabel:cacheoptimization}
+  \centering
+  \begin{tabular}{l||rrr}
+    \hline
+    & FIFO & Alternator & Gate \\
+    \hline\hline
+    Before & 41.571 & 126.468 & 169.161 \\
+    After & 41.571 & 126.468 & 169.161 \\
+    \hline
+  \end{tabular}
+\end{table}
+
 
 \section{Conclusion and Future Work}
 

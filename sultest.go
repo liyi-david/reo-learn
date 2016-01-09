@@ -29,11 +29,12 @@ func main() {
 	sul.SetReoDelay(10)
 	sul.SetBound(2)
 	// logs on/off
-	// sul.CloseLog()
+	sul.CloseLog()
 	sul.CloseReoLog()
 	// learn.CloseLog()
+	// sul.ToggleTreeOptimization()
 	// -------------- CONFIGURATION END --------------------
-	var sulname = "time"
+	var sulname = "fifo"
 	var s *sul.Oracle
 	switch sulname {
 	case "buf2":
@@ -73,4 +74,6 @@ func main() {
 	obs := learn.LStar(s)
 	logger.Println(obs.GetHypoStr())
 	logger.Println(sul.Counter())
+	logger.Println("Time Cost in [SeqSimulate]:", sul.MembershipTime())
+	logger.Println("Time Cost in [SeqRun]:", learn.RunTime())
 }
