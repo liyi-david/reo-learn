@@ -19,10 +19,8 @@ All the codes are written under Google Go.
 ## TODO
 - abstract
 - full paper
-- realize the EQuery function **finished**
-- put time channels in **finished**
 - there's problem in 2-buffer. in the second round, obstables cannot be displayed properly *partly solved on my laptop*
-- lack of redundant in SeqSimulate lead to little problems in Equivanlence Query **finished**
+- tree optimizations should be applied in seqsimulation instead of mquery.
 
 ## logs
 
