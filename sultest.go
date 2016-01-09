@@ -34,7 +34,7 @@ func main() {
 	// learn.CloseLog()
 	// sul.ToggleTreeOptimization()
 	// -------------- CONFIGURATION END --------------------
-	var sulname = "fifo"
+	var sulname = "buf2"
 	var s *sul.Oracle
 	switch sulname {
 	case "buf2":

@@ -5,6 +5,9 @@
 \usepackage{tikz}
 \usepackage{reotex}
 
+% package url is used when citing a website
+\usepackage{url}
+
 \usepackage{amssymb}
 \usepackage{cite}
 \usepackage[normalem]{ulem}
@@ -110,10 +113,11 @@ if they are not ready. But what will happen outside the connector, if the datum 
 question deserves careful consideration if we are taking an external view.
 
 \subsection{Time Domain}
-Time is involved in several extension of Reo like timed Reo, hybrid Reo, etc.
+Time is involved in several extension version of Reo. For example, Timed
+Reo\cite{DBLP:conf/sefm/ArbabBBR04}, Hybrid Reo\cite{DBLP:conf/icfem/ChenSS14}, etc.
 Generally, these models are designed to handle real-time behavior where time is defined in
 $\mathbb{R}$. However, we also found a lot of works where authors use rational time to make things
-easier\todo{citations}.
+easier.
 
 In this paper, we choose the rational number field $\mathbb{Q}$ as our time domain, which simplifies
 discretization of timed behaviors greatly.
@@ -174,7 +178,7 @@ Output(\Sigma,I)=\{\}
 
 Now we can use Parameterized Mealy Machines to define a new semantics to Reo.
 \begin{example}[PMM Semantics of FIFO channel $PM_{FIFO}$]
-  The semantics of FIFO channel with source end $A$ and sink end $B$ can be defined as follows
+  The semantics of FIFO channel with source end $A$ and sink end $B$ can be defined as follows.
   \begin{itemize}
     \item[-] $S(\Sigma)=\{q_0\}\cup\{q_d|d\in\Sigma\}$
     \item[-] $I=\{A\}$
@@ -206,14 +210,17 @@ Now we can use Parameterized Mealy Machines to define a new semantics to Reo.
   \end{itemize}
 \end{example}
 
-\todo{modify this image}
+Besides, the concrete mealy machine (where $\Sigma=\{a\}$) is shown in Figure \ref{fig:pmmfifo}.
 \begin{figure}[h]
   \begin{center}
     \input{./images/pmmfifo.tex}
   \end{center}
-  \caption{PMM-based Semantics of FIFO, where $\Sigma=\{a,b\}$}
+  \caption{PMM-based Semantics of FIFO, where $\Sigma=\{a\}$}
   \label{fig:pmmfifo}
 \end{figure}
+
+Similarly, we can use parameterized mealy machines to define the semantics of other basic timed Reo
+channels. Now we're going to show how to compose these channels into complicated connectors.
 
 \begin{definition}[Production of Parameterized Mealy Machines]
   Now we're going to define the production operator \emph{prod} of two parameterized mealy machines as,
@@ -258,12 +265,6 @@ Now we can use Parameterized Mealy Machines to define a new semantics to Reo.
 \subsection{Observation Table}
 
 \subsection{Closeness}
-
-\subsection{Perfomance Optimization}
-In the learning algorithm, the most time-consuming operations are membership queries and
-equivanlence queries. 
-
-\todo{analysis table}
 
 \subsection{Counter-Examples}
 Generally, equivalence query has been proved impossible in blackbox
@@ -318,8 +319,9 @@ We say if two states are \emph{similiar} iff. they have the same output signatur
 \end{IEEEproof}
 
 \section{Experiments}
-Both \emph{Reo Coordination Models} and \emph{Adapted L* Algorithm} are implemented in Golang.
-\todo{cite}
+Both \emph{Reo Coordination Models} and \emph{Adapted L* Algorithm} are implemented in
+Golang\cite{golang}.
+
 Golang (or Google Go) is a rising programming language started by Google Inc. The language is widely
 known for its elegant design and impressive efficiency. Moreover, the concurrency model of Golang
 comes from CSP\cite{DBLP:books/ph/Hoare85}. As a channel-based model, CSP shares a similar idea with
@@ -377,8 +379,9 @@ To reduce these repeated simulation, we use a cache to save all simulation resul
     \hline
     & FIFO & Alternator & Gate \\
     \hline\hline
-    Before & 41.571 & 126.468 & 169.161 \\
-    After & 41.571 & 126.468 & 169.161 \\
+    Before & 41.571 &  & 1034 \\
+    After & 41.571 &  & 707 \\
+    Reduction Rate & & & 31.6\% \\
     \hline
   \end{tabular}
 \end{table}

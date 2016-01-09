@@ -1,5 +1,6 @@
-\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.9cm,
-                    semithick]
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.6cm,
+  semithick]
+  \tikzstyle{every node}=[font=\small]
   \ionode{(P-A)}{(-4,0)}{(-4,0.5) node {$A$}}
   \ionode{(P-B)}{(-2,0)}{(-2, 0.5) node {$B$}}
   
@@ -9,17 +10,16 @@
   \tikzstyle{red}=[fill=red]
 
   \node[initial,state] (Q0)                     {$q_{0}$};
-  \node[state]         (QA)  [above right = of Q0]    {$q_{a}$};
-  \node[state]         (QB)  [below right = of Q0]    {$q_{b}$};
+  \node[state]         (QA)  [right = of Q0]    {$q_{a}$};
 
   \path
   (Q0)
-  edge  [bend left]   node {$\frac{\{A:a, B:\rnoread\}}{\varnothing}$} (QA)
-  edge  [bend left]   node {$\frac{\{A:b, B:\rnoread\}}{\varnothing}$} (QB)
+  edge  [bend left]     node {$\frac{\{A:a, B:\rnoread\}}{\varnothing}$} (QA)
+  edge  [loop below]    node {$\frac{\{A:\bot, B:\rread\}}{\varnothing}$} (QA)
+  edge  [loop above]    node {$\frac{\{A:a, B:\rread\}}{\{B:a\}}$} (QA)
   (QA)
-  edge  [bend left]   node {$\frac{\{A:\bot,B:\rread\}}{\{B:a\}}$} (Q0)
-  (QB)
-  edge  [bend left]   node {$\frac{\{A:\bot,B:\rread\}}{\{B:b\}}$} (Q0)
+  edge  [bend left]     node {$\frac{\{A:\bot,B:\rread\}}{\{B:a\}}$} (Q0)
+  edge  [loop right]    node {$\frac{\{A:a,B:\rread\}}{\{B:a\}}$} (QA)
   ;
 \end{tikzpicture}
 
