@@ -7,6 +7,7 @@ import "log"
 import "os"
 import "io"
 import "io/ioutil"
+import "time"
 
 /*
 	Created By Li Yi @ Nov 17
@@ -121,9 +122,21 @@ func (self *Obs) expandLp() {
 	self.SL = append(self.SL, newLp...)
 }
 
+/********************************* PERFORMANCE ANALYSIS ******************************************/
+// time-cost analysis
+var hyporuntime float64 = 0
+
+func RunTime() float64 {
+	return hyporuntime
+}
+
+/*************************************************************************************************/
+
 func (self *Obs) SeqRun(in sul.InputSeq) ([]sul.InputSeq, []sul.Output) {
 	var loc = 0
 	var rel *sul.Output
+	starttime := time.Now()
+
 	indarr, outarr := []sul.InputSeq{}, []sul.Output{}
 	for i := 0; i < len(in); i++ {
 		inputindex := self.orac.GetInputIndex(*in[i])
@@ -132,6 +145,8 @@ func (self *Obs) SeqRun(in sul.InputSeq) ([]sul.InputSeq, []sul.Output) {
 		indarr = append(indarr, self.SL[loc].Index)
 		outarr = append(outarr, *rel)
 	}
+
+	hyporuntime += time.Now().Sub(starttime).Seconds()
 	return indarr, outarr
 }
 
