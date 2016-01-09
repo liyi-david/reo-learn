@@ -43,17 +43,26 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-  Coordination is becoming more and more important, especially in concurrent programming and
-  distributed systems. More and more tools are built to verify coordination models while most of
-  them are facing the same problem: \emph{lack of models}. In many cases, somehow we need to check a
-  connector with nothing more than a binary file. In this paper, we present a learning-based
-  framework to formally verify a Reo connector in case there is no source code. From some practical
-  cases, we've shown the effciency of our approach. Both the algorithm and Reo itself have been
-  ported to \emph{Golang}, making it fully-prepared for parallel programming.
+  % reo coordination models
+  Coordination languages provide a mean to formally specify the communication and
+  reaction between different components. Such models play key roles in concurrent programming and
+  large-scale distributed systems.
+  % algorithms
+  In this paper, an active learning framework is proposed to extract timed connectors from black-box
+  systems.
+  First of all, we introduce parameterized mealy machine as an operational semantics for
+  channel-based coordination language Reo.
+  Parameterized mealy machine serves as a bridge between Reo connectors and mealy machines. With
+  production operator, complex connectors can be composed by basic channels and transformed into
+  mealy machines. 
+  Moreover, we adapt L*, a well-known learning algorithm, to timed connectors (in form of mealy
+  machines). The new algorithm has shown its efficiency in multiple cases.
+  % implementation
+  Implementations of this framework is provided as a package in \texttt{Golang}.
 \end{abstract}
 
 \begin{IEEEkeywords}
-  active learning, coordination, formal method.
+  Active Learning, Coordination Languages, Formal Methods
 \end{IEEEkeywords}
 
 \section{Introduction}
@@ -178,6 +187,7 @@ Output(\Sigma,I)=\{\}
 
 Now we can use Parameterized Mealy Machines to define a new semantics to Reo.
 \begin{example}[PMM Semantics of FIFO channel $PM_{FIFO}$]
+  \label{example:pmmfifo}
   The semantics of FIFO channel with source end $A$ and sink end $B$ can be defined as follows.
   \begin{itemize}
     \item[-] $S(\Sigma)=\{q_0\}\cup\{q_d|d\in\Sigma\}$
@@ -355,11 +365,13 @@ However, when dealing with timed connectors, the algorithm failed to meet our ex
   \end{tabular}
 \end{table}
 
-As shown in Table \ref{tabel:timecost}, time comsumption mainly comes from membership queries.
+As shown in Table \ref{tabel:timecost}, time consumption mainly comes from membership queries.
 Since time is involved in our model, it's inevitably that simulation takes time to behave normally.
-Even worse, since our models are treated as blackbox, there's little room for optimization. The only
-way to reduce time cost is trying not to call the simulation process. Basic ideas are listed as
-follows:
+Even worse, since our models are treated as blackbox. With no access to inner behaviour of the
+connectors, it's almost impossible to accelerate the simulation process.
+
+Fortunately, there are still other optimization solutions. After reviewing our algorithm, we found
+that simulations on similar sequences were invoked frequently:
 
 \begin{itemize}
   \item When constructing \emph{Obs} tables, there are lots of redundant calls to membership
@@ -369,7 +381,16 @@ follows:
     simulated an 'abc' sequence, there's no reason to perform simulation on an 'ab' sequence.
 \end{itemize}
 
-To reduce these repeated simulation, we use a cache to save all simulation results. 
+If previous simulation results are stored in a well-maintained cache, the time-cost in
+simulation process could be reduced signficiantly. In this work, we use a multiway tree to buffer
+these results. A brief example of such trees can be found in Example \ref{example:tree}.
+
+\begin{example}[Multiway-Tree Cache]
+  \label{example:tree}
+  Considering the FIFO channel presented in Example \ref{example:pmmfifo}. 
+  \todo{draw a graph for multiway-tree cache}
+\end{example}
+
 \begin{table}[h]
   \renewcommand{\arraystretch}{1.3}
   \caption{Reduction of Membership Queries}
@@ -379,9 +400,9 @@ To reduce these repeated simulation, we use a cache to save all simulation resul
     \hline
     & FIFO & Alternator & Gate \\
     \hline\hline
-    Before & 41.571 &  & 1034 \\
-    After & 41.571 &  & 707 \\
-    Reduction Rate & & & 31.6\% \\
+    Before & 93 & 880 & 1034 \\
+    After & 90 & 725 & 707 \\
+    Reduction Rate & 3.2\% & 21.4\% & 31.6\% \\
     \hline
   \end{tabular}
 \end{table}
