@@ -12,6 +12,7 @@ import buf2 "./example/2-buffer"
 import altn "./example/alternator"
 import fifo "./example/fifo"
 import timer "./example/timer"
+import expfifo "./example/expfifo"
 
 import "./lib/learn"
 import "./lib/sul"
@@ -29,12 +30,12 @@ func main() {
 	sul.SetReoDelay(10)
 	sul.SetBound(2)
 	// logs on/off
-	sul.CloseLog()
+	// sul.CloseLog()
 	sul.CloseReoLog()
 	// learn.CloseLog()
 	// sul.ToggleTreeOptimization()
 	// -------------- CONFIGURATION END --------------------
-	var sulname = "altn"
+	var sulname = "expfifo"
 	var s *sul.Oracle
 	switch sulname {
 	case "buf2":
@@ -48,6 +49,8 @@ func main() {
 		break
 	case "time":
 		s = timer.GetOracle()
+	case "expfifo":
+		s = expfifo.GetOracle()
 	}
 	// -------------- ACTIVE LEARNING START --------------------
 	// following are test code for MQuery
@@ -71,6 +74,7 @@ func main() {
 		}
 		return
 	}
+
 	obs := learn.LStar(s)
 	logger.Println(obs.GetHypoStr())
 	logger.Println(sul.Counter())

@@ -3,6 +3,7 @@
 % used for flow charts
 \usepackage{pgf}
 \usepackage{tikz}
+\usepackage{tikz-qtree}
 \usepackage{reotex}
 
 % package url is used when citing a website
@@ -30,34 +31,29 @@
 \newcommand{\rnoread}[0]{\frownie}
 
 
-\title{Active Learning : From Blackbox To Timed Connectors}
+\title{Active Learning from Blackbox to Timed Connectors}
 \author{
 \IEEEauthorblockN{Yi Li\IEEEauthorrefmark{1} and Meng Sun\IEEEauthorrefmark{1}}
 \IEEEauthorblockA{
-  \IEEEauthorrefmark{1}DI, School of Mathematical Sciences, Peking University,
-  Beijing, China\\
-  liyi\_math@pku.edu.cn, summeng@math.pku.edu.cn
+\IEEEauthorrefmark{1}Department of Informatics, School of Mathematical Sciences, Peking University,
+Beijing, China\\
+liyi\_math@pku.edu.cn, summeng@math.pku.edu.cn
 }
 }
 
-\begin{document}
+  \begin{document}
 \maketitle
 \begin{abstract}
-  % reo coordination models
-  Coordination languages provide a mean to formally specify the communication and
-  reaction between different components. Such models play key roles in concurrent programming and
-  large-scale distributed systems.
-  % algorithms
-  In this paper, an active learning framework is proposed to extract timed connectors from black-box
-  systems.
-  First of all, we introduce parameterized mealy machine as an operational semantics for
-  channel-based coordination language Reo.
-  Parameterized mealy machine serves as a bridge between Reo connectors and mealy machines. With
-  production operator, complex connectors can be composed by basic channels and transformed into
-  mealy machines. 
-  Moreover, we adapt L*, a well-known learning algorithm, to timed connectors (in form of mealy
-  machines). The new algorithm has shown its efficiency in multiple cases.
-  % implementation
+  Coordination models and languages play a key role in formally specifying the communication and
+  interaction among different components in large-scale distributed and concurrent systems. In this
+  paper, we propose an active learning framework to extract timed connector models from black-box
+  system implementation. 
+  We first introduce parameterized mealy machine as an operational semantic
+  model for channel-based coordination language Reo. Parameterized mealy machine serves as a bridge
+  between Reo connectors and mealy machines. With the product operator, complex connectors can be
+  constructed by joining basic channels and transformed into mealy machines. Moreover, we adapt L*,
+  a well-known learning algorithm, to timed connectors (in the form of mealy machines). The new
+  algorithm has shown its efficiency in multiple case studies. 
   Implementations of this framework is provided as a package in \texttt{Golang}.
 \end{abstract}
 
@@ -95,6 +91,14 @@ Reo Coordination Language\cite{DBLP:journals/mscs/Arbab04}
   \end{center}
   \caption{Basic Reo Channels}
   \label{fig:basic}
+\end{figure}
+
+\begin{figure}[h]
+  \begin{center}
+    \input{./images/reoextend.tex}
+  \end{center}
+  \caption{Merger and Replicator}
+  \label{fig:reoextend}
 \end{figure}
 
 \subsection{Active Learning and Mealy Machines}
@@ -383,12 +387,21 @@ that simulations on similar sequences were invoked frequently:
 
 If previous simulation results are stored in a well-maintained cache, the time-cost in
 simulation process could be reduced signficiantly. In this work, we use a multiway tree to buffer
-these results. A brief example of such trees can be found in Example \ref{example:tree}.
+these results. A brief example of such trees can be found in Figure \ref{fig:multiway}.
 
+\todo{the graph need further details}
 \begin{example}[Multiway-Tree Cache]
   \label{example:tree}
   Considering the FIFO channel presented in Example \ref{example:pmmfifo}. 
-  \todo{draw a graph for multiway-tree cache}
+  \begin{figure}[h]
+    \begin{center}
+      \input{./images/cache.tex}
+    \end{center}
+    \caption{Multiway-Tree Cache}
+    \label{fig:multiway}
+  \end{figure}
+  Note that in this figure, only the edge information is stored. States like $q_0,q_a$ are written
+  here only to make it clear.
 \end{example}
 
 \begin{table}[h]
@@ -400,13 +413,15 @@ these results. A brief example of such trees can be found in Example \ref{exampl
     \hline
     & FIFO & Alternator & Gate \\
     \hline\hline
-    Before & 93 & 880 & 1034 \\
-    After & 90 & 725 & 707 \\
+    Original Algorithm & 93 & 880 & 1034 \\
+    Cached Algorithm & 90 & 725 & 707 \\
     Reduction Rate & 3.2\% & 21.4\% & 31.6\% \\
     \hline
   \end{tabular}
 \end{table}
 
+With cache applied, we have made a good reduction on the calls of membership queries. The results
+can be found in Table \ref{tabel:cacheoptimization}.
 
 \section{Conclusion and Future Work}
 
