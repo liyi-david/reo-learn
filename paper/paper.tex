@@ -14,12 +14,17 @@
 \usepackage[normalem]{ulem}
 % for a smile-face character
 \usepackage{wasysym}
-% FIXME finally no todos should exist in this draft
-\usepackage[textsize=tiny]{todonotes}
+% listing for codes
+\usepackage{listings}
+
 % positioning is used for below lef = of
 \usetikzlibrary{shapes,arrows,automata,positioning}
 % some tikz-styles on reo channels, not required in papers that have nothing to do with Reo
 
+% FIXME finally no todos should exist in this draft
+\usepackage[textsize=tiny]{todonotes}
+
+% -------------------------------------- configurations -----------------------------------------
 % declaration of environments
 \newtheorem{theorem}{Theorem}
 \newtheorem{definition}{Definition}
@@ -31,6 +36,7 @@
 \newcommand{\rnoread}[0]{\frownie}
 
 
+% --------------------------------------- information -------------------------------------------
 \title{Active Learning from Blackbox to Timed Connectors}
 \author{
 \IEEEauthorblockN{Yi Li\IEEEauthorrefmark{1} and Meng Sun\IEEEauthorrefmark{1}}
@@ -41,7 +47,7 @@ liyi\_math@pku.edu.cn, summeng@math.pku.edu.cn
 }
 }
 
-  \begin{document}
+\begin{document}
 \maketitle
 \begin{abstract}
   Coordination models and languages play a key role in formally specifying the communication and
@@ -83,7 +89,34 @@ from binaries with no source code needed.
 
 \subsection{Reo Coordination Language}
 \label{sec:reo}
-Reo Coordination Language\cite{DBLP:journals/mscs/Arbab04}
+Reo is a channel based exogenous coordination language proposed by F. Arbab. in
+\cite{DBLP:journals/mscs/Arbab04}. A Reo model, also called \emph{connector}, provides the protocol
+that formalizes the communication, synchronization and cooperation among the components which
+communicate through the connector. Connectors can be defined with no knowledge of the components,
+which makes Reo a powerful ``glue language'' in component-based
+development\cite{DBLP:journals/sigsoft/Gill03}.
+
+In Reo, complex connectors are made up of simpler ones, where the atomic connectors are called
+\emph{channels}. Each channel has two \emph{channel ends}. There are two type of channel ends:
+\emph{source} and \emph{sink}. Source channel ends accepts data into the channel, while sink
+channels ends release them out of the channel. Channels are attached on component instances
+or \emph{nodes}.
+
+
+
+The behavior of some channels are informally described as follows. (Graphical representations
+can be found in Figure \ref{fig:basic}).
+
+\begin{itemize}
+  \item [-] A \emph{Sync} channel accepts a data item from its source end iff. the data item can be
+    dispensed to its sink end simultaneously.
+  \item [-] A \emph{LossySync} channel is always prepared to accept data items. These items will be
+    send to its sink end simutaneously if possible, otherwise they will be dropped.
+  \item [-] A \emph{SyncDrain} channel has two source ends and no sink end. It can accept a data
+    item through one of its source end iff. a data item is also available for it to simultaneously
+    accept through the other end. Then both two data items will be lost.
+  \item [-] 
+\end{itemize}
 
 \begin{figure}[h]
   \begin{center}
@@ -93,6 +126,7 @@ Reo Coordination Language\cite{DBLP:journals/mscs/Arbab04}
   \label{fig:basic}
 \end{figure}
 
+\todo{do we need to remove this graph?}
 \begin{figure}[h]
   \begin{center}
     \input{./images/reoextend.tex}
@@ -101,7 +135,35 @@ Reo Coordination Language\cite{DBLP:journals/mscs/Arbab04}
   \label{fig:reoextend}
 \end{figure}
 
-\subsection{Active Learning and Mealy Machines}
+\subsection{Mealy Machines}
+
+As an extension of \emph{finite state machine}, Mealy machine was first proposed by George. H. Mealy
+in \cite{George1955A}. Compared with other variants, Mealy machines are designed to model
+reactive systems, where outputs are determined not only by its current state but also the current
+inputs. Besides, Mealy machines are supposed to be \emph{input enabled}, which means that all
+possible inputs should be acceptable in all states. In other words, if an input is invalid for some
+state, we need to manually use an additional state to describe such exceptions.
+
+As far as we can see, various forms of Mealy machines are defined in different works. In this paper,
+we give the formal definition of Mealy machine following \cite{DBLP:conf/sfm/SteffenHM11}.
+
+\todo{why we choose this version}
+
+\begin{definition}[Mealy machine]
+  A Mealy machine is a 6-tuple $(S, s_0, I, O, T, G)$ consisting of the following:
+  \begin{itemize}
+    \item[-] a finite set of states $S$
+    \item[-] a start state (also called initial state) $s_0$ which is an element of $S$
+    \item[-] a finite set called the input alphabet $I$
+    \item[-] a finite set called the output alphabet $O$
+    \item[-] a transition function $\delta : S \times I \rightarrow S$ mapping pairs of a
+      state and an input symbol to the corresponding next state.
+    \item[-] an output function $\lambda : S \times I \rightarrow O$ mapping pairs
+      of a state and an input symbol to the corresponding output symbol.
+  \end{itemize}
+\end{definition}
+
+\subsection{Active Learning}
 
 \section{Timed Connectors as Mealy Machines}
 
@@ -345,9 +407,11 @@ We have programmed Reo channels as a new package in Golang. The package is well-
 formal verification but also practical use.
 
 All the following experiments are coded under Golang \emph{1.2.1} and executed on a laptop with 8GB
-of RAM and a Core i7-3630 CPU.
+of RAM and a Core i7-3630 CPU. The source code is available at
+\url{https://github.com/liyi-david/reo-learn}.
 
 \subsection{Case Studies}
+ 
 \subsection{Performance Optimization}
 As a well-known learning algorithm, L* has proved its efficiency in models without time.
 However, when dealing with timed connectors, the algorithm failed to meet our expectation.
@@ -422,6 +486,19 @@ these results. A brief example of such trees can be found in Figure \ref{fig:mul
 
 With cache applied, we have made a good reduction on the calls of membership queries. The results
 can be found in Table \ref{tabel:cacheoptimization}.
+
+\subsection{An Example of the Reo Package}
+As mentioned above, our implementation in \texttt{Golang} is well-prepared not only for academic use
+but also for practical concurrent programming.
+
+\todo{modify the listings package}
+\begin{lstlisting}
+int main(int argc, char ** argv)
+{
+  printf(``Hello world!n'');
+  return 0;
+}
+\end{lstlisting}
 
 \section{Conclusion and Future Work}
 
