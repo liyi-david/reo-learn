@@ -203,6 +203,10 @@ we give the formal definition of Mealy machine following \cite{DBLP:conf/sfm/Ste
 \end{definition}
 
 \subsection{Active Learning}
+Active learning is a special case of semi-supervised machine learning in which a learning algorithm
+is able to interactively query the user (or some other information source) to obtain the desired
+outputs at new data points.\cite{settles2010active}.
+
 
 \section{Timed Connectors as Mealy Machines}
 
@@ -528,14 +532,28 @@ can be found in Table \ref{tabel:cacheoptimization}.
 
 \subsection{An Example of the Reo Package}
 As mentioned above, our implementation in \texttt{Golang} is well-prepared not only for academic use
-but also for practical concurrent programming.
+but also for practical concurrent programming. The following code shows how to compose an alternator
+connector (see Figure \ref{fig:reoconnector}) in \texttt{Golang}. An intact version of this example can be found in our github repo.
 
 \begin{lstlisting}
-int main(int argc, char ** argv)
-{
-  printf(``Hello world!n'');
-  return 0;
-}
+  package main
+
+  import . './lib/reo'
+
+  func alternator(A, B, C reo.Port) {
+    // definition of ports
+    M0 := MakePort()
+    // similarly define M1 ... M5
+
+    // definition of channels
+    go ReplicatorChannel(A, M0, M1)
+    go ReplicatorChannel(B, M2, M3)
+    go MergerChannel(M4, M5, M6)
+
+    go SyncdrainChannel(M1, M2)
+    go SyncChannel(M0, M4)
+    go FifoChannel(M3, M5)
+  }
 \end{lstlisting}
 
 \section{Conclusion and Future Work}
