@@ -12,13 +12,12 @@ func alternator(A, B, C reo.Port) {
 	M3 := reo.MakePort()
 	M4 := reo.MakePort()
 	M5 := reo.MakePort()
-	M6 := reo.MakePort()
 	StopFlag := reo.GenerateStopPort(6)
 
 	// definition of channels
 	go reo.ReplicatorChannel(A, M0, M1, StopFlag[0])
 	go reo.ReplicatorChannel(B, M2, M3, StopFlag[1])
-	go reo.MergerChannel(M4, M5, M6, StopFlag[2])
+	go reo.MergerChannel(M4, M5, C, StopFlag[2])
 
 	go reo.SyncdrainChannel(M1, M2, StopFlag[3])
 	go reo.SyncChannel(M0, M4, StopFlag[4])
@@ -39,7 +38,7 @@ func monitor(port reo.Port) {
 
 func main() {
 	// configurations
-	//reo.CloseLog()
+	reo.CloseLog()
 
 	var wg sync.WaitGroup
 	A := reo.MakePort()
