@@ -39,8 +39,10 @@
 \newcommand{\rnoread}[0]{\frownie}
 
 % style of source code environment listings
-\lstset{basicstyle=\footnotesize\ttfamily,breaklines=true}
-\lstset{framextopmargin=50pt,frame=bottomline, language=Golang}
+\lstset{basicstyle=\footnotesize\ttfamily,breaklines=true, frame=shadowbox}
+\lstset{numbers=left}
+\lstset{xleftmargin=2em, xrightmargin=2em}
+\lstset{language=Golang}
 
 % --------------------------------------- information -------------------------------------------
 \title{Active Learning from Blackbox to Timed Connectors}
@@ -110,6 +112,14 @@ In Reo, complex connectors are made up of simpler ones, where the atomic connect
 \emph{source} and \emph{sink}. Source channel ends accepts data into the channel, while sink
 channels ends release them out of the channel. 
 
+\begin{figure}[h]
+  \begin{center}
+    \input{./images/basic.tex}
+  \end{center}
+  \caption{Basic Reo Channels}
+  \label{fig:basic}
+\end{figure}
+
 The behavior of some channels are informally described as follows. (Graphical representations
 can be found in Figure \ref{fig:basic}).
 
@@ -124,14 +134,6 @@ can be found in Figure \ref{fig:basic}).
   \item [-] A A \emph{FIFO1} channel is an asychronous channel with one buffer cell. It accepts a
     data item whenever the buffer is empty.  
 \end{itemize}
-
-\begin{figure}[h]
-  \begin{center}
-    \input{./images/basic.tex}
-  \end{center}
-  \caption{Basic Reo Channels}
-  \label{fig:basic}
-\end{figure}
 
 Channels are attached on component instances or \emph{nodes}. There are three types of nodes:
 \emph{source}, \emph{sink} and \emph{mixed node}, depending on whether all channel ends that
@@ -171,7 +173,8 @@ channel ends.
 As shown in Figure \ref{fig:reoconnector}, we use a simple example to illustrate how complex
 connectors are constructed and used in coordination. In this example, COM1,COM2 and
 MONITOR are components. With an \emph{alternator} connector, MONITOR can receive data items from
-COM1 and COM2 alternately.
+COM1 and COM2 alternately. The \emph{alternator} example has been implemented in \texttt{Golang} as
+shown in Section \ref{sec:reolib}.
 
 
 \subsection{Mealy Machines}
@@ -183,10 +186,10 @@ inputs. Besides, Mealy machines are supposed to be \emph{input enabled}, which m
 possible inputs should be acceptable in all states. In other words, if an input is invalid for some
 state, we need to manually use an additional state to describe such exceptions.
 
-As far as we can see, various forms of Mealy machines are defined in different works. In this paper,
-we give the formal definition of Mealy machine following \cite{DBLP:conf/sfm/SteffenHM11}.
-
-\todo{why we choose this version}
+As far as we can see, various forms of Mealy machines are defined in different works, wherein some
+are deterministic and some are not. Since active automata learning very much depends on the system
+under learning to be deterministic, in this paper we formally define a deterministic version of
+Mealy machine following \cite{DBLP:conf/sfm/SteffenHM11}.
 
 \begin{definition}[Mealy machine]
   A Mealy machine is a 6-tuple $(S, s_0, I, O, T, G)$ consisting of the following:
@@ -203,10 +206,22 @@ we give the formal definition of Mealy machine following \cite{DBLP:conf/sfm/Ste
 \end{definition}
 
 \subsection{Active Learning}
-Active learning is a special case of semi-supervised machine learning in which a learning algorithm
-is able to interactively query the user (or some other information source) to obtain the desired
-outputs at new data points.\cite{settles2010active}.
+In this section, we briefly introduce the main ideas of active automata learning. 
 
+Active learning \cite{settles2010active} is a special case of semi-supervised machine learning where
+a learning algorithm is able to interactively query the target systems to obtain the desired outputs
+on certain inputs. With such flexibility, active learning makes it able to use targeted and efficient
+queries to obtain more accurate models with smaller dataset. 
+
+
+\todo{a figure illustrating the framework of active learning}
+
+Figure shows a sketch of active learning, wherein
+\begin{itemize}
+  \item[-]
+\end{itemize}
+
+More details on the algorithm will be presented in Section \ref{sec:activelearning}. 
 
 \section{Timed Connectors as Mealy Machines}
 
@@ -379,7 +394,8 @@ channels. Now we're going to show how to compose these channels into complicated
 
 \todo{example of production, maybe fifo+timer}
 
-\section{From Blackbox to Timed Connectors}
+\section{From Blackbox to Timed Connectors} 
+\label{sec:activelearning}
 
 \subsection{Observation Table}
 
@@ -437,7 +453,7 @@ We say if two states are \emph{similiar} iff. they have the same output signatur
   \end{enumerate}
 \end{IEEEproof}
 
-\section{Experiments}
+\section{Experiments} 
 Both \emph{Reo Coordination Models} and \emph{Adapted L* Algorithm} are implemented in
 Golang\cite{golang}.
 
@@ -530,32 +546,58 @@ these results. A brief example of such trees can be found in Figure \ref{fig:mul
 With cache applied, we have made a good reduction on the calls of membership queries. The results
 can be found in Table \ref{tabel:cacheoptimization}.
 
-\subsection{An Example of the Reo Package}
+\subsection{An Example of the Reo Package }
+\label{sec:reolib}
+
 As mentioned above, our implementation in \texttt{Golang} is well-prepared not only for academic use
 but also for practical concurrent programming. The following code shows how to compose an alternator
 connector (see Figure \ref{fig:reoconnector}) in \texttt{Golang}. An intact version of this example can be found in our github repo.
 
 \begin{lstlisting}
-  package main
+package main
 
-  import . './lib/reo'
+import . './lib/reo'
 
-  func alternator(A, B, C reo.Port) {
-    // definition of ports
-    M0 := MakePort()
-    // similarly define M1 ... M5
+func alternator(A, B, C Port) {
+  // definition of ports
+  M0 := MakePort()
+  // M1 ... M5 defined similarly
 
-    // definition of channels
-    go ReplicatorChannel(A, M0, M1)
-    go ReplicatorChannel(B, M2, M3)
-    go MergerChannel(M4, M5, M6)
+  // definition of channels
+  /* NOTE
+  go function() means that the function would
+  be executed as a new parallel task
+  */
+  go ReplicatorChannel(A, M0, M1)
+  go ReplicatorChannel(B, M2, M3)
+  go MergerChannel(M4, M5, C)
 
-    go SyncdrainChannel(M1, M2)
-    go SyncChannel(M0, M4)
-    go FifoChannel(M3, M5)
-  }
+  go SyncdrainChannel(M1, M2)
+  go SyncChannel(M0, M4)
+  go FifoChannel(M3, M5)
+}
 \end{lstlisting}
 
+Provided with the source and sink nodes, \emph{alternator} function creates a series of basic
+channels and mixed nodes (named \emph{Port}) to serve as the alternator connector we need. Now we
+can activate the components and using \emph{alternator} function to coordinate them.
+
+\begin{lstlisting}
+A := MakePort()
+B := MakePort()
+C := MakePort()
+alternator(A, B, C)
+
+go sender(A, "MSG A")
+go sender(B, "MSG B")
+go monitor(C)
+\end{lstlisting}
+
+In this case, \emph{sender} are goroutines (basic parallel units in \texttt{Golang}) that keep
+sending certain messages to some given port (A and B). A \emph{monitor} keep trying to read data
+items from the sink end C and print them on the screen. Finally we have a interleaved sequence of
+``MSG\_A'' and ``MSG\_B''.
+ 
 \section{Conclusion and Future Work}
 
 

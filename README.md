@@ -20,7 +20,7 @@ All the codes are written under Google Go.
 - abstract
 - full paper
 - there's problem in 2-buffer. in the second round, obstables cannot be displayed properly *partly solved on my laptop*
-- bugs found in new example
+- bugs found in new example **SOLVED**
 
 ## logs
 
