@@ -1,5 +1,7 @@
 \documentclass[conference, a4paper]{IEEEtran}
 
+\usepackage{graphicx}
+
 % used for flow charts
 \usepackage{pgf}
 \usepackage{tikz}
@@ -19,9 +21,11 @@
 % listing for golang
 % NOTE listings-golang.sty is required
 \usepackage{listings-golang}
+% to support flow graphs
+\usepackage{textcomp}
 
 % positioning is used for below lef = of
-\usetikzlibrary{shapes,arrows,automata,positioning}
+\usetikzlibrary{shapes,shadows,arrows,automata,positioning}
 % some tikz-styles on reo channels, not required in papers that have nothing to do with Reo
 
 % FIXME finally no todos should exist in this draft
@@ -72,7 +76,7 @@ liyi\_math@pku.edu.cn, summeng@math.pku.edu.cn
 \end{abstract}
 
 \begin{IEEEkeywords}
-  Active Learning, Coordination Languages, Formal Methods
+  Active Learning, Coordination Languages, Timed Connectors
 \end{IEEEkeywords}
 
 \section{Introduction}
@@ -214,9 +218,15 @@ on certain inputs. With such flexibility, active learning makes it able to use t
 queries to obtain more accurate models with smaller dataset. 
 
 
-\todo{a figure illustrating the framework of active learning}
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=.4\textwidth]{./images/activelearning.png}
+  \end{center}
+  \caption{Active Automata Learning}
+  \label{fig:activelearning}
+\end{figure}
 
-Figure shows a sketch of active learning, wherein
+Figure \ref{fig:activelearning} shows a sketch of active learning, wherein:
 \begin{itemize}
   \item[-]
 \end{itemize}
