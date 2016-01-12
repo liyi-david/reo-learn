@@ -51,11 +51,11 @@
 % --------------------------------------- information -------------------------------------------
 \title{Active Learning from Blackbox to Timed Connectors}
 \author{
-\IEEEauthorblockN{Yi Li\IEEEauthorrefmark{1} and Meng Sun\IEEEauthorrefmark{1}}
+\IEEEauthorblockN{Yi Li\IEEEauthorrefmark{1}, Yiwu Wang\IEEEauthorrefmark{1} and Meng Sun\IEEEauthorrefmark{1}}
 \IEEEauthorblockA{
 \IEEEauthorrefmark{1}Department of Informatics, School of Mathematical Sciences, Peking University,
 Beijing, China\\
-liyi\_math@pku.edu.cn, summeng@math.pku.edu.cn
+liyi\_math@pku.edu.cn, yiwuwang@126.com, summeng@math.pku.edu.cn
 }
 }
 
@@ -220,18 +220,54 @@ queries to obtain more accurate models with smaller dataset.
 
 \begin{figure}[h]
   \begin{center}
-    \includegraphics[width=.4\textwidth]{./images/activelearning.png}
+    \includegraphics[width=.5\textwidth]{./images/activelearning.png}
   \end{center}
   \caption{Active Automata Learning}
   \label{fig:activelearning}
 \end{figure}
 
-Figure \ref{fig:activelearning} shows a sketch of active learning, wherein:
+Figure \ref{fig:activelearning} shows the sketch of active automata learning, wherein:
 \begin{itemize}
-  \item[-]
+  \item[-] \emph{Teacher} and \emph{Student}. Active learning is an interactive process where
+    students ask questions and teachers answer. Here learning algorithm plays the role of student.
+  \item[-] \emph{Oracles} is an interface specifying which kind of questions can be answered by the
+    teacher.
+  \item[-] \emph{SUL} is an abbreviation of System Under Learn. The name comes from a well-known
+    concept SUT (System Under Test) in software testing. In this case, we use blackbox models as our
+    SULs.
+  \item[-] \emph{CEGAR} indicates Counter-Example Guided Abstraction
+    Refinement\cite{DBLP:conf/cav/ClarkeGJLV00}. In active learning, we need counter-examples to
+    guide us on further quries and cover the undistinguished states.
 \end{itemize}
 
-More details on the algorithm will be presented in Section \ref{sec:activelearning}. 
+When applying active automata learning on some model, firstly we assume that it should be equivalent
+to some \emph{Mealy machine}. In other words, a deterministic model accepting a finite set of input
+symbols and mapping them to a finite set of output symbols.
+
+Such a model is encapsulated as a \emph{teacher} by the \emph{Oracle}, which handles
+all communication with the model, both providing input and obtaining output. Also, it serves as a
+so-called \emph{Minimal Adequate Teacher} interface, which is responsible for two types of
+queries. 
+
+\begin{itemize}
+  \item[-] \textbf{Membership Query} (hereinafter referred to as \emph{mq}) The name comes from
+    some grammar-learning papers (e.g. \cite{DBLP:journals/iandc/Angluin87}), where \emph{mq} checks
+    if a word is a member of certain language defined by the given grammar. When it comes to
+    automata learning, \emph{mq} is supposed to provide simulation results for given input
+    sequences.
+    \todo{example, also a mealy-machine example}
+  \item[-] \textbf{Equivalence Query} (hereinaftr referred to as \emph{eq}) Given a hypothesis
+    (usually constructed by the learning algorithm), \emph{eq} checks whether the hypothesis is
+    equivalent to the system-under-learn and generates a counter-example if needed.
+\end{itemize}
+
+These queries are given by \emph{learning algorithms}, or so-called \emph{students} in Figure
+\ref{fig:activelearning}. From the \emph{mq} results, a learning algorithm should construct a
+\emph{hypothesis} and check it with \emph{eq}. If counter-examples are found, we turn back and
+repeat the hypothesis construction until the equivalence query returns \emph{true}.
+
+More details on the active automata learning algorithm will be presented in Section
+\ref{sec:activelearning}. 
 
 \section{Timed Connectors as Mealy Machines}
 
