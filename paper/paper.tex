@@ -88,40 +88,52 @@ makes the coordination even more complicated. In this case, we need to specify t
 processes with so-called \emph{coordination languages}, so that formal techniques can be applied to
 guarantee their reliability.
 
-\begin{figure}[h]
-  \begin{center}
-    \includegraphics[width=0.45\textwidth]{./images/IoT.png}
-  \end{center}
-  \caption{Inter of Things in Our Life}
-  \label{fig:IoT}
-\end{figure}
+\emph{Timed Reo} is a real-time extension of the coordination language \emph{Reo}. With timeline
+involved, coordination process in DRES can be depicted clearly and intuitively. Different formal
+semantics are proposed to specify the behavior of timed Reo.
+For example, in \cite{DBLP:conf/tase/Meng12}, a UTP-based
+(\emph{Unifying Theories of Programming}) semantics is provided to verify connectors as
+\emph{designs}. An operational semantics based on \emph{constraint automata} was raised by Baier et
+al., where a variant of LTL was also proposed to describe the properties of timed connectors.
 
-researchers have been focusing on this area, and come up with a series of impressive works.
-\todo{a list}
-However, most of these works are based on models, instead of binaries. Then it comes a well-known
-problem: \emph{how can we obtain these models?}
+Formal verification techniques have also been proved applicable in timed connectors.
+\cite{DBLP:conf/tase/LiCWS15} has shown us a comformance testing method on timed connectors.
+Bounded model checking methods were also adapted in \cite{DBLP:journals/scp/Kemper12}, based on SAT
+solvers. All these solutions seem practical and impressive, however, a common question is faced by
+most of them, which is: \emph{How to obtain these formal models?}
 
 \emph{Correctness} of connectors is very much related to some low-level implementation details.
 For example, well-writen code may behave dramatically weird with an improper set of concurrency
 primitives. Such things happen frequently in embedded systems with different hardware platforms or
-operating systems. Consequently, manually modeling a existing connector seems rather unreliable,
+operating systems. Consequently, manually modeling an existing connector seems rather unreliable,
 even with reference to its source code.
 
-In this paper, we proposed a active learning framework to automatically extract timed connectors
-from blackbox models. 
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=.4\textwidth]{./images/howto.png}
+  \end{center}
+  \caption{The Active Learning Framework}
+  \label{fig:howto}
+\end{figure}
+
+In this paper, we proposed a active learning framework (shown in Figure \ref{fig:howto}) to
+automatically extract timed connectors from blackbox models.
+
 
 To solve this problem, many techniques in model constructing were proposed, for instance in
 \cite{DBLP:journals/mt/Daelemans10, DBLP:journals/iandc/Angluin87, DBLP:conf/fase/RaffeltS06}.
 
-% it seems that we need a graph to describe how we're doing this work
-\todo{better graph}
-% \input{images/flow.tex}
+\todo{finish this part!}
 
-In this paper, we presented an adapted active learning algorithm to extract timed Reo connectors
-from binaries with no source code needed.
+The paper is structured as follows. After this general introduction, in Section
+\ref{sec:preliminaries} we briefly illustrate some basic concepts, including Reo the coordination
+language, Mealy machine, and active automata learning. Section \ref{sec:semantics} defines the
+Mealy-machine-based operational semantics of Reo, which is used in Section \ref{sec:activelearning}
+to show how to extract Reo models from blackboxes by means of active learning. Finally, in Section
+\ref{sec:experiment}, we discuss the optimization and implementation in \texttt{Golang}.
 
 \section{Preliminaries} 
-
+\label{sec:preliminaries}
 \subsection{Reo Coordination Language} 
 \label{sec:reo}
 We provide here a brief overview of the main concepts of Reo, more details can be found in
@@ -233,6 +245,8 @@ Mealy machine following \cite{DBLP:conf/sfm/SteffenHM11}.
   \end{itemize}
 \end{definition}
 
+\todo{supplementation}
+
 \subsection{Active Learning}
 In this section, we briefly introduce the main ideas of active automata learning. 
 
@@ -277,12 +291,13 @@ queries.
   \item[-] \textbf{Membership Query} (hereinafter referred to as \emph{mq}) The name comes from
     some grammar-learning papers (e.g. \cite{DBLP:journals/iandc/Angluin87}), where \emph{mq} checks
     if a word is a member of certain language defined by the given grammar. When it comes to
-    automata learning, \emph{mq} is supposed to provide simulation results for given input
+    automata learning, \emph{mq} is supposed to provide \emph{simulation results} for given input
     sequences.
-    \todo{example, also a mealy-machine example}
   \item[-] \textbf{Equivalence Query} (hereinaftr referred to as \emph{eq}) Given a hypothesis
     (usually constructed by the learning algorithm), \emph{eq} checks whether the hypothesis is
-    equivalent to the system-under-learn and generates a counter-example if needed.
+    equivalent to the system-under-learn and generates a counter-example if needed. Generally, 
+    \emph{equivalence query} is irrealizable when SUT is a blackbox. So we tactically use membership
+    queries to achieve the approximate results.
 \end{itemize}
 
 These queries are given by \emph{learning algorithms}, or so-called \emph{students} in Figure
@@ -294,7 +309,7 @@ More details on the active automata learning algorithm will be presented in Sect
 \ref{sec:activelearning}. 
 
 \section{Timed Connectors as Mealy Machines}
-
+\label{sec:semantics}
 \subsection{External Behavior of Reo Connectors}
 So far as we can tell, most
 works\cite{DBLP:conf/fase/RaffeltS06, DBLP:journals/corr/ChenHLLTWW15} on automata learning are not
@@ -522,6 +537,8 @@ We say if two states are \emph{similiar} iff. they have the same output signatur
 \end{IEEEproof}
 
 \section{Experiments} 
+\label{sec:experiment}
+
 Both \emph{Reo Coordination Models} and \emph{Adapted L* Algorithm} are implemented in
 Golang\cite{golang}.
 
@@ -667,7 +684,6 @@ items from the sink end C and print them on the screen. Finally we have a interl
 ``MSG\_A'' and ``MSG\_B''.
  
 \section{Conclusion and Future Work}
-
 
 
 \bibliographystyle{abbrv}
