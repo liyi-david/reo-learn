@@ -81,30 +81,54 @@ liyi\_math@pku.edu.cn, yiwuwang@126.com, summeng@math.pku.edu.cn
 
 \section{Introduction}
 
-In the past few years, researchers have been focusing on this area, and come up with a
-series of impressive works. 
+Distributed real-time embedded system (DRES) is reforming our lives with the name \emph{IoT}, the
+internet of things, wherein systems are usually composed of individual components and a middleware
+serving as a \emph{connector}. Such systems could be distributed logically or physically, which
+makes the coordination even more complicated. In this case, we need to specify these coordination
+processes with so-called \emph{coordination languages}, so that formal techniques can be applied to
+guarantee their reliability.
+
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=0.45\textwidth]{./images/IoT.png}
+  \end{center}
+  \caption{Inter of Things in Our Life}
+  \label{fig:IoT}
+\end{figure}
+
+researchers have been focusing on this area, and come up with a series of impressive works.
 \todo{a list}
 However, most of these works are based on models, instead of binaries. Then it comes a well-known
 problem: \emph{how can we obtain these models?}
+
+\emph{Correctness} of connectors is very much related to some low-level implementation details.
+For example, well-writen code may behave dramatically weird with an improper set of concurrency
+primitives. Such things happen frequently in embedded systems with different hardware platforms or
+operating systems. Consequently, manually modeling a existing connector seems rather unreliable,
+even with reference to its source code.
+
+In this paper, we proposed a active learning framework to automatically extract timed connectors
+from blackbox models. 
 
 To solve this problem, many techniques in model constructing were proposed, for instance in
 \cite{DBLP:journals/mt/Daelemans10, DBLP:journals/iandc/Angluin87, DBLP:conf/fase/RaffeltS06}.
 
 % it seems that we need a graph to describe how we're doing this work
 \todo{better graph}
-\input{images/flow.tex}
+% \input{images/flow.tex}
 
 In this paper, we presented an adapted active learning algorithm to extract timed Reo connectors
 from binaries with no source code needed.
 
-\section{Preliminaries}
+\section{Preliminaries} 
 
-\subsection{Reo Coordination Language}
+\subsection{Reo Coordination Language} 
 \label{sec:reo}
 We provide here a brief overview of the main concepts of Reo, more details can be found in
 \cite{DBLP:journals/mscs/Arbab04, DBLP:journals/scp/BaierSAR06}.
 
-Reo is a channel based exogenous coordination language proposed by F. Arbab. 
+Reo is a channel based exogenous coordination language proposed by F. Arbab in
+\cite{DBLP:journals/mscs/Arbab04}. 
 A Reo model, also called \emph{connector}, provides the protocol
 that formalizes the communication, synchronization and cooperation among the components which
 communicate through the connector. Connectors can be defined with no knowledge of the components,
@@ -191,8 +215,8 @@ possible inputs should be acceptable in all states. In other words, if an input 
 state, we need to manually use an additional state to describe such exceptions.
 
 As far as we can see, various forms of Mealy machines are defined in different works, wherein some
-are deterministic and some are not. Since active automata learning very much depends on the system
-under learning to be deterministic, in this paper we formally define a deterministic version of
+are deterministic and some are not. Since active automata learning very much depends on the
+system-under-learn to be deterministic, in this paper we formally define a deterministic version of
 Mealy machine following \cite{DBLP:conf/sfm/SteffenHM11}.
 
 \begin{definition}[Mealy machine]
@@ -295,11 +319,9 @@ question deserves careful consideration if we are taking an external view.
 Time is involved in several extension version of Reo. For example, Timed
 Reo\cite{DBLP:conf/sefm/ArbabBBR04}, Hybrid Reo\cite{DBLP:conf/icfem/ChenSS14}, etc.
 Generally, these models are designed to handle real-time behavior where time is defined in
-$\mathbb{R}$. However, we also found a lot of works where authors use rational time to make things
-easier.
-
-In this paper, we choose the rational number field $\mathbb{Q}$ as our time domain, which simplifies
-discretization of timed behaviors greatly.
+$\mathbb{R}$. Besides, we also found some works\cite{DBLP:journals/fmsd/PrabhakarDM015} rational
+time is chosen to make things easier. In this paper, we choose the rational number field
+$\mathbb{Q}$ as our time domain, which simplifies discretization of timed behaviors greatly.
 
 As presented in section \ref{sec:reo}, all real-time behavior in timed Reo comes with the
 \emph{t-timer} channels, and the number of these channels are apparently finite. We use
