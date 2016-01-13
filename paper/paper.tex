@@ -39,8 +39,9 @@
 
 % personal characters
 \newcommand{\rblock}[0]{\circleddash}
-\newcommand{\rread}[0]{\smiley}
-\newcommand{\rnoread}[0]{\frownie}
+\newcommand{\rread}[0]{\rhd}
+\newcommand{\rnoread}[0]{\oslash}
+\newcommand{\smap}[1]{[{#1}]}
 
 % style of source code environment listings
 \lstset{basicstyle=\footnotesize\ttfamily,breaklines=true, frame=shadowbox}
@@ -108,6 +109,13 @@ primitives. Such things happen frequently in embedded systems with different har
 operating systems. Consequently, manually modeling an existing connector seems rather unreliable,
 even with reference to its source code.
 
+As a branch of \emph{machine learning} technique, active learning offers a way to obtain models from
+low-level blackboxes. Works in \cite{DBLP:journals/mt/Daelemans10, DBLP:journals/iandc/Angluin87,
+DBLP:conf/fase/RaffeltS06} shows impressive examples where active learning is used to extract
+\emph{finite state automatas} or \emph{grammars}. 
+
+\todo{better expressions!}
+
 \begin{figure}[h]
   \begin{center}
     \includegraphics[width=.4\textwidth]{./images/howto.png}
@@ -116,30 +124,20 @@ even with reference to its source code.
   \label{fig:howto}
 \end{figure}
 
-
-
-
 In this paper, we proposed a active learning framework (shown in Figure \ref{fig:howto}) to
-automatically extract timed connectors from blackbox models. 
+automatically extract timed connectors from blackbox models. We present \emph{Parameterized Mealy
+machine} as a parametierized semantics for timed Reo channels, which enables us to generate Mealy
+machines with a given alphabet. Then the $L*$ algorithm is adapted and optimized to extract Mealy
+machines with time action from the \emph{connectors in blackboxes}.
 
-As a branch of \emph{machine learning} technique, active learning directly applies queries to a
-low-level blackbox model and construct hypothesis according to the results.
-There're already several works like \cite{DBLP:journals/mt/Daelemans10,
-DBLP:journals/iandc/Angluin87, DBLP:conf/fase/RaffeltS06} where active learning is used to extract
-\emph{finite state automatas} or \emph{grammars}.
-
-We present \emph{Parameterized Mealy machine} provide a parametierized semantics for timed Reo
-channels, which enables us to generate Mealy machines with a given alphabet. Then the $L*$ algorithm
-is adapted and optimized to handle Mealy machines with time action.
-
-The paper is structured as follows. After this general introduction, in Section
+The rest of the paper is organized as follows. After this general introduction, in Section
 \ref{sec:preliminaries} we briefly illustrate some basic concepts, including Reo the coordination
 language, Mealy machine, and active automata learning. Section \ref{sec:semantics} defines the
 Mealy-machine-based operational semantics of Reo, which is used in Section \ref{sec:activelearning}
 to show how to extract Reo models from blackboxes by means of active learning. Finally, in Section
 \ref{sec:experiment}, we discuss the optimization and implementation in \texttt{Golang}.
 
-\section{Preliminar ies} 
+\section{Preliminaries} 
 \label{sec:preliminaries}
 \subsection{Reo Coordination Language} 
 \label{sec:reo}
@@ -240,7 +238,7 @@ system-under-learn to be deterministic, in this paper we formally define a deter
 Mealy machine following \cite{DBLP:conf/sfm/SteffenHM11}.
 
 \begin{definition}[Mealy machine]
-  A Mealy machine is a 6-tuple $(S, s_0, I, O, T, G)$ consisting of the following:
+  A Mealy machine is a 6-tuple $(S, s_0, I, O, \delta, \lambda)$ consisting of the following:
   \begin{itemize}
     \item[-] a finite set of states $S$
     \item[-] a start state (also called initial state) $s_0$ which is an element of $S$
@@ -324,32 +322,18 @@ More details on the active automata learning algorithm will be presented in Sect
 
 \section{Timed Connectors as Mealy Machines}
 \label{sec:semantics}
-\subsection{External Behavior of Reo Connectors}
-So far as we can tell, most
-works\cite{DBLP:conf/fase/RaffeltS06, DBLP:journals/corr/ChenHLLTWW15} on automata learning are not
-capable of infinite models. \todo{reason?} Considering the semantics defined in section
-\ref{sec:reo}, it's apparent that every finite connector has a corresponding constraint
-automata, and the automata is also finite. Unfortunately, when checking the further definition of
-Reo connectors' input, we find that it's not the case.
+In this section, we show how a timed connector be transformed into a Mealy machine with time action.
 
-\todo{an example as graph}
-
-\begin{figure}[h]
-  \caption{Infinite States in a Reo Model}
-  \label{fig:reoinfinite}
-\end{figure}
-
-While focusing on behavior of connectors, Reo doesn't give detail depiction on behavior of
-components. As shown in \figurename \ref{fig:reoinfinite}, connectors are able to reject any datum
-if they are not ready. But what will happen outside the connector, if the datum is rejected? This
-question deserves careful consideration if we are taking an external view.
+Since time is not involed in original Mealy machine, we first discuss how to formalize the time
+dimension in Mealy machine and timed Connectors. After that, we present a \emph{parameterized Mealy
+machine} as a bridge between connectors and Mealy machines.
 
 \subsection{Time Domain}
 Time is involved in several extension version of Reo. For example, Timed
 Reo\cite{DBLP:conf/sefm/ArbabBBR04}, Hybrid Reo\cite{DBLP:conf/icfem/ChenSS14}, etc.
 Generally, these models are designed to handle real-time behavior where time is defined in
-$\mathbb{R}$. Besides, we also found some works\cite{DBLP:journals/fmsd/PrabhakarDM015} rational
-time is chosen to make things easier. In this paper, we choose the rational number field
+$\mathbb{R}$. Besides, we also found some works like \cite{DBLP:journals/fmsd/PrabhakarDM015} where
+rational time indeed  makes things easier. In this paper, we choose the rational number field
 $\mathbb{Q}$ as our time domain, which simplifies discretization of timed behaviors greatly.
 
 As presented in section \ref{sec:reo}, all real-time behavior in timed Reo comes with the
@@ -370,17 +354,17 @@ Besides, we're going to add a ``T'' action in mealy machines. It indicates that 
 will take a time unit to finish, and all outputs would come out after that.
 
 \subsection{Parameterized Mealy Machine}
-We present a model named \emph{parameterized mealy machine} to represent timed connectors
-(hereinafter referred to as PMM). 
+We present a model named \emph{parameterized Mealy machine} (hereinafter referred to as PMM)
+to represent timed connectors. PMM is supposed to behave as a middle representation. Connectors are
+defined as parameterized mealy machines, and composed via its production operator. Then original
+mealy-machine model will be taken as semantics of PMM model.
 
-This model is supposed to behave as a middle representation. Connectors are defined as parameterized
-mealy machines, and composed via its production operator. Then original mealy-machine model will be
-taken as semantics of PMM model.
+Following the formal definition of Mealy machine in Section \ref{sec:preliminaries}, we present the
+definition of \emph{parameterized Mealy machine} as follows.
 
 \begin{definition}[Parameterized Mealy Machine]
-  A \emph{Parameterized Mealy Machine} is defined as a function $\mathcal{PM}(\Sigma)=\langle
-  S(\Sigma), s_0, I, O, \delta(\Sigma), \lambda(\Sigma)\rangle$ that maps an
-  alphabet to its corresponding Mealy Machine. 
+  A \emph{Parameterized Mealy Machine} is defined as a 6-tuple $\mathcal{PM}=\langle
+  S(\Sigma), s_0, I, O, \delta(\Sigma), \lambda(\Sigma)\rangle$ where 
   \begin{itemize}
     \item[-] $\Sigma$ is a \emph{finite} datum alphabet (hereinafter referred to as an alphabet)
     \item[-] $S$ is a function that maps an alphabet to a \emph{finite} set of
@@ -396,7 +380,15 @@ taken as semantics of PMM model.
   \end{itemize}
 \end{definition}
 
-In the definition above, \emph{Input} and \emph{Output} are used to generate input actions and output actions by the corresponding alphabets and ends.
+In the definition above, \emph{Input} and \emph{Output} are used to generate a set of input actions
+and output actions from the corresponding alphabets and ends. For example, if we have a alphabet
+consisting of two items $d_0$ and one source-end named $A$, the input actions would be
+\begin{eqnarray*}
+  Input(\{d_0\},\{A\}) &=& \{\{A:d_0,B:\rread\},\{A:d_0,B:\rnoread\}, \\
+  & & \{A:\bot,B:\rread\},\{A:\bot,B:\rnoread\},T\}
+\end{eqnarray*}
+where we use $\rread$ to indicate that a end-sink is ready for write, and $\rnoread$ otherwise.
+
 \todo{How to say?}
 \[
 Input(\Sigma,I)=\{\}\cup\{T\}
@@ -406,15 +398,33 @@ where we use $T$ to denote the time action.
 Output(\Sigma,I)=\{\}
 \]
 
-Now we can use Parameterized Mealy Machines to define a new semantics to Reo.
-\begin{example}[PMM Semantics of FIFO channel $PM_{FIFO}$]
+Parameterized Mealy machines can be seen as an abstract form of Mealy machines, which means that we
+still need a convert function between the two models.
+
+\begin{definition}[Concretize Mapping]
+  We use $\smap{\mathcal{PM}}_{\Sigma}$ to denote the concrete Mealy machine which is determined by
+  an abstract parameterized Mealy machine $\mathcal{PM}$ and the alphabet $\Sigma$. Apparently
+  $\smap{\mathcal{PM}}_{\Sigma}$ can be described as
+  \begin{eqnarray*}
+    \smap{\mathcal{PM}}_{\Sigma} &=& 
+    \langle
+    \mathcal{PM}.S(\Sigma), \mathcal{PM}.s_0, \\
+    & & Input(\Sigma, \mathcal{PM}.I), Output(\Sigma, \mathcal{PM}.O), \\
+    & & \mathcal{PM}.\delta(\Sigma), \mathcal{PM}.\lambda(\Sigma),
+    \rangle
+  \end{eqnarray*}
+\end{definition}
+
+Now we can use Parameterized Mealy Machines to define a new semantics for timed Reo. Here we
+take one asynchronous channel (FIFO1), one asynchronous channel (Sync) and one timed channel (Timer)
+as examples.
+
+\begin{example}[PMM Semantics of FIFO1 channel]
   \label{example:pmmfifo}
   The semantics of FIFO channel with source end $A$ and sink end $B$ can be defined as follows.
   \begin{itemize}
     \item[-] $S(\Sigma)=\{q_0\}\cup\{q_d|d\in\Sigma\}$
-    \item[-] $I=\{A\}$
-    \item[-] $O=\{B\}$
-    \item[-] $s_0=q_0$
+    \item[-] $I=\{A\}$, $O=\{B\}$, $s_0=q_0$
     \item[-] output function
       \begin{displaymath}
         \delta(\Sigma)(s,i)=\left\{
@@ -446,9 +456,60 @@ Besides, the concrete mealy machine (where $\Sigma=\{a\}$) is shown in Figure \r
   \begin{center}
     \input{./images/pmmfifo.tex}
   \end{center}
-  \caption{PMM-based Semantics of FIFO, where $\Sigma=\{a\}$}
+  \caption{PMM-based Semantics of $\smap{FIFO1}_\Sigma$, where $\Sigma=\{a\}$}
   \label{fig:pmmfifo}
 \end{figure}
+
+\begin{example}[PMM Semantics of Sync channel]
+  The PMM-based semantics of a Sync channel with a source-end A and a sink-end B can be defined as:
+  \begin{itemize}
+    \item[-] $S(\Sigma)=\{q_0\}$, $I=\{A\}$, $O=\{B\}$, $s_0=q_0$
+    \item[-] output function
+      \begin{displaymath}
+        \delta(\Sigma)(s,i)=\left\{
+        \begin{array}[h]{ll}
+          (B:\bot) & s=q_0\land i=(A:\bot,B:\rnoread) \\
+          (B:d) & s=q_0\land i=(A:d,B:\rread)\\
+          \rblock & s=q_0\land i=(A:\bot,B:\rread) \\
+          \rblock & s=q_0\land i=(A:d,B:\rnoread) \\
+        \end{array}
+        \right.
+      \end{displaymath}
+    \item[-] transition function $\lambda(\Sigma)(s,i)=q_0$.
+  \end{itemize}
+\end{example}
+
+\begin{example}[PMM Semantics of n-Timer channel]
+  Considering a n-Timer channel with a source-end A and a sink-end B, we define its PMM-based
+  semantics as:
+  \begin{itemize}
+    \item[-] $S(\Sigma)=\{q_0\}\cup\{q_d|d\in\Sigma\}$
+    \item[-] $I=\{A\}$, $O=\{B\}$, $s_0=q_0$
+    \item[-] output function
+      \begin{displaymath}
+        \delta(\Sigma)(s,i)=\left\{
+        \begin{array}[h]{ll}
+          (B:\bot) & s=q_0\land i=(A:\_,B:\rnoread) \\
+          (B:d) & s=q_0\land i=(A:d,B:\rread)\\
+          \rblock & s=q_0\land i=(A:\bot,B:\rread) \\
+          (B:d) & s=q_d\land i=(A:\_,B:\rread)\\
+          \rblock & s=q_d\land i=(A:d,B:\rnoread) \\
+          (B:\bot) & s=q_d\land i=(A:\_,B:\rnoread) \\     
+        \end{array}
+        \right.
+      \end{displaymath}
+    \item[-] transition function
+      \begin{displaymath}
+        \lambda(\Sigma)(s,i)=\left\{
+        \begin{array}[h]{ll}
+          q_d & s=q_0\land i=(A:d,B:\rnoread) \\
+          q_d & s=q_{d'}\land i=(A:d,B:\rread) \\
+          q_0 & otherwise \\
+        \end{array}
+        \right.
+      \end{displaymath}
+  \end{itemize}
+\end{example}
 
 Similarly, we can use parameterized mealy machines to define the semantics of other basic timed Reo
 channels. Now we're going to show how to compose these channels into complicated connectors.
@@ -493,6 +554,8 @@ channels. Now we're going to show how to compose these channels into complicated
 
 \section{From Blackbox to Timed Connectors} 
 \label{sec:activelearning}
+In this section, we will show how to use L* algorithm to extract models from blackboxes. Firstly, we
+presents the definition of \emph{Observation Table}, which is used to describe the hypothesis.
 
 \subsection{Observation Table}
 
@@ -569,6 +632,14 @@ of RAM and a Core i7-3630 CPU. The source code is available at
 \url{https://github.com/liyi-david/reo-learn}.
 
 \subsection{Case Studies}
+A simple example of timed connector is presented to show how L* works.
+\begin{figure}[h]
+  \begin{center}
+    \input{./images/expfifo.tex}
+  \end{center}
+  \caption{Expiring FIFO1 Channel}
+  \label{fig:expfifo}
+\end{figure}
  
 \subsection{Performance Optimization}
 As a well-known learning algorithm, L* has proved its efficiency in models without time.
@@ -698,7 +769,8 @@ items from the sink end C and print them on the screen. Finally we have a interl
 ``MSG\_A'' and ``MSG\_B''.
  
 \section{Conclusion and Future Work}
-
+Future work should focus on better representation on timed connectors and implementation of
+equivanlence query.
 
 \bibliographystyle{abbrv}
 \bibliography{bib}
