@@ -116,14 +116,21 @@ even with reference to its source code.
   \label{fig:howto}
 \end{figure}
 
+
+
+
 In this paper, we proposed a active learning framework (shown in Figure \ref{fig:howto}) to
-automatically extract timed connectors from blackbox models.
+automatically extract timed connectors from blackbox models. 
 
+As a branch of \emph{machine learning} technique, active learning directly applies queries to a
+low-level blackbox model and construct hypothesis according to the results.
+There're already several works like \cite{DBLP:journals/mt/Daelemans10,
+DBLP:journals/iandc/Angluin87, DBLP:conf/fase/RaffeltS06} where active learning is used to extract
+\emph{finite state automatas} or \emph{grammars}.
 
-To solve this problem, many techniques in model constructing were proposed, for instance in
-\cite{DBLP:journals/mt/Daelemans10, DBLP:journals/iandc/Angluin87, DBLP:conf/fase/RaffeltS06}.
-
-\todo{finish this part!}
+We present \emph{Parameterized Mealy machine} provide a parametierized semantics for timed Reo
+channels, which enables us to generate Mealy machines with a given alphabet. Then the $L*$ algorithm
+is adapted and optimized to handle Mealy machines with time action.
 
 The paper is structured as follows. After this general introduction, in Section
 \ref{sec:preliminaries} we briefly illustrate some basic concepts, including Reo the coordination
@@ -132,7 +139,7 @@ Mealy-machine-based operational semantics of Reo, which is used in Section \ref{
 to show how to extract Reo models from blackboxes by means of active learning. Finally, in Section
 \ref{sec:experiment}, we discuss the optimization and implementation in \texttt{Golang}.
 
-\section{Preliminaries} 
+\section{Preliminar ies} 
 \label{sec:preliminaries}
 \subsection{Reo Coordination Language} 
 \label{sec:reo}
@@ -219,6 +226,7 @@ shown in Section \ref{sec:reolib}.
 
 \subsection{Mealy Machines}
 
+In this paper, we use \emph{Mealy machine} to model SUTs.
 As an extension of \emph{finite state machine}, Mealy machine was first proposed by George. H. Mealy
 in \cite{George1955A}. Compared with other variants, Mealy machines are designed to model
 reactive systems, where outputs are determined not only by its current state but also the current
@@ -245,7 +253,13 @@ Mealy machine following \cite{DBLP:conf/sfm/SteffenHM11}.
   \end{itemize}
 \end{definition}
 
-\todo{supplementation}
+We say that a Mealy machine is \emph{finite} if the set $S$ of states and the set $I$ of inputs are
+finite. Hereinafter, Mealy machines are always supposed to be finite.
+
+A Mealy machine is in some state $q\in S$ is always ready for inputs at any time. If an input symbol
+$i\in I$ is provided, the Mealy machine generates output $\lambda(q,i)$ and jumps to state
+$\delta(q,i)$.
+
 
 \subsection{Active Learning}
 In this section, we briefly introduce the main ideas of active automata learning. 
