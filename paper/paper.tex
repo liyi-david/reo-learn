@@ -110,11 +110,9 @@ operating systems. Consequently, manually modeling an existing connector seems r
 even with reference to its source code.
 
 As a branch of \emph{machine learning} technique, active learning offers a way to obtain models from
-low-level blackboxes. Works in \cite{DBLP:journals/mt/Daelemans10, DBLP:journals/iandc/Angluin87,
+low-level models. Works in \cite{DBLP:journals/mt/Daelemans10, DBLP:journals/iandc/Angluin87,
 DBLP:conf/fase/RaffeltS06} shows impressive examples where active learning is used to extract
-\emph{finite state automatas} or \emph{grammars}. 
-
-\todo{better expressions!}
+\emph{Mealy machines} or \emph{regular languages} without time domain.
 
 \begin{figure}[h]
   \begin{center}
@@ -176,7 +174,7 @@ can be found in Figure \ref{fig:basic}).
   \item [-] A \emph{SyncDrain} channel has two source ends and no sink end. It can accept a data
     item through one of its source end iff. a data item is also available for it to simultaneously
     accept through the other end. Then both two data items will be lost.
-  \item [-] A A \emph{FIFO1} channel is an asychronous channel with one buffer cell. It accepts a
+  \item [-] A \emph{FIFO1} channel is an asychronous channel with one buffer cell. It accepts a
     data item whenever the buffer is empty.  
 \end{itemize}
 
@@ -373,30 +371,47 @@ definition of \emph{parameterized Mealy machine} as follows.
     \item[-] $O$ is a finite set of sink-ends.
     \item[-] $s_0$ is the initial state. It satisfies $\forall \Sigma,s_0\in S(\Sigma)$
     \item[-] $\delta$ maps a \emph{finite} datum alphabet to an \emph{output function}. We use
-      $\delta(\Sigma):S(\Sigma)\times Input(\Sigma,I)\rightarrow Output(\Sigma, O)$ to denote the output function.
+      $\delta(\Sigma):S(\Sigma)\times Input(\Sigma,I,O)\rightarrow Output(\Sigma,I,O)$ to denote the
+      output function.
     \item[-] $\lambda$ maps an alphabet to a \emph{transition function}. We use
-      $\lambda(\Sigma):S(\Sigma)\times Input(\Sigma,I)\rightarrow S(\Sigma)$ to denote the transiton
+      $\lambda(\Sigma):S(\Sigma)\times Input(\Sigma,I,O)\rightarrow S(\Sigma)$ to denote the transiton
       function.
   \end{itemize}
 \end{definition}
 
 In the definition above, \emph{Input} and \emph{Output} are used to generate a set of input actions
-and output actions from the corresponding alphabets and ends. For example, if we have a alphabet
-consisting of two items $d_0$ and one source-end named $A$, the input actions would be
-\begin{eqnarray*}
-  Input(\{d_0\},\{A\}) &=& \{\{A:d_0,B:\rread\},\{A:d_0,B:\rnoread\}, \\
-  & & \{A:\bot,B:\rread\},\{A:\bot,B:\rnoread\},T\}
-\end{eqnarray*}
-where we use $\rread$ to indicate that a end-sink is ready for write, and $\rnoread$ otherwise.
+and output actions from the corresponding alphabets and ends. The value of $Input(\Sigma,I,O)$ is
+defined as a set of functions with on $I\cup O$ where $forall f\in Input(\Sigma,I,O)$, we have
+\[
+\forall i\in I, f(i)\in \Sigma\cup\{\bot\}\land \forall o\in
+O,f(o)\in\{\rread, \rnoread\}
+\]
+where we use $\rread$ to indicate that a end-sink is ready for write, and $\rnoread$ otherwise. Note
+that a $\bot$ means that there is \emph{no} data items on a source (or sink) end. In the same way,
+$Output(\Sigma,I,O)$ is defined as a set of functions on domain $O$, with an additional symbol
+$\rblock$ indicating an input failure. Similarly, $\forall f\in Output(\Sigma,I,O), f\neq \rblock$
+implies
+\[
+\forall o\in O, f(o)\in \Sigma\cup\{\bot\}
+\]
 
-\todo{How to say?}
-\[
-Input(\Sigma,I)=\{\}\cup\{T\}
-\]
-where we use $T$ to denote the time action.
-\[
-Output(\Sigma,I)=\{\}
-\]
+\begin{example}[Input and Output]
+  If we have a simple alphabet with only one item $d_0$, a source-end named $A$, and a
+  sink-end named $B$, the input actions would be
+  \begin{small}
+    \begin{eqnarray*}
+      Input(\{d_0\},\{A\},\{B\}) &=& \{\{A:d_0,B:\rread\},\{A:d_0,B:\rnoread\}, \\
+      & & \{A:\bot,B:\rread\},\{A:\bot,B:\rnoread\},T\}
+    \end{eqnarray*}
+  \end{small}
+  and its output actions
+  \[
+  Output(\{d_0\},\{A\},\{B\}) =\{\{B:d_0\},\{B:\bot\}, \rblock\}
+  \]
+\end{example}
+
+If there no data item written to all sink ends, we use $\varnothing$ to denote the empty output. For
+example, in the case given above, $\{B:\bot\}$ can be briefly rewritten as $\varnothing$.
 
 Parameterized Mealy machines can be seen as an abstract form of Mealy machines, which means that we
 still need a convert function between the two models.
@@ -430,11 +445,11 @@ as examples.
         \delta(\Sigma)(s,i)=\left\{
         \begin{array}[h]{ll}
           (B:\bot) & s=q_0\land i=(A:\_,B:\rnoread) \\
+          (B:\bot) & s=q_d\land i=(A:\_,B:\rnoread) \\     
           (B:d) & s=q_0\land i=(A:d,B:\rread)\\
-          \rblock & s=q_0\land i=(A:\bot,B:\rread) \\
           (B:d) & s=q_d\land i=(A:\_,B:\rread)\\
           \rblock & s=q_d\land i=(A:d,B:\rnoread) \\
-          (B:\bot) & s=q_d\land i=(A:\_,B:\rnoread) \\     
+          \rblock & s=q_0\land i=(A:\bot,B:\rread) \\
         \end{array}
         \right.
       \end{displaymath}
@@ -483,18 +498,19 @@ Besides, the concrete mealy machine (where $\Sigma=\{a\}$) is shown in Figure \r
   Considering a n-Timer channel with a source-end A and a sink-end B, we define its PMM-based
   semantics as:
   \begin{itemize}
-    \item[-] $S(\Sigma)=\{q_0\}\cup\{q_d|d\in\Sigma\}$
+    \item[-] $S(\Sigma)=\{q_{i,d}|1\leq i\leq n, d\in \Sigma\}\cup\{q_0\}$
     \item[-] $I=\{A\}$, $O=\{B\}$, $s_0=q_0$
     \item[-] output function
       \begin{displaymath}
         \delta(\Sigma)(s,i)=\left\{
         \begin{array}[h]{ll}
-          (B:\bot) & s=q_0\land i=(A:\_,B:\rnoread) \\
-          (B:d) & s=q_0\land i=(A:d,B:\rread)\\
-          \rblock & s=q_0\land i=(A:\bot,B:\rread) \\
-          (B:d) & s=q_d\land i=(A:\_,B:\rread)\\
-          \rblock & s=q_d\land i=(A:d,B:\rnoread) \\
-          (B:\bot) & s=q_d\land i=(A:\_,B:\rnoread) \\     
+          (B:d) & s=q_{n,d}\land i=(A:d,B:\rread)\\
+          \rblock & s=q_{n,d}\:\land \\
+          & (i=T\lor i=(A:\_,B:\rnoread) \\
+          \rblock & s=q_{j,d}\land 1 \leq j < n\land \\
+          & (i=(A:\_,B:\rread)\lor \\
+          & i=(A:d,B:\_))\\
+          (B:\bot) & otherwise\\
         \end{array}
         \right.
       \end{displaymath}
@@ -502,9 +518,11 @@ Besides, the concrete mealy machine (where $\Sigma=\{a\}$) is shown in Figure \r
       \begin{displaymath}
         \lambda(\Sigma)(s,i)=\left\{
         \begin{array}[h]{ll}
-          q_d & s=q_0\land i=(A:d,B:\rnoread) \\
-          q_d & s=q_{d'}\land i=(A:d,B:\rread) \\
-          q_0 & otherwise \\
+          q_{j+1,d} & s=q_{j,d}\land i=T\land0 < j < n\\
+          q_0 & s=q_{n,d}\land i=(A:\bot,B:\rread) \\
+          q_{1,d} & s=q_{n,d'}\land i=(A:d,B:\rread) \\
+          q_{1,d} & s=q_0 \land i=(A:d,B:\_) \\
+          s & otherwise \\
         \end{array}
         \right.
       \end{displaymath}
@@ -514,8 +532,9 @@ Besides, the concrete mealy machine (where $\Sigma=\{a\}$) is shown in Figure \r
 Similarly, we can use parameterized mealy machines to define the semantics of other basic timed Reo
 channels. Now we're going to show how to compose these channels into complicated connectors.
 
-\begin{definition}[Production of Parameterized Mealy Machines]
-  Now we're going to define the production operator \emph{prod} of two parameterized mealy machines as,
+\todo{check the timed behavior}
+\begin{definition}[Production Operator]
+  Now we're going to define the production operator \emph{prod} of two parameterized Mealy machines as,
   \[
   prod(PM_1,PM_2)=PM_3
   \]
@@ -524,12 +543,16 @@ channels. Now we're going to show how to compose these channels into complicated
   	\item[-] $\forall\Sigma, PM_3.S(\Sigma)=PM_1.S(\Sigma)\times PM_2.S(\Sigma)$
     \item[-] $PM_3.I=PM_1.I\cup PM_2.I-PM_1.O$
     \item[-] $PM_3.O=PM_1.O\cup PM_2.O-PM_2.I$
+  \end{itemize}
+  \emph{(Here we assume that sink ends of $PM_1$ can be connected to source ends $PM_2$, but not
+  vise versa)}
+  \begin{itemize}
     \item[-] $PM_3.s_0=(PM_1.s_0, PM_2.s_0)$
     \item[-] $\forall\Sigma, PM_3.\delta(\Sigma)((s_1,s_2), i)=$
       \begin{displaymath}
         \left\{
         \begin{array}[h]{ll}
-          (Out_1 + Out_2)|_{PM_3.O} & \rblock\land Out_2\neq\rblock \\
+          (Out_1 + Out_2)|_{PM_3.O} & Out_1\neq\rblock\land Out_2\neq\rblock \\
           \rblock & otherwise \\
         \end{array}
         \right.
@@ -541,7 +564,7 @@ channels. Now we're going to show how to compose these channels into complicated
         \item[*] $In_2 = (Out_1 + i)|_{PM_2.I}$
         \item[*] $Out_2 = PM_2.\delta(\Sigma)(s_2,In_2)$
       \end{itemize}
-    \item[-] $\forall\Sigma, PM_3.\lambda(\Sigma)((s_1,s_2),i)=(s_1',s_2')$
+    \item[-] $\forall\Sigma, PM_3. \lambda(\Sigma)((s_1,s_2),i)=(s_1',s_2')$
       where we have
       \begin{itemize}
         \item[*] $s_1' = PM_1.\lambda(\Sigma)(s_1,In_1)$
@@ -550,12 +573,67 @@ channels. Now we're going to show how to compose these channels into complicated
   \end{itemize}
 \end{definition}
 
-\todo{example of production, maybe fifo+timer}
+The idea in \emph{production} is quite simple. The output of $PM_1$ would be provided as part of the
+input of $PM_2$. Time actions T is only executed simutaneously betwenn $PM_1$ and $PM_2$.
+
+As mentioned in the notation above, we cannot connect a sink end of $PM_2$ and a source end of
+$PM_1$, which makes it difficult to construct connectors like alternator in Figure
+\ref{fig:reoconnector}. Now we define a \emph{link} operation to connect sink ends and source ends
+in the same connector.
+
+\begin{definition}[Link Operator]
+  The \emph{link} operation constructs connector by linking a sink end $OUT$ to a source end $IN$
+  within the same connector.   
+  \[
+  PM' = link(PM, OUT, IN)
+  \]
+  Here we asuume that $IN\in PM.I$ and $OUT\in PM.O$.
+
+  \begin{itemize}
+  	\item[-] $\forall\Sigma, PM'.S(\Sigma)=PM.S(\Sigma)$
+    \item[-] $PM'.I=PM.I-\{IN\}$
+    \item[-] $PM'.O=PM.O-\{OUT\}$
+    \item[-] $PM'.s=PM.s$
+    \item[-] $\forall\Sigma, i\in Input(\Sigma,PM'.I,PM'.O)$, $PM'.\delta(\Sigma)(s, i)=$
+      \begin{equation}
+        \label{equ:existd}
+        PM.\delta(\Sigma)(s,T)|_{PM'.O}
+      \end{equation}
+      if $i=T$. When $i$ is a non-time action, we need to check whether there's a data item
+      $d\in\Sigma$
+      satiefies
+      \[
+      PM.\delta(\Sigma)(s,i\cup\{IN:d\})|_{OUT} = d
+      \]
+      if \emph{true}, we have $PM'.\delta(\Sigma)(s, i)=$
+      \[
+      PM.\delta(\Sigma)(s,i\cup\{IN:d\})|_{PM'.O}
+      \]
+      otherwise $PM'.\delta(\Sigma)(s, i)=\rblock$
+    \item[-] $\forall\Sigma, i\in Input(\Sigma,PM'.I,PM'.O).'$ the transition
+      function can be defined as $PM.\lambda(\Sigma)(s,i)=$
+      \begin{displaymath}
+        \left\{
+        \begin{array}[h]{ll}
+          PM.\lambda(\Sigma,T) & i=T \\
+          PM.\lambda(\Sigma,i\cup\{IN:d\}) & \exists d\in\Sigma \mbox{ satisfes Equation
+          \ref{equ:existd}} \\
+          s & otherwise \\
+        \end{array}
+        \right.
+      \end{displaymath}
+  \end{itemize}
+\end{definition}
+
+With \emph{link} and \emph{prop} defined, complex connectors can be formed by simple channels in
+form of \emph{parameterized mealy machines}. It will be transformed into a concrete Mealy machine
+once the alphabet $\Sigma$ is provided.
 
 \section{From Blackbox to Timed Connectors} 
 \label{sec:activelearning}
-In this section, we will show how to use L* algorithm to extract models from blackboxes. Firstly, we
-presents the definition of \emph{Observation Table}, which is used to describe the hypothesis.
+In this section, we will show how to use L* algorithm to extract models from blackboxes, which
+mainly includes 3 steps: \emph{constructing hypothesis}, \emph{enclosing hypothesis} and
+\emph{checking hypothesis}.
 
 \subsection{Observation Table}
 
@@ -637,10 +715,15 @@ A simple example of timed connector is presented to show how L* works.
   \begin{center}
     \input{./images/expfifo.tex}
   \end{center}
-  \caption{Expiring FIFO1 Channel}
+  \caption{Expiring FIFO1 Channel (ExpFIFO1)}
   \label{fig:expfifo}
 \end{figure}
- 
+
+Informally speaking, an expiring FIFO1 channel with \emph{timeout} $n$ is able to accept a data item
+and stored it in the buffer cell for $n$ time units. If a read operation on $B$ is performed within
+$n$ time units, it will obtain the data item successfully and clear the buffer. However, the data
+item would be dropped if no read operation comes.
+
 \subsection{Performance Optimization}
 As a well-known learning algorithm, L* has proved its efficiency in models without time.
 However, when dealing with timed connectors, the algorithm failed to meet our expectation.
@@ -650,14 +733,14 @@ However, when dealing with timed connectors, the algorithm failed to meet our ex
   \caption{Time-Cost Analysis}
   \label{tabel:timecost}
   \centering
-  \begin{tabular}{l||rrr}
+  \begin{tabular}{l||rrrr}
     \hline
-    & FIFO & Alternator & Gate \\
+    & FIFO & Alternator & Gate & ExpFIFO1\\
     \hline\hline
-    Membership Query(s) & 41.571 & 126.468 & 169.161 \\
-    Hypothesis Query(s) & 0.001 & 0.003 & 0.004 \\
-    Total Time(s) & 41.715 & 165.114 & 247.098\\
-    Membership Query(\%) & 99.6 & 76.6 & 68.5\\
+    Membership Query(s) & 41.571 & 126.468 & 169.161 &\\
+    Hypothesis Query(s) & 0.001 & 0.003 & 0.004 &\\
+    Total Time(s) & 41.715 & 165.114 & 247.098 &\\
+    Membership Query(\%) & 99.6 & 76.6 & 68.5 &\\
     \hline
   \end{tabular}
 \end{table}
