@@ -12,6 +12,7 @@
 \usepackage{url}
 
 \usepackage{amssymb}
+\usepackage{amsmath}
 \usepackage{cite}
 \usepackage[normalem]{ulem}
 % for a smile-face character
@@ -23,6 +24,11 @@
 \usepackage{listings-golang}
 % to support flow graphs
 \usepackage{textcomp}
+% highlight in tables
+\usepackage{xcolor}
+\usepackage{colortbl}
+
+\usepackage[linesnumbered, ruled, vlined]{algorithm2e}
 
 % positioning is used for below lef = of
 \usetikzlibrary{shapes,shadows,arrows,automata,positioning}
@@ -42,6 +48,7 @@
 \newcommand{\rread}[0]{\rhd}
 \newcommand{\rnoread}[0]{\oslash}
 \newcommand{\smap}[1]{[{#1}]}
+\newcommand{\rempty}[0]{\varnothing}
 
 % style of source code environment listings
 \lstset{basicstyle=\footnotesize\ttfamily,breaklines=true, frame=shadowbox}
@@ -114,7 +121,7 @@ low-level models. Works in \cite{DBLP:journals/mt/Daelemans10, DBLP:journals/ian
 DBLP:conf/fase/RaffeltS06} shows impressive examples where active learning is used to extract
 \emph{Mealy machines} or \emph{regular languages} without time domain.
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \begin{center}
     \includegraphics[width=.4\textwidth]{./images/howto.png}
   \end{center}
@@ -155,7 +162,7 @@ In Reo, complex connectors are made up of simpler ones, where the atomic connect
 \emph{source} and \emph{sink}. Source channel ends accepts data into the channel, while sink
 channels ends release them out of the channel. 
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \begin{center}
     \input{./images/basic.tex}
   \end{center}
@@ -182,7 +189,7 @@ Channels are attached on component instances or \emph{nodes}. There are three ty
 \emph{source}, \emph{sink} and \emph{mixed node}, depending on whether all channel ends that
 coincide on a node are source ends, sink ends or both. (see in Figure \ref{fig:node})
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \begin{center}
     \input{./images/nodes.tex}
   \end{center}
@@ -196,7 +203,7 @@ With definition of more basic channels, it's easy to extend Reo to formalize coo
 different areas. In this paper, we take timed Reo\cite{DBLP:conf/sefm/ArbabBBR04} as our formal
 model. Timed Reo includes several timed channels, where the most commonly-used one, called
 \emph{timer}, is also shown in Figure \ref{fig:basic}. A t-timer channel accepts any data item from
-its source end and returns on its sink end a timeout signal after a delay of t time units.
+its source end, and later dispense it to its sink end after a delay of t time units.
 
 Components can be linked to source nodes or sink nodes. A component can write data items to its
 corresponding source node only if the data item can be dispensed simultaneously to all source ends
@@ -205,7 +212,7 @@ sink end on its corresponding node. A mixed node non-determinstically selects an
 from one of its coincident sink channel ends and replicates it into all of its coincident source
 channel ends.
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \begin{center}
     \input{./images/connectorexample.tex}
   \end{center}
@@ -253,8 +260,8 @@ We say that a Mealy machine is \emph{finite} if the set $S$ of states and the se
 finite. Hereinafter, Mealy machines are always supposed to be finite.
 
 A Mealy machine is in some state $q\in S$ is always ready for inputs at any time. If an input symbol
-$i\in I$ is provided, the Mealy machine generates output $\lambda(q,i)$ and jumps to state
-$\delta(q,i)$.
+$i\in I$ is provided, the Mealy machine generates output $o=\lambda(q,i)$ and jumps to state
+$q'=\delta(q,i)$. Such an edge is also denoted as $q\xrightarrow[]{i/o}q'$.
 
 
 \subsection{Active Learning}
@@ -266,7 +273,7 @@ on certain inputs. With such flexibility, active learning makes it able to use t
 queries to obtain more accurate models with smaller dataset. 
 
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \begin{center}
     \includegraphics[width=.5\textwidth]{./images/activelearning.png}
   \end{center}
@@ -443,7 +450,7 @@ as examples.
     \item[-] output function
       \begin{displaymath}
         \delta(\Sigma)(s,i)=\left\{
-        \begin{array}[h]{ll}
+        \begin{array}[ht]{ll}
           (B:\bot) & s=q_0\land i=(A:\_,B:\rnoread) \\
           (B:\bot) & s=q_d\land i=(A:\_,B:\rnoread) \\     
           (B:d) & s=q_0\land i=(A:d,B:\rread)\\
@@ -456,7 +463,7 @@ as examples.
     \item[-] transition function
       \begin{displaymath}
         \lambda(\Sigma)(s,i)=\left\{
-        \begin{array}[h]{ll}
+        \begin{array}[ht]{ll}
           q_d & s=q_0\land i=(A:d,B:\rnoread) \\
           q_d & s=q_{d'}\land i=(A:d,B:\rread) \\
           q_0 & otherwise \\
@@ -466,8 +473,9 @@ as examples.
   \end{itemize}
 \end{example}
 
-Besides, the concrete mealy machine (where $\Sigma=\{a\}$) is shown in Figure \ref{fig:pmmfifo}.
-\begin{figure}[h]
+Besides, the concrete mealy machine (where $\Sigma=\{a\}$) is shown in Figure \ref{fig:pmmfifo},
+where labels of edges are in form of $\frac{input}{output}$.
+\begin{figure}[ht]
   \begin{center}
     \input{./images/pmmfifo.tex}
   \end{center}
@@ -482,7 +490,7 @@ Besides, the concrete mealy machine (where $\Sigma=\{a\}$) is shown in Figure \r
     \item[-] output function
       \begin{displaymath}
         \delta(\Sigma)(s,i)=\left\{
-        \begin{array}[h]{ll}
+        \begin{array}[ht]{ll}
           (B:\bot) & s=q_0\land i=(A:\bot,B:\rnoread) \\
           (B:d) & s=q_0\land i=(A:d,B:\rread)\\
           \rblock & s=q_0\land i=(A:\bot,B:\rread) \\
@@ -498,12 +506,12 @@ Besides, the concrete mealy machine (where $\Sigma=\{a\}$) is shown in Figure \r
   Considering a n-Timer channel with a source-end A and a sink-end B, we define its PMM-based
   semantics as:
   \begin{itemize}
-    \item[-] $S(\Sigma)=\{q_{i,d}|1\leq i\leq n, d\in \Sigma\}\cup\{q_0\}$
+    \item[-] $S(\Sigma)=\{q_{i,d}|0\leq i\leq n, d\in \Sigma\}\cup\{q_0\}$
     \item[-] $I=\{A\}$, $O=\{B\}$, $s_0=q_0$
     \item[-] output function
       \begin{displaymath}
         \delta(\Sigma)(s,i)=\left\{
-        \begin{array}[h]{ll}
+        \begin{array}[ht]{ll}
           (B:d) & s=q_{n,d}\land i=(A:d,B:\rread)\\
           \rblock & s=q_{n,d}\:\land \\
           & (i=T\lor i=(A:\_,B:\rnoread) \\
@@ -517,11 +525,11 @@ Besides, the concrete mealy machine (where $\Sigma=\{a\}$) is shown in Figure \r
     \item[-] transition function
       \begin{displaymath}
         \lambda(\Sigma)(s,i)=\left\{
-        \begin{array}[h]{ll}
+        \begin{array}[ht]{ll}
           q_{j+1,d} & s=q_{j,d}\land i=T\land0 < j < n\\
           q_0 & s=q_{n,d}\land i=(A:\bot,B:\rread) \\
-          q_{1,d} & s=q_{n,d'}\land i=(A:d,B:\rread) \\
-          q_{1,d} & s=q_0 \land i=(A:d,B:\_) \\
+          q_{0,d} & s=q_{n,d'}\land i=(A:d,B:\rread) \\
+          q_{0,d} & s=q_0 \land i=(A:d,B:\_) \\
           s & otherwise \\
         \end{array}
         \right.
@@ -551,7 +559,7 @@ channels. Now we're going to show how to compose these channels into complicated
     \item[-] $\forall\Sigma, PM_3.\delta(\Sigma)((s_1,s_2), i)=$
       \begin{displaymath}
         \left\{
-        \begin{array}[h]{ll}
+        \begin{array}[ht]{ll}
           (Out_1 + Out_2)|_{PM_3.O} & Out_1\neq\rblock\land Out_2\neq\rblock \\
           \rblock & otherwise \\
         \end{array}
@@ -614,7 +622,7 @@ in the same connector.
       function can be defined as $PM.\lambda(\Sigma)(s,i)=$
       \begin{displaymath}
         \left\{
-        \begin{array}[h]{ll}
+        \begin{array}[ht]{ll}
           PM.\lambda(\Sigma,T) & i=T \\
           PM.\lambda(\Sigma,i\cup\{IN:d\}) & \exists d\in\Sigma \mbox{ satisfes Equation
           \ref{equ:existd}} \\
@@ -633,63 +641,144 @@ once the alphabet $\Sigma$ is provided.
 \label{sec:activelearning}
 In this section, we will show how to use L* algorithm to extract models from blackboxes, which
 mainly includes 3 steps: \emph{constructing hypothesis}, \emph{enclosing hypothesis} and
-\emph{checking hypothesis}.
+\emph{checking hypothesis}. Besides, we assume that input symbols and output symbols of the blackbox
+have been provided as $\mathcal{I}$ and $\mathcal{O}$.
 
 \subsection{Observation Table}
+As mentioned above, membership queries provide us information with the form $mq(s)=o$, where $s$ is
+an input sequence in $\Sigma^{+}$. Now the question is, \emph{how to find the connection between
+such query results and Mealy machines?}
 
-\subsection{Closeness}
+Generally, Mealy machines are composed of \emph{states} and \emph{transitions}.
+Provided with a Mealy machine $m$, any input sequence in $m.I^+$ leads to a unique state. 
+Such a sequence is called an \emph{access sequence} of this state.
+Specially, we use $\varepsilon$, the \emph{empty sequnce}, to denote the initial state.
+Similarly, if a blackbox model has the same bahavior with a Mealy machine, we can use access
+sequences to label its states and, in the same way, input actions to label its transitions.
+For example, we consider a Mealy machine stays is staying in some state labelled by $s$. With an
+action $a$ provided, the Mealy machine will jump to a new state labelled by $s'=sa$ and generate a
+output $mq(sa)$. 
 
-\subsection{Counter-Examples}
-Generally, equivalence query has been proved impossible in blackbox
-models\cite{DBLP:journals/iandc/Angluin87}. However, in this
-section, we're showing that in certain circumstances, equivalence query can be implemented with
-no approximation.
+Different access sequences may lead to similar states. For example, a 2-Timer channel will dispense
+any accepted data item in 2 time units. After that, the state of this channel is exactly same as its
+initial state. Here \emph{suffixes} are used to distinguish different states as shown in the
+following definition, where $D$ is initialized as $\mathcal{I}$. Under such a suffix set, two states
+are considered different only when they have different one-step behaviors.
 
-Equivalence queries are used to search for counter-examples. But what makes counter-examples even
-existing? In Reo models, we believe that \emph{FIFO} channels and \emph{Timer} channels are to
-blame. Here we present a brief example. To make things eaiser, we have only untimed Reo here.
+\begin{definition}[Equivalence under Suffixes]
+  provided with two access sequences $s_1,s_2$ and a set of suffixes $D\subset\mathcal{I}^+$, we say
+  the corresponding states of $s_1$ and $s_2$ are equivalent under $D$ (denoted as $s_1\sim_D s_2$)
+  iff $\forall d\in D, mq(s_1d) = mq(s_2d)$.
+\end{definition}
 
-\begin{figure}[h]
+Since all this \emph{inputs} and \emph{outputs} can be observed outside the
+model, we can use the same notations to describe a black box as a hypothetical Mealy machine.
+Following this idea, \emph{Observation Tables}, proposed in \cite{DBLP:journals/iandc/Angluin87},
+shows a tabular form of such hypothetical models. In observation tables, rows represent states with
+label of their access sequences and columns are labelled suffixes. Successors of a state $s$ is,
+intuitively, denoted as extended access sequences $sa$ where $a$ is a single input action. 
+A cell with column-label $d$ and row-label $s$ should contain the value $mq(sd)$. Algorithm
+\ref{alg:buildtable} shows how to build such an observation table.
+
+\begin{algorithm} 
+  \caption{BuildTable} 
+  \label{alg:buildtable}
+  \KwIn{Oracle interface $mq$, Input actions $\mathcal{I}$, suffix set $D$}
+  \KwOut{Observation table $obs$} 
+  $obs$ initialized as empty\;
+  $unclosed=\{\varepsilon\}$\;
+  \Repeat{$unclosed=\varnothing$}
+  {
+    $next=\{st|\forall s\in unclosed,\forall t\in \mathcal{I}\}$\;
+    append $unclosed$ to $obs$\;
+    $unclosed=\{seq\in next|\forall a\in obs, seq \not\sim_D a\}$\;
+  }
+  \Return $obs$\; 
+\end{algorithm}
+
+Taking a 2-Timer channel as an example, we now illustrate how this algorithm works. 
+We assume that the source end of this 2-Timer channel is $A$, the sink end is $B$ and the alphabet
+is $\{a\}$. We briefly denote $\{A:a,B:\rnoread\}$ and other input/output actions in form of
+$a,\rnoread$.
+
+Firstly, $obs$ is initialized as empty and the empty sequence $\varepsilon$ is pushed in $unclosed$.
+Then we will explore all the access sequences in $unclosed$ and calculate its successors. Here the
+$unclosed$ set consists of access sequences that has no equivalent fellow with less length. 
+For example, figure \ref{fig:hypo} shows the $obs$ of a 2-Timer channel after the first
+iteration. The five successors of $\varepsilon$ is presented as the bottom part of the table, where
+four are equivalent with $\varepsilon$ but $a,\rnoread$ is not. Therefore, we take $a,\rnoread$ as a
+brand-new state and all of its successors need further exploration (see in the hypothesis Mealy
+machine presented in the following figure).
+
+\begin{figure}[ht]
   \begin{center}
-    \input{./images/3buf.tex}
+    \begin{displaymath}
+      \begin{array}{l||ccccc}
+        \hline
+        & a,\rread & \bot,\rread & a,\rnoread & \bot,\rnoread & T\\
+        \hline\hline
+        \varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        \hline
+        a,\rread & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        \bot,\rread & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        \rowcolor[gray]{.9}
+        a,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty \\
+        \bot,\rnoread & \rblock & \rblock & \rempty & \rempty & \rempty  \\
+        T & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        \hline
+      \end{array}
+    \end{displaymath}
+    \input{./images/hypo.tex}
   \end{center}
-  \caption{A Switching Connector $S$ with Three Buffers}
-  \label{fig:buf3}
+  \caption{Observation Table and Corresponding Hypothesis}
+  \label{fig:hypo}
 \end{figure}
 
-A \emph{Switching} connector in \figurename \ref{fig:buf3} has two source-ends $A,B$ and one
-sink-end $C$. In a nutshell, datum come from $A$ and be stored temporarily in buffers. These datum
-will never flow out until signals come to $B$. With the Mealy-Machine semantics given, the semantics
-of \emph{Switching} connectors can be defined as following \figurename \ref{fig:buf3semantics}.
+In the second iteration, we explore the successors of $a,\rnoread$. Fortunately we find that every
+successor has a shorted equivalence fellow (\emph{itself}). Consequently, the algorithm terminates
+with a closed hypothesis where all the unclosed edge shown in Figure \ref{fig:hypo} turn into
+self-loop.
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \begin{center}
-    \input{./images/3bufsemantics.tex}
+    \begin{displaymath}
+      \begin{array}{l||ccccc}
+        \hline
+        & a,\rread & \bot,\rread & a,\rnoread & \bot,\rnoread & T\\
+        \hline\hline
+        \varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        \hline
+        a,\rread & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        \bot,\rread & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        a,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty \\
+        \bot,\rnoread & \rblock & \rblock & \rempty & \rempty & \rempty  \\
+        T & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        \hline
+        a,\rnoread-a,\rread & \rblock & \rblock & \rblock & \rempty & \rempty \\
+        a,\rnoread-\bot,\rread & \rblock & \rblock & \rblock & \rempty & \rempty \\
+        a,\rnoread-a,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty \\
+        a,\rnoread-\bot,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty \\
+        a,\rnoread-T & \rblock & \rblock & \rblock & \rempty & \rempty \\
+        \hline
+      \end{array}
+    \end{displaymath}
   \end{center}
-  \caption{\emph{Gate} as Mealy Machine $\mathcal{M}(S)$}
-  \label{fig:buf3semantics}
+  \caption{A Closed Observation Table}
+  \label{fig:hypo2}
 \end{figure}
 
-According to the production of Mealy-Machines, 8 different states should be found in
-$\mathcal{M}(S)$. We use $q_{abc}$ to denote them. $q_{001}$ indicates that the last buffer is
-filled and others are empty, and $q_{111}$ means that there are no space in any buffer. It's
-obvious that some states like $q_{100}$ is unreachable.
+\subsection{Counter-Examples' Analysis} 
+In our framework, the oracle function $eq$ is used to check the equivalence between hypothesis
+models and blackboxes. It is also responsible for generating counter-examples.
+Generally, as mentioned in \cite{DBLP:journals/iandc/Angluin87,DBLP:conf/sfm/SteffenHM11},
+equivalence query has been proved impossible in blackbox models.
 
-We say if two states are \emph{similiar} iff. they have the same output signature.
-
-\begin{theorem}[Bound of Counter-Example]
-  \label{the:cebound} Assume that an observation table has already been closed with maximum
-  query length \todo{find a better phrase?} $l$. An counter-example of length $l+2$ would be
-  found iff. there're possible counter-examples.
-\end{theorem}
-\begin{IEEEproof}
-  Sketch of this proof are shown in several points:
-  \begin{enumerate}
-    \item Hypothesises are subgraphs of the semantics graph.
-    \item Inputs on reverse edges are complementary.
-    \item 
-  \end{enumerate}
-\end{IEEEproof}
+Apparently, the closed hypothesis presented in Figure \ref{fig:hypo2} is not equal to the 2-Timer
+channel. It's easy to find a counter-example $s=a,\rnoread-T-T-\bot,\rread$ where $mq(s)=a$ while
+according to the hypothesis, the result shoud have been $\rempty$. As mentioned above, we use a
+suffix set $D$ to distinguish different states. The existance of counter-examples shows that the
+current suffix set $D$ is not powerful enough to distinguish all different states. We need to analyze
+the counter-example and in turn append more elements to $D$.
 
 \section{Experiments} 
 \label{sec:experiment}
@@ -711,7 +800,7 @@ of RAM and a Core i7-3630 CPU. The source code is available at
 
 \subsection{Case Studies}
 A simple example of timed connector is presented to show how L* works.
-\begin{figure}[h]
+\begin{figure}[ht]
   \begin{center}
     \input{./images/expfifo.tex}
   \end{center}
@@ -728,7 +817,7 @@ item would be dropped if no read operation comes.
 As a well-known learning algorithm, L* has proved its efficiency in models without time.
 However, when dealing with timed connectors, the algorithm failed to meet our expectation.
 
-\begin{table}[h]
+\begin{table}[ht]
   \renewcommand{\arraystretch}{1.3}
   \caption{Time-Cost Analysis}
   \label{tabel:timecost}
@@ -763,24 +852,9 @@ that simulations on similar sequences were invoked frequently:
 
 If previous simulation results are stored in a well-maintained cache, the time-cost in
 simulation process could be reduced signficiantly. In this work, we use a multiway tree to buffer
-these results. A brief example of such trees can be found in Figure \ref{fig:multiway}.
+these results.
 
-\todo{the graph need further details}
-\begin{example}[Multiway-Tree Cache]
-  \label{example:tree}
-  Considering the FIFO channel presented in Example \ref{example:pmmfifo}. 
-  \begin{figure}[h]
-    \begin{center}
-      \input{./images/cache.tex}
-    \end{center}
-    \caption{Multiway-Tree Cache}
-    \label{fig:multiway}
-  \end{figure}
-  Note that in this figure, only the edge information is stored. States like $q_0,q_a$ are written
-  here only to make it clear.
-\end{example}
-
-\begin{table}[h]
+\begin{table}[ht]
   \renewcommand{\arraystretch}{1.3}
   \caption{Reduction of Membership Queries}
   \label{tabel:cacheoptimization}
@@ -796,7 +870,7 @@ these results. A brief example of such trees can be found in Figure \ref{fig:mul
   \end{tabular}
 \end{table}
 
-With cache applied, we have made a good reduction on the calls of membership queries. The results
+With cache applied, we have made considerable reduction on the calls of membership queries. The results
 can be found in Table \ref{tabel:cacheoptimization}.
 
 \subsection{An Example of the Reo Package }
