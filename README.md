@@ -32,3 +32,4 @@ All the codes are written under Google Go.
 - **Jan 09 2016** time-comsumption analysis is added in both sul and learn modules
 - **Jan 09 2016** new tree-optimization tactic
 - **Jan 11 2016** new example showing how to use reo package for concurrent programming
+- **Jan 16 2016** bugs fixed in *LossySync* channel

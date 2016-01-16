@@ -29,6 +29,7 @@ func main() {
 	// configurations in simulation
 	sul.SetReoDelay(10)
 	sul.SetBound(2)
+	sul.SetEquivBound(4)
 	// logs on/off
 	// sul.CloseLog()
 	sul.CloseReoLog()
@@ -59,18 +60,16 @@ func main() {
 		counter := 0
 		for {
 			var tin sul.InputSeq = sul.InputSeq{
-				&sul.Input{map[string]bool{"A": false, "B": false}, false},
-				&sul.Input{map[string]bool{"A": false, "B": true}, false},
-				&sul.Input{map[string]bool{"A": false, "B": false}, false},
-				&sul.Input{map[string]bool{"A": true, "B": false}, false},
+				&sul.Input{map[string]bool{"A": true}, false},
+				&sul.Input{map[string]bool{"A": false}, true},
+				&sul.Input{map[string]bool{"A": false}, true},
+				&sul.Input{map[string]bool{"A": false}, true},
 			}
 			r := s.SeqSimulate(tin)
 			logger.Println("RESULT:", r, counter)
 			counter++
 
-			if len(r[3]) == 0 {
-				break
-			}
+			break
 		}
 		return
 	}
