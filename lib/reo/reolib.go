@@ -113,8 +113,9 @@ func TimerChannel(in, out Port, t time.Duration, stop Port) {
 			Operation{"write", in.Slave, "read"},
 			Operation{"read", in.Main, "datum"},
 			Operation{"write", c, "datum"},
-			Operation{"debug", c, "[FIFO] BUFFERED"},
+			Operation{"debug", c, "[Timer] BUFFERED"},
 			Operation{"read", timer(t), ""},
+			Operation{"debug", c, "[Timer] TRY TO PUSH"},
 			// following are the syncwrite part
 			Operation{"write", out.Slave, "write"},
 			Operation{"read", out.Slave, ""},
@@ -129,22 +130,40 @@ func TimerChannel(in, out Port, t time.Duration, stop Port) {
 }
 
 func LossysyncChannel(in, out, stop Port) {
+	defer close(stop.Slave)
+	c := make(chan string, 1)
 	for {
-		select {
-		case <-stop.Main:
-			close(stop.Slave)
+		// try to read a data item
+		status := StepExec(
+			stop.Main,
+			Operation{"read", in.Slave, ""},
+			Operation{"write", in.Slave, "read"},
+			Operation{"read", in.Main, "datum"},
+			Operation{"write", c, "datum"},
+			Operation{"debug", c, "[LossySync] data found."},
+		)
+		if !status {
 			return
-		}
-		// FIXME the SyncRead operation may blocks this channel
-		// and hence it cannot be closed by stop Port
-		c := in.SyncRead()
-		select {
-		// try WaitWrite
-		case out.Slave <- "write":
-			out.ConfirmWrite()
-			out.Write(c)
-		default:
-			// do nothing
+		} else {
+			// try to dipense the data
+			select {
+			case <-stop.Main:
+				return
+			case <-time.After(1 * time.Millisecond):
+				logger.Println("[LossySync] data dropped")
+			case out.Slave <- "write":
+				data := <-c
+				status := StepExec(
+					stop.Main,
+					Operation{"read", out.Slave, ""},
+					Operation{"write", out.Main, data},
+				)
+				if !status {
+					return
+				} else {
+					logger.Println("[LossySync] data pushed", data)
+				}
+			}
 		}
 	}
 }
@@ -272,46 +291,7 @@ func MergerChannel(in1, in2, out, stop Port) {
 	wg.Wait()
 }
 
-//func NMergerChannel(in1, in2, out, stop Port) {
-//defer close(stop.Slave)
-//for {
-//// considering the syntax of select, here we use
-//// <-in.slave instead of in.WaitRead()
-//c := make(chan string, 1)
-//select {
-//case <-stop.Main:
-//return
-//case <-in1.Slave:
-//status := StepExec(
-//stop.Main,
-//Operation{"write", out.Slave, "write"},
-//Operation{"write", in1.Slave, "read"},
-//Operation{"read", out.Slave, ""},
-//Operation{"read", in1.Main, "datum"},
-//Operation{"write", out.Main, "datum"},
-//Operation{"write", c, "datum"},
-//)
-//if !status {
-//return
-//}
-//case <-in2.Slave:
-//status := StepExec(
-//stop.Main,
-//Operation{"write", out.Slave, "write"},
-//Operation{"write", in2.Slave, "read"},
-//Operation{"read", out.Slave, ""},
-//Operation{"read", in2.Main, "datum"},
-//Operation{"write", out.Main, "datum"},
-//Operation{"write", c, "datum"},
-//)
-//if !status {
-//return
-//}
-//}
-//logger.Println("[MERGER] TRANS", <-c)
-//}
-//}
-
+// FIXME order between out1 and out2?
 func ReplicatorChannel(in, out1, out2 Port, stop Port) {
 	defer close(stop.Slave)
 	for {
