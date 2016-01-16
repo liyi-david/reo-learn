@@ -27,8 +27,9 @@
 % highlight in tables
 \usepackage{xcolor}
 \usepackage{colortbl}
-
+% used to encode algorithms
 \usepackage[linesnumbered, ruled, vlined]{algorithm2e}
+\usepackage{array}
 
 % positioning is used for below lef = of
 \usetikzlibrary{shapes,shadows,arrows,automata,positioning}
@@ -684,7 +685,7 @@ A cell with column-label $d$ and row-label $s$ should contain the value $mq(sd)$
 \ref{alg:buildtable} shows how to build such an observation table.
 
 \begin{algorithm} 
-  \caption{BuildTable} 
+  \caption{CloseTable} 
   \label{alg:buildtable}
   \KwIn{Oracle interface $mq$, Input actions $\mathcal{I}$, suffix set $D$}
   \KwOut{Observation table $obs$} 
@@ -716,22 +717,22 @@ machine presented in the following figure).
 \begin{figure}[ht]
   \begin{center}
     \begin{displaymath}
-      \begin{array}{l||ccccc}
+      \begin{array}{l||ccccc||c}
         \hline
-        & a,\rread & \bot,\rread & a,\rnoread & \bot,\rnoread & T\\
+        & a,\rread & \bot,\rread & a,\rnoread & \bot,\rnoread & T & \mbox{AccessSequence}\\
         \hline\hline
-        \varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        \varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
         \hline
-        a,\rread & \rblock & \rblock & \rempty & \rempty & \rempty \\
-        \bot,\rread & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        a,\rread & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
+        \bot,\rread & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
         \rowcolor[gray]{.9}
-        a,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty \\
-        \bot,\rnoread & \rblock & \rblock & \rempty & \rempty & \rempty  \\
-        T & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        a,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty & \mbox{NO MATCH}\\
+        \bot,\rnoread & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+        T & \rblock & \rblock & \rempty & \rempty & \rempty \varepsilon & \varepsilon \\
         \hline
       \end{array}
     \end{displaymath}
-    \input{./images/hypo.tex}
+    % \input{./images/hypo.tex}
   \end{center}
   \caption{Observation Table and Corresponding Hypothesis}
   \label{fig:hypo}
@@ -745,23 +746,24 @@ self-loop.
 \begin{figure}[ht]
   \begin{center}
     \begin{displaymath}
-      \begin{array}{l||ccccc}
+      \small
+      \begin{array}{l||ccccc||c}
         \hline
-        & a,\rread & \bot,\rread & a,\rnoread & \bot,\rnoread & T\\
+        & a,\rread & \bot,\rread & a,\rnoread & \bot,\rnoread & T & \mbox{AccessSequence}\\
         \hline\hline
-        \varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        \varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
         \hline
-        a,\rread & \rblock & \rblock & \rempty & \rempty & \rempty \\
-        \bot,\rread & \rblock & \rblock & \rempty & \rempty & \rempty \\
-        a,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty \\
-        \bot,\rnoread & \rblock & \rblock & \rempty & \rempty & \rempty  \\
-        T & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        a,\rread & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
+        \bot,\rread & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+        a,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
+        \bot,\rnoread & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+        T & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
         \hline
-        a,\rnoread-a,\rread & \rblock & \rblock & \rblock & \rempty & \rempty \\
-        a,\rnoread-\bot,\rread & \rblock & \rblock & \rblock & \rempty & \rempty \\
-        a,\rnoread-a,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty \\
-        a,\rnoread-\bot,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty \\
-        a,\rnoread-T & \rblock & \rblock & \rblock & \rempty & \rempty \\
+        a,\rnoread-a,\rread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
+        a,\rnoread-\bot,\rread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
+        a,\rnoread-a,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
+        a,\rnoread-\bot,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
+        a,\rnoread-T & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
         \hline
       \end{array}
     \end{displaymath}
@@ -774,7 +776,7 @@ self-loop.
 Apparently, the closed hypothesis presented in Figure \ref{fig:hypo2} is not equal to the 2-Timer
 channel. It's easy to find a counter-example $s=a,\rnoread-T-T-\bot,\rread$ where $mq(s)=a$ while
 according to the hypothesis, the result shoud have been $\rempty$. In this section, we show how to
-find and analyze counter-examples, which is mainly based on \cite{DBLP:conf/sfm/SteffenHM11}. 
+find and analyze counter-examples using the method in \cite{DBLP:conf/sfm/SteffenHM11}. 
 
 Firstly, we give a formal definition of \emph{counter-examples}. With a observation table $obs$ and
 a sequence $s$, we use $acc(s)$ to denote the access sequence of $obs\xrightarrow{s}$ and $hq(s)$ to
@@ -794,7 +796,8 @@ Considering a counter example $s$, we have
 \mbox{MaxSuffix}(s)=\max_d\{s=s'd, mq(acc(s')d)\neq mq(s)\}
 \]
 Since $mq(acc(s))=hq(s)\neq mq(s)$ and $mq(s) = mq(s)$, the existance of such $d$ is easy to prove.
-After appending $d$ in $D$, we explain the closedness will be violated.
+After appending $d$ in $D$, we can rebuild a closed hypothesis where $s$ is no longer a
+counter-example.
 
 The whole L* algorithm can be concluded as follows.
 \begin{algorithm} 
@@ -804,7 +807,7 @@ The whole L* algorithm can be concluded as follows.
   \KwOut{Observation table $obs$} 
   $D=I$\;
   \Repeat{$ce=true$}{
-    $obs$ = BuildTable($mq$, $\mathcal{I}$, $D$)\;
+    $obs$ = CloseTable($mq$, $\mathcal{I}$, $D$)\;
     $ce=eq(obs)$\;
     \If {$ce!=true$} {
       D.append(MaxSuffix(s))\;
@@ -820,12 +823,9 @@ The whole L* algorithm can be concluded as follows.
 \label{sec:experiment}
 
 Both \emph{Reo Coordination Models} and \emph{Adapted L* Algorithm} are implemented in
-Golang\cite{golang}.
-
-Golang (or Google Go) is a rising programming language started by Google Inc. The language is widely
-known for its elegant design and impressive efficiency. Moreover, the concurrency model of Golang
-comes from CSP\cite{DBLP:books/ph/Hoare85}. As a channel-based model, CSP shares a similar idea with
-Reo and makes our implementation much more natural.
+Golang\cite{golang}, which is widely known for its elegant design and impressive efficiency.
+Moreover, with a CSP-style\cite{DBLP:books/ph/Hoare85} cocurrency model,\texttt{Golang} shares many
+similar ideas with Reo, and in turn makes our implementation much more natural.
 
 All the following experiments are coded under Golang \emph{1.2.1} and executed on a laptop with 8GB
 of RAM and a Core i7-3630 CPU. The source code is available at
@@ -880,12 +880,8 @@ However, when dealing with timed connectors, the algorithm failed to meet our ex
 \end{table}
 
 As shown in Table \ref{tabel:timecost}, time consumption mainly comes from membership queries.
-Since time is involved in our model, it's inevitably that simulation takes time to behave normally.
-Even worse, since our models are treated as blackbox. With no access to inner behaviour of the
-connectors, it's almost impossible to accelerate the simulation process.
-
-Fortunately, there are still other optimization solutions. After reviewing our algorithm, we found
-that simulations on similar sequences were invoked frequently:
+With time involved, every single membership query takes a lot of time inevitably.
+After reviewing our algorithm, we found that simulations on similar sequences were invoked frequently:
 
 \begin{itemize}
   \item When constructing \emph{Obs} tables, there are lots of redundant calls to membership
