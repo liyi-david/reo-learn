@@ -771,17 +771,50 @@ self-loop.
 \end{figure}
 
 \subsection{Counter-Examples' Analysis} 
-In our framework, the oracle function $eq$ is used to check the equivalence between hypothesis
-models and blackboxes. It is also responsible for generating counter-examples.
-Generally, as mentioned in \cite{DBLP:journals/iandc/Angluin87,DBLP:conf/sfm/SteffenHM11},
-equivalence query has been proved impossible in blackbox models.
-
 Apparently, the closed hypothesis presented in Figure \ref{fig:hypo2} is not equal to the 2-Timer
 channel. It's easy to find a counter-example $s=a,\rnoread-T-T-\bot,\rread$ where $mq(s)=a$ while
-according to the hypothesis, the result shoud have been $\rempty$. As mentioned above, we use a
-suffix set $D$ to distinguish different states. The existance of counter-examples shows that the
-current suffix set $D$ is not powerful enough to distinguish all different states. We need to analyze
-the counter-example and in turn append more elements to $D$.
+according to the hypothesis, the result shoud have been $\rempty$. In this section, we show how to
+find and analyze counter-examples, which is mainly based on \cite{DBLP:conf/sfm/SteffenHM11}. 
+
+Firstly, we give a formal definition of \emph{counter-examples}. With a observation table $obs$ and
+a sequence $s$, we use $acc(s)$ to denote the access sequence of $obs\xrightarrow{s}$ and $hq(s)$ to
+denote the corresponding output.
+
+\begin{definition}[Counter-Example]
+  We use $hq$ to denote execution result of the hypothetical Mealy machine, sequence $s$ is called a
+  counter-example iff $mq(s)\neq hq(s)$.
+\end{definition}
+
+Now we consider the reason that lead to existance of counter examples. Since
+the suffix set $D$ is used to distinguish different states, the existance of counter-examples
+shows that the current suffix set $D$ is not powerful enough to distinguish all different states.
+
+Considering a counter example $s$, we have
+\[
+\mbox{MaxSuffix}(s)=\max_d\{s=s'd, mq(acc(s')d)\neq mq(s)\}
+\]
+Since $mq(acc(s))=hq(s)\neq mq(s)$ and $mq(s) = mq(s)$, the existance of such $d$ is easy to prove.
+After appending $d$ in $D$, we explain the closedness will be violated.
+
+The whole L* algorithm can be concluded as follows.
+\begin{algorithm} 
+  \caption{L*} 
+  \label{alg:lstar}
+  \KwIn{Oracle interface $mq,eq$, Input actions $\mathcal{I}$}
+  \KwOut{Observation table $obs$} 
+  $D=I$\;
+  \Repeat{$ce=true$}{
+    $obs$ = BuildTable($mq$, $\mathcal{I}$, $D$)\;
+    $ce=eq(obs)$\;
+    \If {$ce!=true$} {
+      D.append(MaxSuffix(s))\;
+    }
+  }
+  \Return $obs$\; 
+\end{algorithm}
+
+
+
 
 \section{Experiments} 
 \label{sec:experiment}
@@ -794,14 +827,11 @@ known for its elegant design and impressive efficiency. Moreover, the concurrenc
 comes from CSP\cite{DBLP:books/ph/Hoare85}. As a channel-based model, CSP shares a similar idea with
 Reo and makes our implementation much more natural.
 
-We have programmed Reo channels as a new package in Golang. The package is well-written for not only
-formal verification but also practical use.
-
 All the following experiments are coded under Golang \emph{1.2.1} and executed on a laptop with 8GB
 of RAM and a Core i7-3630 CPU. The source code is available at
 \url{https://github.com/liyi-david/reo-learn}.
 
-\subsection{Case Studies}
+\subsection{Case Study}
 A simple example of timed connector is presented to show how L* works.
 \begin{figure}[ht]
   \begin{center}
@@ -816,6 +846,18 @@ and stored it in the buffer cell for $n$ time units. If a read operation on $B$ 
 $n$ time units, it will obtain the data item successfully and clear the buffer. However, the data
 item would be dropped if no read operation comes.
 
+\begin{figure}[ht]
+  \begin{center}
+    \input{./images/expfifosemantics.tex}
+  \end{center}
+  \caption{Learn Result of The ExpFIFO1 where $n=2,\Sigma=\{a\}$}
+  \label{fig:expfifosemantics}
+\end{figure}
+
+Figure \ref{fig:expfifosemantics} shows the learning result of this example.
+To simplify the graph, we ignore the all the trivial transitions $\frac{\bot,\rnoread}{\rempty}$
+and block transitions. More details of this case can be found in our \emph{github repo}.
+
 \subsection{Performance Optimization}
 As a well-known learning algorithm, L* has proved its efficiency in models without time.
 However, when dealing with timed connectors, the algorithm failed to meet our expectation.
@@ -825,14 +867,14 @@ However, when dealing with timed connectors, the algorithm failed to meet our ex
   \caption{Time-Cost Analysis}
   \label{tabel:timecost}
   \centering
-  \begin{tabular}{l||rrrr}
+  \begin{tabular}{l||rrr}
     \hline
-    & FIFO & Alternator & Gate & ExpFIFO1\\
+    & FIFO & Alternator & Gate \\
     \hline\hline
-    Membership Query(s) & 41.571 & 126.468 & 169.161 &\\
-    Hypothesis Query(s) & 0.001 & 0.003 & 0.004 &\\
-    Total Time(s) & 41.715 & 165.114 & 247.098 &\\
-    Membership Query(\%) & 99.6 & 76.6 & 68.5 &\\
+    Membership Query(s) & 41.571 & 126.468 & 169.161 \\
+    Hypothesis Query(s) & 0.001 & 0.003 & 0.004 \\
+    Total Time(s) & 41.715 & 165.114 & 247.098 \\
+    Membership Query(\%) & 99.6 & 76.6 & 68.5 \\
     \hline
   \end{tabular}
 \end{table}
@@ -879,9 +921,9 @@ can be found in Table \ref{tabel:cacheoptimization}.
 \subsection{An Example of the Reo Package }
 \label{sec:reolib}
 
-As mentioned above, our implementation in \texttt{Golang} is well-prepared not only for academic use
+Our implementation in \texttt{Golang} is well-prepared not only for academic use
 but also for practical concurrent programming. The following code shows how to compose an alternator
-connector (see Figure \ref{fig:reoconnector}) in \texttt{Golang}. An intact version of this example
+connector (see in Figure \ref{fig:reoconnector}) in \texttt{Golang}. An intact version of this example
 can be found in our github repo.
 
 \begin{lstlisting}
