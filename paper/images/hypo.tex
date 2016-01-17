@@ -1,0 +1,20 @@
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.9cm,
+  semithick]
+  \tikzstyle{initial}=[fill=black, text=white]
+
+  \node[initial,state] (Q0)               {$\varepsilon$};
+  \node[state]         (Q1) [right of=Q0] {$a,\rnoread$};
+  
+  \path
+  (Q0) edge [loop left]  node {$\frac{a,\rread}{\rblock}$} (Q0)
+  (Q0) edge [loop above] node {$\frac{\bot,\rread}{\rblock}$} (Q0)
+  (Q0) edge              node {$\frac{a,\rnoread}{\rempty}$} (Q1)
+  (Q0) edge [loop below] node {$\frac{\bot,\rnoread/T}{\rempty}$} (Q0)
+  (Q1) edge [bend left]  node {} (3,1)
+  (Q1) edge [bend left]  node {} (3,0.5)
+  (Q1) edge              node {} (3,0)
+  (Q1) edge [bend right] node {} (3,-0.5)
+  (Q1) edge [bend right] node {} (3,-1)
+  ;
+\end{tikzpicture}
+
