@@ -75,8 +75,8 @@ liyi\_math@pku.edu.cn, yiwuwang@126.com, summeng@math.pku.edu.cn
   interaction among different components in large-scale distributed and concurrent systems. In this
   paper, we propose an active learning framework to extract timed connector models from black-box
   system implementation. 
-  We first introduce parameterized mealy machine as an operational semantic
-  model for channel-based coordination language Reo. Parameterized mealy machine serves as a bridge
+  We first introduce parameterized Mealy machine(PMM) as an operational semantic
+  model for channel-based coordination language Reo. Parameterized Mealy machine serves as a bridge
   between Reo connectors and mealy machines. With the product operator, complex connectors can be
   constructed by joining basic channels and transformed into mealy machines. Moreover, we adapt L*,
   a well-known learning algorithm, to timed connectors (in the form of mealy machines). The new
@@ -90,11 +90,11 @@ liyi\_math@pku.edu.cn, yiwuwang@126.com, summeng@math.pku.edu.cn
 
 \section{Introduction}
 
-Distributed real-time embedded system (DRES) is reforming our lives with the name \emph{IoT}, the
-internet of things, wherein systems are usually composed of individual components and a
-\emph{connector}. Such systems could be distributed logically or physically, which
-makes coordination processes even more complicated. In this case, we need to specify these coordination
-processes with so-called \emph{coordination languages}, so that formal techniques can be applied to
+Distributed real-time embedded systems (DRES) are reforming our lives with the
+Internet of Things(IoT), wherein individual components are composed via a
+\emph{connector} to build a system. Such systems could be distributed logically or physically, which
+makes coordination processes even more complicated. In this case, we need to specify the coordination
+processes with \emph{coordination languages}, such that formal techniques can be applied to
 guarantee their reliability.
 
 \emph{Timed Reo} is a real-time extension of the coordination language \emph{Reo}, by which
@@ -105,16 +105,15 @@ For example, in \cite{DBLP:conf/tase/Meng12}, a UTP-based
 \emph{designs}. An operational semantics based on \emph{constraint automata} was raised by Baier et
 al.\cite{DBLP:conf/sefm/ArbabBBR04}, where a variant of LTL was also proposed to describe the properties of timed connectors.
 
-Formal verification techniques have also been proved applicable in timed connectors, e.g.
-\cite{DBLP:conf/tase/LiCWS15} has shown us a comformance testing method on timed connectors.
-Bounded model checking methods based on SAT solvers were also adapted in
-\cite{DBLP:journals/scp/Kemper12}.
-All these solutions seem practical and impressive, however, a common question is faced by
-most of them: \emph{how to obtain these formal models?}
+Formal verification and validation techniques have also been proved applicable for timed connectors, 
+e.g. a comformance testing framework on timed connectors in \cite{DBLP:conf/tase/LiCWS15}.
+A SAT-based bounded model checking approach was adapted in \cite{DBLP:journals/scp/Kemper12} for
+verifying connectors. Although these solutions are practical and impressive, there is one important
+question faced by most of them: \emph{how to obtain the formal models?}
 
-\emph{Correctness} of connectors is very much related to some low-level implementation details.
-For example, well-writen code may behave dramatically weird with an improper set of concurrency
-primitives. Such things happen frequently in embedded systems with different hardware platforms or
+\emph{Correctness} of connectors is closely related to some low-level implementation details.
+For example, well-written code may behave dramatically weird with an improper set of concurrency
+primitives. Such senarios happen frequently in embedded systems with different hardware platforms or
 operating systems. Consequently, manually modeling an existing connector seems rather unreliable,
 even with reference to its source code.
 
@@ -131,20 +130,21 @@ DBLP:conf/fase/RaffeltS06} shows interesting examples where active learning is u
   \label{fig:howto}
 \end{figure}
 
-To address the problem, we proposed a active learning framework (shown in Figure \ref{fig:howto}) to
-automatically extract timed connectors from blackbox models. To achieve this goal, firstly we
-present \emph{parameterized Mealy machine} as a parametierized semantics for timed Reo channels,
-which is able to generate concrete Mealy machines with a given alphabet. Then the $L*$ algorithm
-\cite{DBLP:journals/iandc/Angluin87}
-is adapted and optimized to extract Mealy machines with time action from the \emph{connectors in
-blackboxes}. 
+In this paper we address this question by proposing a active learning framework as shown in Figure
+\ref{fig:howto}) to automatically extract timed connector models from blackbox implementations. 
+To achieve this goal, we first introduce \emph{parameterized Mealy machine} as a parametierized
+semantics for timed Reo connectors, which can be transformed intoe concrete Mealy machines with a
+given alphabet. Then the $L*$ algorithm \cite{DBLP:journals/iandc/Angluin87} is adapted and
+optimized to extract Mealy machines with timed action from the connector implementations as
+blackboxes. 
 
-The rest of the paper is organized as follows. After this general introduction, in Section
-\ref{sec:preliminaries} we briefly illustrate some basic concepts, including Reo the coordination
-language, Mealy machine, and active automata learning. Section \ref{sec:semantics} defines an
+The rest of the paper is organized as follows: In Section
+\ref{sec:preliminaries} we briefly illustrate some basic concepts, including the coordination
+language Reo, Mealy machine, and active automata learning. Section \ref{sec:semantics} defines an
 operational semantics of Reo, which is used in Section \ref{sec:activelearning} to show how to
-extract Reo models from blackboxes by means of active learning. Finally, in Section
-\ref{sec:experiment}, we discuss the implementation and optimization in \texttt{Golang}. 
+extract Reo models from blackboxes by means of active learning. In Section
+\ref{sec:experiment}, we discuss the implementation and optimization of the approach in
+\texttt{Golang}.
 
 \section{Preliminaries} 
 \label{sec:preliminaries}
@@ -155,16 +155,16 @@ We provide here a brief overview of the main concepts in Reo. Further details ca
 
 Reo is a channel based exogenous coordination language proposed by F. Arbab in
 \cite{DBLP:journals/mscs/Arbab04}. 
-A Reo model, also called \emph{connector}, provides the protocol
-that formalizes the communication, synchronization and cooperation among the components which
+A coordinator in Reo, also called \emph{connector}, provides the protocol that controls and
+organizes the communication, synchronization and cooperation among the components which
 communicate through the connector. Connectors can be defined without dependence on components,
 which makes Reo a powerful ``glue language'' in component-based
 development\cite{DBLP:journals/sigsoft/Gill03}.
 
 In Reo, complex connectors are made up of simpler ones. The atomic connectors are called
-\emph{channels}, and each of them has two \emph{channel ends}. There are two type of channel ends:
-\emph{source} and \emph{sink}. Source channel ends accepts data into the channel, while sink
-channels ends dispense them out of the channel. 
+\emph{channels}, and each of them has two \emph{channel ends}. There are two types of channel ends:
+\emph{source} and \emph{sink}. Source channel ends accept data into the channel, while sink
+channel ends dispense data out of the channel. 
 
 \begin{figure}[ht]
   \begin{center}
@@ -174,24 +174,28 @@ channels ends dispense them out of the channel.
   \label{fig:basic}
 \end{figure}
 
-The behavior of some channels are informally described as follows. (Graphical representations
-can be found in Figure \ref{fig:basic}).
+Figure \ref{fig:basic} shows the graphical representation of some basic channel types in Reo, whose
+behavior are described as follows:
 
 \begin{itemize}
   \item [-] A \emph{Sync} channel accepts a data item from its source end iff the data item can be
-    dispensed to its sink end simultaneously.
-  \item [-] A \emph{LossySync} channel is always prepared to accept data items. These items will be
-    send to its sink end simutaneously if possible, otherwise they will be dropped.
+    dispensed through its sink end simultaneously.
+  \item [-] A \emph{Lo ssySync} channel is always ready to accept data items. These items will be
+    dispensed through its sink end if possible, otherwise they will be lost.
   \item [-] A \emph{SyncDrain} channel has two source ends and no sink end. It can accept a data
-    item through one of its source end iff a data item is also available to accept simultaneously
-    through the other end. Then both items will be dropped.
+    item through one of its source end iff a data item is also available to be accepted
+    simultaneously through the other end. Then both items will be dropped.
   \item [-] A \emph{FIFO1} channel is an asychronous channel with a buffer cell. It accepts a
     data item whenever the buffer is empty. 
+  \item [-] A t-timer channel accepts any data item from its source end, and later dispense it to
+    its sink end after a delay of $t$ time units.
+
 \end{itemize}
 
-Channels are attached on component instances or \emph{nodes}. There are three types of nodes:
-\emph{source}, \emph{sink} and \emph{mixed node}, depending on whether all channel ends that
-coincide on a node are source ends, sink ends or both. (see in Figure \ref{fig:node})
+Channels are joint together in \emph{nodes}. There are three types of nodes:
+\emph{source}, \emph{sink} and \emph{mixed} nodes, depending on whether all channel ends that
+coincide on a node are source ends, sink ends or a combination of both.
+(see in Figure \ref{fig:node})
 
 \begin{figure}[ht]
   \begin{center}
@@ -200,14 +204,6 @@ coincide on a node are source ends, sink ends or both. (see in Figure \ref{fig:n
   \caption{Source, Sink and Mixed Nodes in Reo}
   \label{fig:node}
 \end{figure}
-
-
-
-With definition of more basic channels, it's easy to extend Reo to formalize coordination in
-different areas. In this paper, we take timed Reo\cite{DBLP:conf/sefm/ArbabBBR04} as our formal
-model. Timed Reo includes several timed channels, where the most commonly-used one, called
-\emph{timer}, is also shown in Figure \ref{fig:basic}. A t-timer channel accepts any data item from
-its source end, and later dispense it to its sink end after a delay of t time units.
 
 Components can be linked to source nodes or sink nodes. A component can write data items to its
 corresponding source node only if the data item can be dispensed simultaneously to all source ends
@@ -223,46 +219,46 @@ from one of its coincident sink ends and replicates it into all of its coinciden
   \label{fig:reoconnector}
 \end{figure}
 
-As shown in Figure \ref{fig:reoconnector}, we use a simple example to illustrate how complex
-connectors are constructed and used in coordination. In this example, COM1,COM2 and
-MONITOR are components. With an \emph{alternator} connector, MONITOR can obtain data items from
-COM1 and COM2 alternately. The \emph{alternator} example has been implemented in \texttt{Golang} as
-shown in Section \ref{sec:reolib}.
-Besides, all the connectors are supposed to be \emph{deterministic} hereinafter to meet the
-requirement of active learning algorithm L*.
+Figure \ref{fig:reoconnector} provides a simple example to illustrate how complex
+connectors are constructed and used in coordination. In this example, we have three components
+COM1,COM2 and MONITOR. With an \emph{alternator} connector as shown in Figure
+\ref{fig:reoconnector}, MONITOR can obtain data items from COM1 and COM2 alternately. This example
+has been implemented in \texttt{Golang} as shown in Section \ref{sec:reolib}.
+Besides, all the connectors are supposed to have \emph{deterministic} behavior hereinafter to meet
+the requirement of active learning algorithm L*.
 
 
 \subsection{Mealy Machines}
 
 In this work, we use \emph{Mealy machines} to model Reo connectors.
-As an extension of \emph{finite state machine}, Mealy machine was first proposed by George. H. Mealy
-in \cite{George1955A}. Compared with other variants, Mealy machines are designed to model
-reactive systems, where outputs are determined not only by its current state but also the current
-inputs. Besides, Mealy machines are supposed to be \emph{input enabled}, which means that all
-possible inputs should be acceptable in all states. In other words, if an input is invalid for some
-state, we need to manually define an additional state to describe such exceptions.
+Mealy machine was first proposed by George. H. Mealy in \cite{George1955A} as an extension of finite
+state machine. Compared with other variants, Mealy machines are designed to model
+reactive systems, where outputs of a machine are determined by not only its current state but also
+the current inputs. Besides, Mealy machines are supposed to be \emph{input enabled}, which means
+that all possible inputs should be acceptable in all states. In other words, if an input is invalid
+for some state, we need to manually define an additional state to describe such exceptions.
 
-Various forms of Mealy machines are defined in different works. 
-Since active automata learning very much depends on the system-under-learn to be deterministic, in
-this paper we formally define a deterministic Mealy machine following
+Various forms of Mealy machines have been defined in the literature. 
+Since active automata learning requires the system-under-learn to be deterministic, in
+this paper we take the deterministic Mealy machine model as defined in 
 \cite{DBLP:conf/sfm/SteffenHM11}. 
 
 \begin{definition}[Mealy machine]
-  A Mealy machine is a 6-tuple $(S, s_0, I, O, \delta, \lambda)$ consisting of the following:
+  A Mealy machine is a 6-tuple $(S, s_0, I, O, \delta, \lambda)$ consisting of:
   \begin{itemize}
     \item[-] a finite set of states $S$
-    \item[-] a start state (also called initial state) $s_0$ which is an element of $S$
-    \item[-] a finite set called the input alphabet $I$
-    \item[-] a finite set called the output alphabet $O$
-    \item[-] a transition function $\delta : S \times I \rightarrow S$ mapping pairs of a
-      state and an input symbol to the corresponding next state.
-    \item[-] an output function $\lambda : S \times I \rightarrow O$ mapping pairs
-      of a state and an input symbol to the corresponding output symbol.
+    \item[-] an initial $s_0\in S$
+    \item[-] a finite set of inputs $I$
+    \item[-] a finite set of outputs $O$
+    \item[-] a transition function $\delta : S \times I \rightarrow S$ mapping a pair of a
+      state and an input to the corresponding next state.
+    \item[-] an output function $\lambda : S \times  I \rightarrow O$ mapping a pair
+      of a state and an input to the corresponding output.
   \end{itemize}
 \end{definition}
 
 We say that a Mealy machine is \emph{finite} if the set $S$ of states and the set $I$ of inputs are
-finite. Hereinafter, Mealy machines are always supposed to be finite.
+both finite. Hereinafter, Mealy machines are always supposed to be finite in this paper.
 
 A Mealy machine is in some state $q\in S$ is always ready for inputs at any time. If an input symbol
 $i\in I$ is provided, the Mealy machine generates output $o=\lambda(q,i)$ and jumps to state
@@ -291,33 +287,32 @@ Figure \ref{fig:activelearning} shows the sketch of active learning, wherein:
     students ask questions and teachers answer. Here learning algorithm plays the role of student.
   \item[-] \emph{Oracles} is an interface specifying which kind of questions can be answered by the
     teacher.
-  \item[-] \emph{SUL} is an abbreviation of System Under Learn. The name comes from a well-known
-    concept SUT (System Under Test) in software testing. In this case, we take blackbox models as our
-    SULs.
+  \item[-] \emph{SUL} is an abbreviation of System Under Learn. In this paper, we take blackbox
+    models as our SULs.
   \item[-] \emph{CEGAR} indicates Counter-Example Guided Abstraction
     Refinement\cite{DBLP:conf/cav/ClarkeGJLV00}. In active learning, we need counter-examples to
-    guide us on further quries and cover the undistinguished states.
+    guide us on further queries and cover the undistinguished states.
 \end{itemize}
 
-When applying active automata learning on some model, firstly we assume that it should be equivalent
-to some \emph{Mealy machine}, in other words, a deterministic model accepting a finite set of input
-symbols and mapping them to a finite set of output symbols.
+When applying active automata learning on some model, we assume that the model should be equivalent
+to some \emph{Mealy machine}, i.e., a deterministic model accepting a finite set of inputs and
+mapping them to a finite set of outputs.
 
 Such a model is encapsulated as a \emph{teacher} by the \emph{Oracle}, which handles
 all communication with the model. The oracle also serves as a so-called \emph{Minimal Adequate Teacher}
 interface, which is responsible for two types of queries. 
 
 \begin{itemize}
-  \item[-] \textbf{Membership Query} (hereinafter referred to as \emph{mq}) The name comes from
-    some grammar-learning papers (e.g. \cite{DBLP:journals/iandc/Angluin87}), where \emph{mq} checks
-    if a word is a member of certain language defined by the given grammar. When it comes to
+  \item[-] \textbf{Membership Query} (hereinafter referred to as \emph{mq}) In grammar-learning
+    \cite{DBLP:journals/iandc/Angluin87}) \emph{mq} checks if a word is a member of certain language
+    defined by the given grammar. When it comes to
     automata learning, \emph{mq} is supposed to provide \emph{simulation results} for given input
     sequences.
   \item[-] \textbf{Equivalence Query} (hereinaftr referred to as \emph{eq}) Given a hypothesis
     (usually constructed by the learning algorithm), \emph{eq} checks whether the hypothesis is
     equivalent to the system-under-learn and generates a counter-example if needed. Generally, 
-    \emph{equivalence query} is irrealizable when SUL is a blackbox. So we tactically use membership
-    queries to achieve the approximate results.
+    \emph{eq} is irrealizable when SUL is a blackbox. So we tactically use $mq$ to achieve the
+    approximate results.
 \end{itemize}
 
 These queries are given by \emph{learning algorithms}, or so-called \emph{students} in Figure
@@ -330,43 +325,43 @@ More details on the active automata learning algorithm will be presented in Sect
 
 \section{Timed Connectors as Mealy Machines}
 \label{sec:semantics}
-In this section, we illustrate how to transform a timed connector into a Mealy machine with time
+In this section, we illustrate how to transform a timed connector into a Mealy machine with timed
 action.
-Since time is not involed in original Mealy machine, we first discuss how to formalize the time
-dimension in Mealy machine. After that, we present a \emph{parameterized Mealy
+Since time is not involved in original Mealy machine, we first discuss how to formalize the time
+dimension in Mealy machine. After that, we present the notion of \emph{parameterized Mealy
 machine} as a bridge between connectors and Mealy machines.
 
 \subsection{Time Domain}
-Time is involved in several extensions of Reo. For example, timed
-Reo\cite{DBLP:conf/sefm/ArbabBBR04}, hybrid Reo\cite{DBLP:conf/icfem/ChenSS14}, etc.
-Generally, these models are designed to handle real-time behavior where time is defined in
-$\mathbb{R}$. However, we also found some works like \cite{DBLP:journals/fmsd/PrabhakarDM015} where
+Time has been investigated in several extensions of Reo. For example, timed
+Reo\cite{DBLP:conf/sefm/ArbabBBR04, DBLP:conf/fmoods/MengA07}, hybrid Reo\cite{DBLP:conf/icfem/ChenSS14}, etc.
+Generally, these models are designed to handle real-time behavior where time is defined on the
+real number field $\mathbb{R}$. However, there are also found some works like
+\cite{DBLP:journals/fmsd/PrabhakarDM015} where
 rational time indeed  makes things easier. In this paper, we choose the rational number field
-$\mathbb{Q}$ as our time domain, which simplifies discretization of timed behaviors greatly.
+$\mathbb{Q}$ as our time domain, which simplifies discretization of timed behavior greatly.
 
-As presented in section \ref{sec:reo}, all real-time behavior in timed Reo comes with the
-\emph{t-timer} channels, and the number of these channels are apparently finite. We use
-$t_i\in\mathbb{Q}$ to denote the delays of these timer channels, and now we can define a precision
-function $prec$.
+As presented in section \ref{sec:reo}, all real-time behavior in timed Reo comes with a finite set
+of timed channels, and the number of these channels are apparently finite. We use
+$t_i\in\mathbb{Q}, i=1,2,\dots,n$ to denote the delays of these timed channels, and then we can define a precision
+function $prec$:
 \[
-prec(t_1,\cdots,t_n) = \max_T\{\forall t_i.\exists n_i\in\mathbb{N}.t_i=n_i\cdot T\}
+prec(t_1,\cdots,t_n) = \max_T\{T\in\mathbb{Q}|\forall t_i.\exists n_i\in\mathbb{N}.t_i=n_i\cdot T\}
 \]
-It's easy to prove that such a $T$ is always existing.
+It's easy to prove that such a $T$ always exists.
 
 In real systems, the concept \emph{time precision} is well known with other names like ``clock-period''.
 Most of the time, we know the clock-period of some hardware components, even without any idea of its
 structure. With such precision $dt$ given, it's reasonable to assume that all $t$-timers are actually
 $ndt$-timers. In following sections, we'll use $n$-Timers instead.
 
-Besides, we're going to add a ``T'' action in Mealy machines. It indicates that a transition
-will take a time unit to finish.
+Besides, we're going to add a ``T'' action in Mealy machines. It indicates that the corresponding
+transition will take one time unit to finish.
 
 \subsection{Parameterized Mealy Machine}
-We present a model named \emph{parameterized Mealy machine} (hereinafter referred to as PMM)
-to model timed connectors. PMM is supposed to behave as a middle representation between Mealy
-machines and timed connectors. Connectors are firstly defined as parameterized Mealy machines, and
-composed by production operator and link operator. Then, concrete Mealy-machine model can be
-generated from the PMM model.
+We present a model named \emph{parameterized Mealy machine}to model timed connectors. PMM is
+supposed to behave as a bridge between Mealy machines and timed connectors. Connectors are firstly
+defined as PMMs, and composed by production operator and link operator. Then, concrete Mealy-machine
+model can be generated from the PMM model.
 Following the formal definition of Mealy machine in Section \ref{sec:preliminaries}, we define the
 \emph{parameterized Mealy machine} as follows. 
 
