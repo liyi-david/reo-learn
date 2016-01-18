@@ -51,6 +51,9 @@
 \newcommand{\smap}[1]{[{#1}]}
 \newcommand{\rempty}[0]{\varnothing}
 
+\newcommand{\OUT}[0]{\mbox{OUT}}
+\newcommand{\IN}[0]{\mbox{IN}}
+
 % style of source code environment listings
 \lstset{basicstyle=\footnotesize\ttfamily,breaklines=true, frame=shadowbox}
 \lstset{numbers=left}
@@ -180,7 +183,7 @@ behavior are described as follows:
 \begin{itemize}
   \item [-] A \emph{Sync} channel accepts a data item from its source end iff the data item can be
     dispensed through its sink end simultaneously.
-  \item [-] A \emph{Lo ssySync} channel is always ready to accept data items. These items will be
+  \item [-] A \emph{LossySync} channel is always ready to accept data items. These items will be
     dispensed through its sink end if possible, otherwise they will be lost.
   \item [-] A \emph{SyncDrain} channel has two source ends and no sink end. It can accept a data
     item through one of its source end iff a data item is also available to be accepted
@@ -259,10 +262,6 @@ this paper we take the deterministic Mealy machine model as defined in
 
 We say that a Mealy machine is \emph{finite} if the set $S$ of states and the set $I$ of inputs are
 both finite. Hereinafter, Mealy machines are always supposed to be finite in this paper.
-
-A Mealy machine is in some state $q\in S$ is always ready for inputs at any time. If an input symbol
-$i\in I$ is provided, the Mealy machine generates output $o=\lambda(q,i)$ and jumps to state
-$q'=\delta(q,i)$. Such an edge is also denoted as $q\xrightarrow[]{i/o}q'$.
 
 
 \subsection{Active Learning}
@@ -547,25 +546,26 @@ Similarly, we can use PMMs to describe the behavior of other basic timed Reo
 channels. Now we show how to compose these channels into more complicated connectors.
 
 \begin{definition}[Production]
-  Now we're going to define the production operator \emph{prod} of two parameterized Mealy machines
+  The production operator \emph{prod} of two parameterized Mealy machines
   \[
-  prod(PM_1,PM_2)=PM_3
+  \mathcal{PM'} = prod(\mathcal{PM}_1,\mathcal{PM}_2)\mbox{ if }\mathcal{PM}_2.O\cap
+  \mathcal{PM}_1.I=\varnothing
   \]
-  as follows. Here we assume that $PM_2.O\cap PM_1.I=\varnothing$
+  is defined as follows.
   \begin{itemize}
-  	\item[-] $\forall\Sigma, PM_3.S(\Sigma)=PM_1.S(\Sigma)\times PM_2.S(\Sigma)$
-    \item[-] $PM_3.I=PM_1.I\cup PM_2.I-PM_1.O$
-    \item[-] $PM_3.O=PM_1.O\cup PM_2.O-PM_2.I$
+  	\item[-] $\forall\Sigma. \mathcal{PM}'.S(\Sigma)=\mathcal{PM}_1.S(\Sigma)\times \mathcal{PM}_2.S(\Sigma)$
+    \item[-] $\mathcal{PM}'.I=(\mathcal{PM}_1.I\cup \mathcal{PM}_2.I)\backslash \mathcal{PM}_1.O$
+    \item[-] $\mathcal{PM}'.O=(\mathcal{PM}_1.O\cup \mathcal{PM}_2.O)\backslash \mathcal{PM}_2.I$
   \end{itemize}
-  \emph{(Here we assume that sink ends of $PM_1$ can be connected to source ends $PM_2$, but not
+  \emph{(Here we assume that sink ends of $\mathcal{PM}_1$ can be connected to source ends $\mathcal{PM}_2$, but not
   vise versa)}
   \begin{itemize}
-    \item[-] $PM_3.s_0=(PM_1.s_0, PM_2.s_0)$
-    \item[-] $\forall\Sigma, PM_3.\delta(\Sigma)((s_1,s_2), i)=$
+    \item[-] $\mathcal{PM}'.s_0=(\mathcal{PM}_1.s_0, \mathcal{PM}_2.s_0)$
+    \item[-] $\forall\Sigma. \mathcal{PM}'.\delta(\Sigma)((s_1,s_2), i)=$
       \begin{displaymath}
         \left\{
         \begin{array}[ht]{ll}
-          (Out_1 + Out_2)\downarrow_{PM_3.O} & Out_1\neq\rblock\land Out_2\neq\rblock \\
+          (Out_1 \cup Out_2)\downarrow_{\mathcal{PM}'.O} & Out_1\neq\rblock\land Out_2\neq\rblock \\
           \rempty & i = T \\
           \rblock & otherwise \\
         \end{array}
@@ -573,65 +573,66 @@ channels. Now we show how to compose these channels into more complicated connec
       \end{displaymath}
       where we have
       \begin{itemize}
-        \item[*] $In_1 = i\downarrow_{PM_1.I}$
-        \item[*] $Out_1 = PM_1.\delta(\Sigma)(s_1,In_1)$
-        \item[*] $In_2 = (Out_1 + i)\downarrow_{PM_2.I}$
-        \item[*] $Out_2 = PM_2.\delta(\Sigma)(s_2,In_2)$
+        \item[*] $In_1 = i\downarrow_{\mathcal{PM}_1.I}$
+        \item[*] $Out_1 = \mathcal{PM}_1.\delta(\Sigma)(s_1,In_1)$
+        \item[*] $In_2 = (Out_1 \cup i)\downarrow_{\mathcal{PM}_2.I}$
+        \item[*] $Out_2 = \mathcal{PM}_2.\delta(\Sigma)(s_2,In_2)$
       \end{itemize}
-    \item[-] $\forall\Sigma, PM_3. \lambda(\Sigma)((s_1,s_2),i)=(s_1',s_2')$
+    \item[-] $\forall\Sigma. \mathcal{PM}'. \lambda(\Sigma)((s_1,s_2),i)=(s_1',s_2')$
       where we have
       \begin{itemize}
-        \item[*] $s_1' = PM_1.\lambda(\Sigma)(s_1,In_1)$
-        \item[*] $s_2' = PM_2.\lambda(\Sigma)(s_2,In_2)$
+        \item[*] $s_1' = \mathcal{PM}_1.\lambda(\Sigma)(s_1,In_1)$
+        \item[*] $s_2' = \mathcal{PM}_2.\lambda(\Sigma)(s_2,In_2)$
       \end{itemize}
   \end{itemize}
 \end{definition}
 
-The idea in \emph{production} is quite simple. The output of $PM_1$ would be provided as part of the
-input of $PM_2$. Time actions T is only executed simutaneously between $PM_1$ and $PM_2$.
+The idea in \emph{production} is quite simple. The output of $\mathcal{PM}_1$ would be provided as part of the
+input of $\mathcal{PM}_2$. Time actions T is only executed simutaneously between $\mathcal{PM}_1$ and $\mathcal{PM}_2$.
 
-As mentioned in the notation above, we cannot connect a sink end of $PM_2$ to a source end of
-$PM_1$, which makes it difficult to construct connectors like alternator in Figure
+As mentioned in the notation above, we cannot connect a sink end of $\mathcal{PM}_2$ to a source end of
+$\mathcal{PM}_1$, which makes it difficult to construct connectors like alternator in Figure
 \ref{fig:reoconnector}. To address the problem, we define a \emph{link} operation to connect sink
 ends and source ends in the same connector.
 
-\begin{definition}[Link Operator]
-  The \emph{link} operation constructs connector by connecting a sink end $OUT$ to a source end $IN$
+\begin{definition}[Link]
+  The \emph{link} operator constructs connector by connecting a sink end $\OUT$ to a source end $\IN$
   within the same connector.   
   \[
-  PM' = link(PM, OUT, IN)
+  \mathcal{PM}' = link(\mathcal{PM}, \OUT, \IN)
   \]
-  Here we asuume that $IN\in PM.I$ and $OUT\in PM.O$.
+  Here we assume that $\IN\in \mathcal{PM}.I$ and $\OUT\in \mathcal{PM}.O$.
 
   \begin{itemize}
-  	\item[-] $\forall\Sigma, PM'.S(\Sigma)=PM.S(\Sigma)$
-    \item[-] $PM'.I=PM.I-\{IN\}$
-    \item[-] $PM'.O=PM.O-\{OUT\}$
-    \item[-] $PM'.s=PM.s$
-    \item[-] $\forall\Sigma, i\in Input(\Sigma,PM'.I,PM'.O)$, $PM'.\delta(\Sigma)(s, i)=$
-      \begin{equation}
-        \label{equ:existd}
-        PM.\delta(\Sigma)(s,T)\downarrow_{PM'.O}
-      \end{equation}
-      if $i=T$. When $i$ is a non-time action, we need to check whether there's a data item
-      $d\in\Sigma$
-      satisfies
-      \[
-      PM.\delta(\Sigma)(s,i\cup\{IN:d\})\downarrow_{OUT} = d
-      \]
-      if the formula is satisfied, we have $PM'.\delta(\Sigma)(s, i)=$
-      \[
-      PM.\delta(\Sigma)(s,i\cup\{IN:d\})\downarrow_{PM'.O}
-      \]
-      otherwise $PM'.\delta(\Sigma)(s, i)=\rblock$
-    \item[-] $\forall\Sigma, i\in Input(\Sigma,PM'.I,PM'.O).'$ the transition
-      function can be defined as $PM.\lambda(\Sigma)(s,i)=$
+  	\item[-] $\forall\Sigma. \mathcal{PM}'.S(\Sigma)=\mathcal{PM}.S(\Sigma)$
+    \item[-] $\mathcal{PM}'.I=\mathcal{PM}.I\backslash\{\IN\}$
+    \item[-] $\mathcal{PM}'.O=\mathcal{PM}.O\backslash\{\OUT\}$
+    \item[-] $\mathcal{PM}'.s_0=\mathcal{PM}.s_0$
+    \item[-] $\forall\Sigma, i\in
+      Input(\Sigma,\mathcal{PM}'.I,\mathcal{PM}'.O).\mathcal{PM}'.\delta(\Sigma)(s,i)=$
       \begin{displaymath}
+        \small
         \left\{
-        \begin{array}[ht]{ll}
-          PM.\lambda(\Sigma,T) & i=T \\
-          PM.\lambda(\Sigma,i\cup\{IN:d\}) & \exists d\in\Sigma \mbox{ satisfes Equation
-          \ref{equ:existd}} \\
+        \begin{array}[h]{lr}
+          \rempty & i=T \\
+          \mathcal{PM}.\delta(\Sigma)(s,i\cup\{\IN:d\})\downarrow_{\mathcal{PM}'.O} & (*)\\
+          \rblock & otherwise \\
+        \end{array}
+        \right.
+      \end{displaymath}
+      where the condition (*) is defined as
+      \[
+      \exists d.\mathcal{PM}.\delta(\Sigma)(s,i\cup\{\IN:d\})(\OUT)=d
+      \]
+    \item[-] $\forall\Sigma, i\in
+      Input(\Sigma,\mathcal{PM}'.I,\mathcal{PM}'.O).$
+      \begin{displaymath}
+        \small
+        \mathcal{PM}.\lambda(\Sigma)(s,i)=
+        \left\{
+        \begin{array}[ht]{lr}
+          \mathcal{PM}.\lambda(\Sigma,T) & i=T \\
+          \mathcal{PM}.\lambda(\Sigma,i\cup\{\IN:d\}) & (*)\\
           s & otherwise \\
         \end{array}
         \right.
@@ -639,9 +640,9 @@ ends and source ends in the same connector.
   \end{itemize}
 \end{definition}
 
-With \emph{link} and \emph{prop} defined, complex connectors can be formed by simple channels in
+With \emph{link} and \emph{prop} defined, a connector can be formed by simpler ones in
 form of \emph{parameterized Mealy machines}. It will be transformed into a concrete Mealy machine
-later once the alphabet $\Sigma$ is provided.
+later, once the alphabet $\Sigma$ is provided.
 
 \section{From Blackbox to Timed Connectors} 
 \label{sec:activelearning}
