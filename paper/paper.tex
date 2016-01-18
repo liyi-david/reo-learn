@@ -69,7 +69,7 @@ liyi\_math@pku.edu.cn, yiwuwang@126.com, summeng@math.pku.edu.cn
 }
 
 \begin{document}
-\maketitle
+\maketitle 
 \begin{abstract}
   Coordination models and languages play a key role in formally specifying the communication and
   interaction among different components in large-scale distributed and concurrent systems. In this
@@ -88,7 +88,7 @@ liyi\_math@pku.edu.cn, yiwuwang@126.com, summeng@math.pku.edu.cn
   Active Learning, Coordination Languages, Timed Connectors
 \end{IEEEkeywords}
 
-\section{Introduction}
+\section{Introduction} 
 
 Distributed real-time embedded systems (DRES) are reforming our lives with the
 Internet of Things(IoT), wherein individual components are composed via a
@@ -228,7 +228,7 @@ Besides, all the connectors are supposed to have \emph{deterministic} behavior h
 the requirement of active learning algorithm L*.
 
 
-\subsection{Mealy Machines}
+\subsection{Mealy Machines} 
 
 In this work, we use \emph{Mealy machines} to model Reo connectors.
 Mealy machine was first proposed by George. H. Mealy in \cite{George1955A} as an extension of finite
@@ -250,10 +250,10 @@ this paper we take the deterministic Mealy machine model as defined in
     \item[-] an initial $s_0\in S$
     \item[-] a finite set of inputs $I$
     \item[-] a finite set of outputs $O$
-    \item[-] a transition function $\delta : S \times I \rightarrow S$ mapping a pair of a
-      state and an input to the corresponding next state.
-    \item[-] an output function $\lambda : S \times  I \rightarrow O$ mapping a pair
+    \item[-] an output function $\delta : S \times  I \rightarrow O$ mapping a pair
       of a state and an input to the corresponding output.
+    \item[-] a transition function $\lambda : S \times I \rightarrow S$ mapping a pair of a
+      state and an input to the corresponding successor state.
   \end{itemize}
 \end{definition}
 
@@ -308,7 +308,7 @@ interface, which is responsible for two types of queries.
     defined by the given grammar. When it comes to
     automata learning, \emph{mq} is supposed to provide \emph{simulation results} for given input
     sequences.
-  \item[-] \textbf{Equivalence Query} (hereinaftr referred to as \emph{eq}) Given a hypothesis
+  \item[-] \textbf{Equivalence Query} (hereinafter referred to as \emph{eq}) Given a hypothesis
     (usually constructed by the learning algorithm), \emph{eq} checks whether the hypothesis is
     equivalent to the system-under-learn and generates a counter-example if needed. Generally, 
     \emph{eq} is irrealizable when SUL is a blackbox. So we tactically use $mq$ to achieve the
@@ -343,22 +343,24 @@ $\mathbb{Q}$ as our time domain, which simplifies discretization of timed behavi
 As presented in section \ref{sec:reo}, all real-time behavior in timed Reo comes with a finite set
 of timed channels, and the number of these channels are apparently finite. We use
 $t_i\in\mathbb{Q}, i=1,2,\dots,n$ to denote the delays of these timed channels, and then we can define a precision
-function $prec$:
+function $prec$ which calculate a gcd-style \emph{maximal time precision}:
 \[
-prec(t_1,\cdots,t_n) = \max_T\{T\in\mathbb{Q}|\forall t_i.\exists n_i\in\mathbb{N}.t_i=n_i\cdot T\}
+prec(t_1,\dots,t_n) = \max\{T\in\mathbb{Q}|\forall t_i.\exists n_i\in\mathbb{N}.t_i=n_i\cdot T\}
 \]
 It's easy to prove that such a $T$ always exists.
 
-In real systems, the concept \emph{time precision} is well known with other names like ``clock-period''.
-Most of the time, we know the clock-period of some hardware components, even without any idea of its
-structure. With such precision $dt$ given, it's reasonable to assume that all $t$-timers are actually
-$ndt$-timers. In following sections, we'll use $n$-Timers instead.
+In embedded systems, the maximal time precision is also called ``clock-period'', which is the basic
+time unit provided by an oscillator. For example, a widely-used Intel-80C51 microcontroller works
+under the frequency 16Mhz, where the clock-period is $62.5$ns. A resonable assumption comes that
+such a maximal time precision $dt=prec(t_1,\dots,t_n)$ should always be provided to make sure
+different components are able to work together. Then all $t_i$-Timers can be seen as $n_idt$-Timers
+for some $n_i$. In the following sections, we'll use $n_i$-Timers instead.
 
 Besides, we're going to add a ``T'' action in Mealy machines. It indicates that the corresponding
 transition will take one time unit to finish.
 
 \subsection{Parameterized Mealy Machine}
-We present a model named \emph{parameterized Mealy machine}to model timed connectors. PMM is
+We present a model named \emph{parameterized Mealy machine} to model timed connectors. PMM is
 supposed to behave as a bridge between Mealy machines and timed connectors. Connectors are firstly
 defined as PMMs, and composed by production operator and link operator. Then, concrete Mealy-machine
 model can be generated from the PMM model.
@@ -366,60 +368,59 @@ Following the formal definition of Mealy machine in Section \ref{sec:preliminari
 \emph{parameterized Mealy machine} as follows. 
 
 \begin{definition}[Parameterized Mealy Machine]
-  A \emph{Parameterized Mealy Machine} is defined as a 6-tuple $\mathcal{PM}=\langle
-  S, s_0, I, O, \delta, \lambda\rangle$ with a parameter named $\Sigma$ where 
+  A \emph{Parameterized Mealy Machine} with a parameter $\Sigma$ is defined as a 6-tuple
+  $\mathcal{PM}=\langle S, s_0, I, O, \delta, \lambda\rangle$ where 
   \begin{itemize}
-    \item[-] $\Sigma$, the parameter, is a \emph{finite} datum alphabet
-    \item[-] $S$ is a function that maps an alphabet to a \emph{finite} set of
-      states. We use $S(\Sigma)$ to denote the state set.
+    \item[-] The value of $\Sigma$ is a \emph{finite} data set (hereinafter referred as
+      alphabet), e.g. $\{a,b\}$
+    \item[-] $S$ maps an alphabet to a \emph{finite} set of states.
+    \item[-] $s_0$ is the initial state. It satisfies $\forall \Sigma.s_0\in S(\Sigma)$
     \item[-] $I$ is a finite set of source-ends.
     \item[-] $O$ is a finite set of sink-ends.
-    \item[-] $s_0$ is the initial state. It satisfies $\forall \Sigma,s_0\in S(\Sigma)$
-    \item[-] $\delta$ maps a \emph{finite} datum alphabet to an \emph{output function}. We use
-      $\delta(\Sigma):S(\Sigma)\times Input(\Sigma,I,O)\rightarrow Output(\Sigma,I,O)$ to denote the
+    \item[-] $\delta$ maps an alphabet to an \emph{output function}. We use
+      $\delta(\Sigma):S(\Sigma)\times Input(\Sigma,I,O)\rightarrow Output(\Sigma,O)$ to denote the
       output function.
     \item[-] $\lambda$ maps an alphabet to a \emph{transition function}. We use
-      $\lambda(\Sigma):S(\Sigma)\times Input(\Sigma,I,O)\rightarrow S(\Sigma)$ to denote the transiton
-      function.
+      $\lambda(\Sigma):S(\Sigma)\times Input(\Sigma,I,O)\rightarrow S(\Sigma)$ to denote the
+      transition function.
   \end{itemize}
 \end{definition}
 
-In the definition above, \emph{Input} and \emph{Output} are used to generate input actions
-and output actions from the corresponding alphabets and source/sink ends. The value of $Input(\Sigma,I,O)$ is
-defined as a set of functions on $I\cup O$ where $\forall f\in Input(\Sigma,I,O)$ and an additional
-\emph{time action} T, we have
+In the definition above, \emph{Input} and \emph{Output} are used to generate the set of input actions
+and output actions from the corresponding alphabets and source/sink ends. $Input(\Sigma,I,O)$ is
+defined as a set of functions on $I\cup O$ and an additional \emph{time action} T,  
+where for all $f\in Input(\Sigma,I,O)\backslash \{T\}$ we have
 \[
-\forall i\in I\backslash\{T\}, f(i)\in \Sigma\cup\{\bot\}\land \forall o\in
-O,f(o)\in\{\rread, \rnoread\}
+\forall i\in I.f(i)\in \Sigma\cup\{\bot\}\land \forall o\in O.f(o)\in\{\rread, \rnoread\}
 \]
-where we use $\rread$ to indicate that an end-sink is ready for write, and $\rnoread$ otherwise. Note
-that a $\bot$ means that there is \emph{no} data items on a source (or sink) end. In the same way,
-$Output(\Sigma,I,O)$ is defined as a set of functions on domain $O$, with an additional symbol
-$\rblock$ indicating an input failure. Similarly, $\forall f\in Output(\Sigma,I,O), f\neq \rblock$
-implies
+where we use $\bot$ to indicate that there is \emph{no} data item on a channel end. 
+Besides, $\rread$ means that a sink end is ready for writing, $\rnoread$ otherwise. 
+In the same way,
+$Output(\Sigma,O)$ is defined as a set of functions on $O$, with an additional symbol
+$\rblock$ indicating an input failure. Similarly, for all $f\in
+Output(\Sigma,O)\backslash\{\rblock\}$,
 \[
-\forall o\in O, f(o)\in \Sigma\cup\{\bot\}
+\forall o\in O. f(o)\in \Sigma\cup\{\bot\}
 \]
 
 \begin{example}[Input and Output]
   If we have a simple alphabet with only one item $d_0$, a source-end named $A$, and a
   sink-end named $B$, the input actions would be
-  \begin{small}
-    \begin{eqnarray*}
-      Input(\{d_0\},\{A\},\{B\}) &=& \{\{A:d_0,B:\rread\},\{A:d_0,B:\rnoread\}, \\
-      & & \{A:\bot,B:\rread\},\{A:\bot,B:\rnoread\},T\}
-    \end{eqnarray*}
-  \end{small}
+  \begin{eqnarray*}
+    & & Input(\{d_0\},\{A\},\{B\}) \\
+    & = & \{\{A\mapsto d_0,B\mapsto\rread\},\{A\mapsto d_0,B\mapsto\rnoread\}, \\
+    & & \{A\mapsto\bot,B\mapsto\rread\}, \{A\mapsto\bot,B\mapsto\rnoread\},T\}
+  \end{eqnarray*}
   and its output actions
   \[
-  Output(\{d_0\},\{A\},\{B\}) =\{\{B:d_0\},\{B:\bot\}, \rblock\}
+  Output(\{d_0\},\{A\},\{B\}) =\{\{B\mapsto d_0\},\{B\mapsto \bot\}, \rblock\}
   \]
 \end{example}
 
-If there is no data item written to any sink ends, we use $\varnothing$ to denote such an empty
-output. For example, in the case given above, $\{B:\bot\}$ can be briefly rewritten as $\varnothing$.
+We use $\varnothing$ to denote the empty output when no data item is written to any sink end.
+For example, in this case $\{B\mapsto\bot\}$ can be briefly denoted as $\rempty$.
 
-Parameterized Mealy machines can be seen as an abstract form of Mealy machines, which means that we
+Parameterized Mealy machines can be seen as an abstraction of Mealy machines, and we
 still need a convert function between the two models.
 
 \begin{definition}[Concretize Mapping]
@@ -430,41 +431,44 @@ still need a convert function between the two models.
     \smap{\mathcal{PM}}_{\Sigma} &=& 
     \langle
     \mathcal{PM}.S(\Sigma), \mathcal{PM}.s_0, \\
-    & & Input(\Sigma, \mathcal{PM}.I), Output(\Sigma, \mathcal{PM}.O), \\
+    & & Input(\Sigma, \mathcal{PM}.I, \mathcal{PM}.O), Output(\Sigma, \mathcal{PM}.O), \\
     & & \mathcal{PM}.\delta(\Sigma), \mathcal{PM}.\lambda(\Sigma),
     \rangle
   \end{eqnarray*}
 \end{definition}
 
-Now we can use parameterized Mealy Machines to define a new semantics for timed Reo. Here we
-take one asynchronous channel (FIFO1), one asynchronous channel (Sync) and one timed channel (Timer)
-as examples.
+Now we can use PMMs to specify timed Reo. Here we take the asynchronous channel (FIFO1), the
+synchronous channel (Sync) and the timed channel (Timer) as examples. For simplicity, we use $A=\_$
+to indicate that there is no constraint on channel end $A$.
 
-\begin{example}[PMM Semantics of FIFO1 channel]
+\begin{example}[FIFO1]
   \label{example:pmmfifo}
-  The semantics of FIFO channel with source end $A$ and sink end $B$ can be defined as follows.
+  The PMM of a FIFO1 with source end $A$ and sink end $B$ can be defined as follows.
   \begin{itemize}
     \item[-] $S(\Sigma)=\{q_0\}\cup\{q_d|d\in\Sigma\}$
     \item[-] $I=\{A\}$, $O=\{B\}$, $s_0=q_0$
     \item[-] output function
       \begin{displaymath}
+        \small
         \delta(\Sigma)(s,i)=\left\{
         \begin{array}[ht]{ll}
-          (B:\bot) & s=q_0\land i=(A:\_,B:\rnoread) \\
-          (B:\bot) & s=q_d\land i=(A:\_,B:\rnoread) \\     
-          (B:d) & s=q_0\land i=(A:d,B:\rread)\\
-          (B:d) & s=q_d\land i=(A:\_,B:\rread)\\
-          \rblock & s=q_d\land i=(A:d,B:\rnoread) \\
-          \rblock & s=q_0\land i=(A:\bot,B:\rread) \\
+          \rempty & s=q_0\land i=\{A\mapsto\_,B\mapsto\rnoread\} \\
+          \rblock & s=q_0\land i=\{A\mapsto d',B\mapsto\rread\} \\
+          \rblock & s=q_0\land i=\{A\mapsto\bot,B\mapsto\rread\} \\
+          \rempty & s=q_d\land i=\{A\mapsto\bot,B\mapsto\rnoread\} \\     
+          \{B\mapsto d\} & s=q_d\land i=\{A\mapsto\_,B\mapsto\rread\}\\
+          \rblock & s=q_d\land i=\{A\mapsto d',B\mapsto \rnoread\} \\
         \end{array}
         \right.
       \end{displaymath}
     \item[-] transition function
       \begin{displaymath}
+        \small
         \lambda(\Sigma)(s,i)=\left\{
         \begin{array}[ht]{ll}
-          q_d & s=q_0\land i=(A:d,B:\rnoread) \\
-          q_d & s=q_{d'}\land i=(A:d,B:\rread) \\
+          q_{d'} & s=q_0\land i=\{A\mapsto d',B\mapsto\_\} \\
+          q_{d'} & s=q_{d}\land i=\{A\mapsto d',B\mapsto \rread\} \\
+          q_{d} & s=q_{d}\land i=\{A\mapsto \_,B\mapsto \rnoread\} \\
           q_0 & otherwise \\
         \end{array}
         \right.
@@ -472,28 +476,29 @@ as examples.
   \end{itemize}
 \end{example}
 
-Besides, the concrete Mealy machine (where $\Sigma=\{a\}$) is shown in Figure \ref{fig:pmmfifo},
-where labels of edges are in form of $\frac{input}{output}$.
+Besides, the concrete Mealy machine (where $\Sigma=\{d\}$) is shown in Figure \ref{fig:pmmfifo},
+where labels of edges are in form of $\frac{input}{output}$. All $\rblock$ edges are ignored for
+clearance.
 \begin{figure}[ht]
   \begin{center}
     \input{./images/pmmfifo.tex}
   \end{center}
-  \caption{PMM-based Semantics of $\smap{FIFO1}_\Sigma$, where $\Sigma=\{a\}$}
+  \caption{PMM-based Semantics of $\smap{FIFO1}_\Sigma$, where $\Sigma=\{d\}$}
   \label{fig:pmmfifo}
 \end{figure}
 
-\begin{example}[PMM Semantics of Sync channel]
-  The PMM-based semantics of a Sync channel with a source-end A and a sink-end B can be defined as:
+\begin{example}[Sync]
+  The PMM of a Sync with a source-end A and a sink-end B can be defined as:
   \begin{itemize}
     \item[-] $S(\Sigma)=\{q_0\}$, $I=\{A\}$, $O=\{B\}$, $s_0=q_0$
     \item[-] output function
       \begin{displaymath}
         \delta(\Sigma)(s,i)=\left\{
         \begin{array}[ht]{ll}
-          (B:\bot) & s=q_0\land i=(A:\bot,B:\rnoread) \\
-          (B:d) & s=q_0\land i=(A:d,B:\rread)\\
-          \rblock & s=q_0\land i=(A:\bot,B:\rread) \\
-          \rblock & s=q_0\land i=(A:d,B:\rnoread) \\
+          \rempty & i=\{A\mapsto\bot,B\mapsto\rnoread\} \\
+          \{B\mapsto d\} & i=\{A\mapsto d,B\mapsto\rread\}\\
+          \rblock & i=\{A\mapsto\bot,B\mapsto\rread\} \\
+          \rblock & i=\{A\mapsto d,B\mapsto\rnoread\} \\
         \end{array}
         \right.
       \end{displaymath}
@@ -501,34 +506,36 @@ where labels of edges are in form of $\frac{input}{output}$.
   \end{itemize}
 \end{example}
 
-\begin{example}[PMM Semantics of n-Timer channel]
-  Considering an n-Timer channel with a source-end A and a sink-end B, we define its PMM-based
-  semantics as:
+\begin{example}[n-Timer]
+  The PMM of an n-Timer with a source-end A and a sink-end B can be defined as:
   \begin{itemize}
     \item[-] $S(\Sigma)=\{q_{i,d}|0\leq i\leq n, d\in \Sigma\}\cup\{q_0\}$
     \item[-] $I=\{A\}$, $O=\{B\}$, $s_0=q_0$
     \item[-] output function
       \begin{displaymath}
+        \small
         \delta(\Sigma)(s,i)=\left\{
         \begin{array}[ht]{ll}
-          (B:d) & s=q_{n,d}\land i=(A:d,B:\rread)\\
-          \rblock & s=q_{n,d}\:\land \\
-          & (i=T\lor i=(A:\_,B:\rnoread) \\
-          \rblock & s=q_{j,d}\land 1 \leq j < n\land \\
-          & (i=(A:\_,B:\rread)\lor \\
-          & i=(A:d,B:\_))\\
-          (B:\bot) & otherwise\\
+          \{B\mapsto d\} & s=q_{n,d}\land i=\{A\mapsto \_,B\mapsto \rread\}\\
+          \rblock & s=q_{n,d}\land \\
+          & (i=T\lor i=\{A\mapsto \_,B\mapsto \rnoread\}) \\
+          \rblock & s=q_{j,d}\land 0 \leq j < n\land \\
+          & (i=\{A\mapsto \_,B\mapsto \rread\}\lor \\
+          & i=\{A\mapsto d,B\mapsto \_\})\\
+          \rempty & otherwise\\
         \end{array}
         \right.
-      \end{displaymath}
+      \end{displaymath} 
     \item[-] transition function
       \begin{displaymath}
+        \small
         \lambda(\Sigma)(s,i)=\left\{
         \begin{array}[ht]{ll}
-          q_{j+1,d} & s=q_{j,d}\land i=T\land0 < j < n\\
-          q_0 & s=q_{n,d}\land i=(A:\bot,B:\rread) \\
-          q_{0,d} & s=q_{n,d'}\land i=(A:d,B:\rread) \\
-          q_{0,d} & s=q_0 \land i=(A:d,B:\_) \\
+          q_{0,d} & s=q_0 \land i=\{A\mapsto d,B\mapsto \_\} \\
+          q_{j+1,d} & s=q_{j,d}\land i=T\land0 \leq j < n\\
+          q_0 & s=q_{n,d}\land i=\{A\mapsto \bot,B\mapsto \rread\} \\
+          q_{0,d'} & s=q_{n,d}\land i=\{A\mapsto d',B\mapsto \rread\} \\
+          q_0 & s=q_{n,d} \land i=T \\
           s & otherwise \\
         \end{array}
         \right.
@@ -536,11 +543,11 @@ where labels of edges are in form of $\frac{input}{output}$.
   \end{itemize}
 \end{example}
 
-Similarly, we can use parameterized mealy machines to define the semantics of other basic timed Reo
-channels. Now we're going to show how to compose these channels into complicated connectors.
+Similarly, we can use PMMs to describe the behavior of other basic timed Reo
+channels. Now we show how to compose these channels into more complicated connectors.
 
-\begin{definition}[Production Operator]
-  Now we're going to define the production operator \emph{prod} of two parameterized Mealy machines as,
+\begin{definition}[Production]
+  Now we're going to define the production operator \emph{prod} of two parameterized Mealy machines
   \[
   prod(PM_1,PM_2)=PM_3
   \]
@@ -682,6 +689,7 @@ A cell with column-label $d$ and row-label $s$ should contain the value $mq(sd)$
 \begin{algorithm} 
   \caption{CloseTable} 
   \label{alg:buildtable}
+  \small
   \KwIn{Oracle interface $mq$, Input actions $\mathcal{I}$, suffix set $D$}
   \KwOut{Observation table $obs$} 
   $obs$ initialized as empty\;

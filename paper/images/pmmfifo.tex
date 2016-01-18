@@ -10,16 +10,16 @@
   \tikzstyle{red}=[fill=red]
 
   \node[initial,state] (Q0)                     {$q_{0}$};
-  \node[state]         (QA)  [right = of Q0]    {$q_{a}$};
+  \node[state]         (QA)  [right = of Q0]    {$q_{d}$};
 
   \path
   (Q0)
-  edge  [bend left]     node {$\frac{\{A:a, B:\rnoread\}}{\varnothing}$} (QA)
-  edge  [loop below]    node {$\frac{\{A:\bot, B:\rread\}}{\varnothing}$} (QA)
-  edge  [loop above]    node {$\frac{\{A:a, B:\rread\}}{\{B:a\}}$} (QA)
+  edge  [bend left]     node {$\frac{\{A\mapsto d, B\mapsto \rnoread\}}{\varnothing}$} (QA)
+  edge  [loop below]    node {$\frac{\{A\mapsto \bot, B\mapsto \rread\}}{\varnothing}$} (QA)
+  edge  [loop above]    node {$\frac{\{A\mapsto d, B\mapsto \rread\}}{\{B\mapsto d\}}$} (QA)
   (QA)
-  edge  [bend left]     node {$\frac{\{A:\bot,B:\rread\}}{\{B:a\}}$} (Q0)
-  edge  [loop right]    node {$\frac{\{A:a,B:\rread\}}{\{B:a\}}$} (QA)
+  edge  [bend left]     node {$\frac{\{A\mapsto \bot,B\mapsto \rread\}}{\{B\mapsto d\}}$} (Q0)
+  edge  [loop right]    node {$\frac{\{A\mapsto d,B\mapsto \rread\}}{\{B\mapsto d\}}$} (QA)
   ;
 \end{tikzpicture}
 
