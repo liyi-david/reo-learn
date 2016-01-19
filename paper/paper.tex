@@ -36,7 +36,7 @@
 % some tikz-styles on reo channels, not required in papers that have nothing to do with Reo
 
 % finally no todos should exist in this draft
-% \usepackage[textsize=tiny]{todonotes}
+\usepackage[textsize=tiny]{todonotes}
 
 % -------------------------------------- configurations -----------------------------------------
 % declaration of environments
@@ -79,12 +79,12 @@ liyi\_math@pku.edu.cn, yiwuwang@126.com, summeng@math.pku.edu.cn
   paper, we propose an active learning framework to extract timed connector models from black-box
   system implementation. 
   We first introduce parameterized Mealy machine(PMM) as an operational semantic
-  model for channel-based coordination language Reo. Parameterized Mealy machine serves as a bridge
-  between Reo connectors and mealy machines. With the product operator, complex connectors can be
-  constructed by joining basic channels and transformed into mealy machines. Moreover, we adapt L*,
-  a well-known learning algorithm, to timed connectors (in the form of mealy machines). The new
-  algorithm has shown its efficiency in multiple case studies. 
-  Implementations of this framework is provided as a package in \texttt{Golang}.
+  model for channel-based coordination language Reo. PMM serves as a bridge
+  between Reo connectors and Mealy machines. With the product operator, complex connectors can be
+  constructed by joining basic channels and the PMM of connectors can be transformed into Mealy
+  machines. Moreover, we adapt L*, a well-known learning algorithm, to timed connectors (in the form
+  of Mealy machines). The new algorithm has shown its efficiency in multiple case studies. 
+  This framework has been implemented as a package in \texttt{Golang}.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -94,36 +94,37 @@ liyi\_math@pku.edu.cn, yiwuwang@126.com, summeng@math.pku.edu.cn
 \section{Introduction} 
 
 Distributed real-time embedded systems (DRES) are reforming our lives with the
-Internet of Things(IoT), wherein individual components are composed via a
-\emph{connector} to build a system. Such systems could be distributed logically or physically, which
+Internet of Things(IoT), wherein individual components are composed via \emph{connectors} 
+to build systems. Such systems could be distributed logically or physically, which
 makes coordination processes even more complicated. In this case, we need to specify the coordination
 processes with \emph{coordination languages}, such that formal techniques can be applied to
 guarantee their reliability.
 
-\emph{Timed Reo} is a real-time extension of the coordination language \emph{Reo}, by which
-coordination process in DRES can be depicted clearly and intuitively. Different formal
-semantics are proposed to specify the behavior of timed Reo.
-For example, in \cite{DBLP:conf/tase/Meng12}, a UTP-based
-(\emph{Unifying Theories of Programming}) semantics is provided to verify connectors as
-\emph{designs}. An operational semantics based on \emph{constraint automata} was raised by Baier et
-al.\cite{DBLP:conf/sefm/ArbabBBR04}, where a variant of LTL was also proposed to describe the properties of timed connectors.
+\emph{Timed Reo} is a real-time extension of the coordination language \emph{Reo}, which can be used
+to describe the coordination process in DRES clearly and intuitively. Different formal
+semantics have been proposed to specify the behavior of timed Reo.
+For example, an operational semantics based on \emph{timed constraint automata} was raised by Baier et
+al.\cite{DBLP:conf/sefm/ArbabBBR04}, where a variant of LTL was also proposed to describe the
+properties of timed connectors.
+In \cite{DBLP:conf/tase/Meng12}, a UTP design model was proposed to specify the behavior of timed
+connectors.. 
 
 Formal verification and validation techniques have also been proved applicable for timed connectors, 
-e.g. a comformance testing framework on timed connectors in \cite{DBLP:conf/tase/LiCWS15}.
+e.g. a comformance testing framework on timed connectors has been proposed in \cite{DBLP:conf/tase/LiCWS15}.
 A SAT-based bounded model checking approach was adapted in \cite{DBLP:journals/scp/Kemper12} for
 verifying connectors. Although these solutions are practical and impressive, there is one important
 question faced by most of them: \emph{how to obtain the formal models?}
 
 \emph{Correctness} of connectors is closely related to some low-level implementation details.
 For example, well-written code may behave dramatically weird with an improper set of concurrency
-primitives. Such senarios happen frequently in embedded systems with different hardware platforms or
-operating systems. Consequently, manually modeling an existing connector seems rather unreliable,
-even with reference to its source code.
+primitives. Such scenarios happen frequently in embedded systems with different hardware platforms or
+operating systems. Consequently, manually extracting a proper model for an existing connector
+implementation seems rather unreliable, even with reference to its source code.
 
-As a branch of \emph{machine learning} technique, active learning offers a way to obtain models from
-low-level models. Works in \cite{DBLP:journals/mt/Daelemans10, DBLP:journals/iandc/Angluin87,
-DBLP:conf/fase/RaffeltS06} shows interesting examples where active learning is used to extract
-\emph{Mealy machines} or \emph{regular languages} without time domain.
+As a branch of \emph{machine learning} technique, active learning offers a means to obtain
+high-level models from low-level models. Works in \cite{de2010grammatical,
+DBLP:journals/iandc/Angluin87, DBLP:conf/fase/RaffeltS06} show interesting examples where active
+learning is used to extract \emph{Mealy machines} or \emph{regular languages} without time domain.
 
 \begin{figure}[ht]
   \begin{center}
@@ -134,9 +135,9 @@ DBLP:conf/fase/RaffeltS06} shows interesting examples where active learning is u
 \end{figure}
 
 In this paper we address this question by proposing a active learning framework as shown in Figure
-\ref{fig:howto}) to automatically extract timed connector models from blackbox implementations. 
-To achieve this goal, we first introduce \emph{parameterized Mealy machine} as a parametierized
-semantics for timed Reo connectors, which can be transformed intoe concrete Mealy machines with a
+\ref{fig:howto} to automatically extract timed connector models from blackbox implementations. 
+To achieve this goal, we first introduce \emph{parameterized Mealy machine} as a parameterized
+semantics for timed Reo connectors, which can be transformed to concrete Mealy machines with a
 given alphabet. Then the $L*$ algorithm \cite{DBLP:journals/iandc/Angluin87} is adapted and
 optimized to extract Mealy machines with timed action from the connector implementations as
 blackboxes. 
@@ -147,7 +148,7 @@ language Reo, Mealy machine, and active automata learning. Section \ref{sec:sema
 operational semantics of Reo, which is used in Section \ref{sec:activelearning} to show how to
 extract Reo models from blackboxes by means of active learning. In Section
 \ref{sec:experiment}, we discuss the implementation and optimization of the approach in
-\texttt{Golang}.
+\texttt{Golang}. Finally, Section VI concludes the paper.
 
 \section{Preliminaries} 
 \label{sec:preliminaries}
@@ -184,7 +185,7 @@ behavior are described as follows:
   \item [-] A \emph{Sync} channel accepts a data item from its source end iff the data item can be
     dispensed through its sink end simultaneously.
   \item [-] A \emph{LossySync} channel is always ready to accept data items. These items will be
-    dispensed through its sink end if possible, otherwise they will be lost.
+    dispensed through its sink end simultaneously if possible, otherwise they will be lost.
   \item [-] A \emph{SyncDrain} channel has two source ends and no sink end. It can accept a data
     item through one of its source end iff a data item is also available to be accepted
     simultaneously through the other end. Then both items will be dropped.
@@ -192,7 +193,9 @@ behavior are described as follows:
     data item whenever the buffer is empty. 
   \item [-] A t-timer channel accepts any data item from its source end, and later dispense it to
     its sink end after a delay of $t$ time units.
-
+    \footnote{Here the interpretation of t-Timer is a bit different as in other works like
+    \cite{DBLP:conf/sefm/ArbabBBR04, DBLP:conf/tase/Meng12}, but we can easily transform between the
+    two kinds of behavior by composing with some other basic channels.}
 \end{itemize}
 
 Channels are joint together in \emph{nodes}. There are three types of nodes:
@@ -303,7 +306,7 @@ interface, which is responsible for two types of queries.
 
 \begin{itemize}
   \item[-] \textbf{Membership Query} (hereinafter referred to as \emph{mq}) In grammar-learning
-    \cite{DBLP:journals/iandc/Angluin87}) \emph{mq} checks if a word is a member of certain language
+    \cite{DBLP:journals/iandc/Angluin87}, \emph{mq} checks if a word is a member of certain language
     defined by the given grammar. When it comes to
     automata learning, \emph{mq} is supposed to provide \emph{simulation results} for given input
     sequences.
@@ -334,13 +337,13 @@ machine} as a bridge between connectors and Mealy machines.
 Time has been investigated in several extensions of Reo. For example, timed
 Reo\cite{DBLP:conf/sefm/ArbabBBR04, DBLP:conf/fmoods/MengA07}, hybrid Reo\cite{DBLP:conf/icfem/ChenSS14}, etc.
 Generally, these models are designed to handle real-time behavior where time is defined on the
-real number field $\mathbb{R}$. However, there are also found some works like
+real number field $\mathbb{R}$. However, there are also some works like
 \cite{DBLP:journals/fmsd/PrabhakarDM015} where
 rational time indeed  makes things easier. In this paper, we choose the rational number field
 $\mathbb{Q}$ as our time domain, which simplifies discretization of timed behavior greatly.
 
 As presented in section \ref{sec:reo}, all real-time behavior in timed Reo comes with a finite set
-of timed channels, and the number of these channels are apparently finite. We use
+of timed channels. We use
 $t_i\in\mathbb{Q}, i=1,2,\dots,n$ to denote the delays of these timed channels, and then we can define a precision
 function $prec$ which calculate a gcd-style \emph{maximal time precision}:
 \[
@@ -350,10 +353,10 @@ It's easy to prove that such a $T$ always exists.
 
 In embedded systems, the maximal time precision is also called ``clock-period'', which is the basic
 time unit provided by an oscillator. For example, a widely-used Intel-80C51 microcontroller works
-under the frequency 16Mhz, where the clock-period is $62.5$ns. A resonable assumption comes that
+under the frequency 16Mhz, where the clock-period is $62.5$ns. A reasonable assumption comes that
 such a maximal time precision $dt=prec(t_1,\dots,t_n)$ should always be provided to make sure
 different components are able to work together. Then all $t_i$-Timers can be seen as $n_idt$-Timers
-for some $n_i$. In the following sections, we'll use $n_i$-Timers instead.
+for some $n_i$ and we use $n_i$-Timers instead in the following sections.
 
 Besides, we're going to add a ``T'' action in Mealy machines. It indicates that the corresponding
 transition will take one time unit to finish.
@@ -361,8 +364,8 @@ transition will take one time unit to finish.
 \subsection{Parameterized Mealy Machine}
 We present a model named \emph{parameterized Mealy machine} to model timed connectors. PMM is
 supposed to behave as a bridge between Mealy machines and timed connectors. Connectors are firstly
-defined as PMMs, and composed by production operator and link operator. Then, concrete Mealy-machine
-model can be generated from the PMM model.
+defined as PMMs, and composed by \emph{product} and \emph{link} operators. Then, concrete
+Mealy-machine model can be generated from the PMM model.
 Following the formal definition of Mealy machine in Section \ref{sec:preliminaries}, we define the
 \emph{parameterized Mealy machine} as follows. 
 
@@ -549,8 +552,8 @@ clearance.
 Similarly, we can use PMMs to describe the behavior of other basic timed Reo
 channels. Now we show how to compose these channels into more complicated connectors.
 
-\begin{definition}[Production]
-  The production operator \emph{prod} of two parameterized Mealy machines
+\begin{definition}[Product]
+  The product operator \emph{prod} of two PMMs
   \[
   \mathcal{PM'} = prod(\mathcal{PM}_1,\mathcal{PM}_2)\mbox{ if }\mathcal{PM}_2.O\cap
   \mathcal{PM}_1.I=\varnothing
@@ -592,7 +595,7 @@ channels. Now we show how to compose these channels into more complicated connec
 \end{definition}
 
 The idea in \emph{production} is quite simple. The output of $\mathcal{PM}_1$ would be provided as part of the
-input of $\mathcal{PM}_2$. Time actions T is only executed simutaneously between $\mathcal{PM}_1$ and $\mathcal{PM}_2$.
+input of $\mathcal{PM}_2$. Time actions T is only executed simultaneously between $\mathcal{PM}_1$ and $\mathcal{PM}_2$.
 
 As mentioned in the notation above, we cannot connect a sink end of $\mathcal{PM}_2$ to a source end of
 $\mathcal{PM}_1$, which makes it difficult to construct connectors like alternator in Figure
@@ -661,7 +664,7 @@ reachable.
 
 \subsection{Observation Table}
 \emph{Observation Tables}, proposed in \cite{DBLP:journals/iandc/Angluin87}, is used to construct
-a hypothetical Mealy machine from results membership queries.
+a hypothetical Mealy machine from the results of membership queries.
 
 Generally, a Mealy machines is determined by its \emph{states} and \emph{transitions}.
 As for blackboxes, input sequence $s\in\mathcal{I}^*$ can be used to denote its state 
@@ -698,6 +701,19 @@ An observation table $(S,D)$ is \emph{closed} if
 \[
 \forall s\in S,a\in\mathcal{I}.\exists s'\in S. sa\sim_D s'
 \]
+
+From a closed observation we can construct a hypothetical Mealy machine in a straight-forward way.
+The Mealy machine $\mathcal{H}=\langle S,s_0,\mathcal{I},\mathcal{O},\delta,\lambda\rangle$ is
+constructed from $obs$ as follows:
+\begin{itemize}
+  \item[-] Every state in $S$ corresponds to an input sequence in $obs.S$
+  \item[-] $s_0$ corresponds to the empty sequence $\varepsilon$
+    
+    \emph{(we use input sequences to indicate their corresponding states in following parts)}
+    \todo{define the empty sequence}
+  \item[-] $\delta(s,a)=mq(sa)$
+  \item[-] $\lambda(s,a)=acc(sa,obs.D)$
+\end{itemize}
 
 Algorithm \ref{alg:buildtable} shows how to build an closed observation table.
 
@@ -989,11 +1005,15 @@ could contribute to concurrent programming.
 Our future works would mainly focus on better support of dense time. To describe dense
 time behavior, the Mealy machine model needs a lot of changes instead of a simple T action. Besides,
 we will also try to improve our algorithm to handle non-deterministic behaviors. This is not a brand
-new topic \cite{DBLP:journals/eceasst/VolpatoT15}, but we believe that there is still room for
+new topic \cite{DBLP:conf/isola/VolpatoT14}, but we believe that there is still room for
 improvement.  
 
-\bibliographystyle{IEEEtran}
-% \bibliography{IEEEabrv, bib}
+\section*{Acknowledgments}
+The work was partially supported by the National Natural Science Foundation of China under grant no.
+61202069, 61272160 and 61532019, and Research Fund for the Doctoral Program of Higher Education of
+China under grant no. 20120001120103.
+
+\bibliographystyle{abbrv}
 \bibliography{bib}
 
 \end{document}
