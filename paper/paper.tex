@@ -447,31 +447,33 @@ to indicate that there is no constraint on channel end $A$.
     \item[-] $S(\Sigma)=\{q_0\}\cup\{q_d|d\in\Sigma\}$
     \item[-] $I=\{A\}$, $O=\{B\}$, $s_0=q_0$
     \item[-] output function
-      \begin{displaymath}
-        \small
-        \delta(\Sigma)(s,i)=\left\{
-        \begin{array}[ht]{ll}
-          \rempty & s=q_0\land i=\{A\mapsto\_,B\mapsto\rnoread\} \\
-          \rblock & s=q_0\land i=\{A\mapsto d',B\mapsto\rread\} \\
-          \rblock & s=q_0\land i=\{A\mapsto\bot,B\mapsto\rread\} \\
-          \rempty & s=q_d\land i=\{A\mapsto\bot,B\mapsto\rnoread\} \\     
-          \{B\mapsto d\} & s=q_d\land i=\{A\mapsto\_,B\mapsto\rread\}\\
-          \rblock & s=q_d\land i=\{A\mapsto d',B\mapsto \rnoread\} \\
-        \end{array}
-        \right.
-      \end{displaymath}
+      \begin{small}
+        \begin{displaymath}
+          \delta(\Sigma)(s,i)=\left\{
+          \begin{array}[ht]{ll}
+            \rempty & s=q_0\land i=\{A\mapsto\_,B\mapsto\rnoread\} \\
+            \rblock & s=q_0\land i=\{A\mapsto d',B\mapsto\rread\} \\
+            \rblock & s=q_0\land i=\{A\mapsto\bot,B\mapsto\rread\} \\
+            \rempty & s=q_d\land i=\{A\mapsto\bot,B\mapsto\rnoread\} \\     
+            \{B\mapsto d\} & s=q_d\land i=\{A\mapsto\_,B\mapsto\rread\}\\
+            \rblock & s=q_d\land i=\{A\mapsto d',B\mapsto \rnoread\} \\
+          \end{array}
+          \right.
+        \end{displaymath}
+      \end{small}
     \item[-] transition function
-      \begin{displaymath}
-        \small
-        \lambda(\Sigma)(s,i)=\left\{
-        \begin{array}[ht]{ll}
-          q_{d'} & s=q_0\land i=\{A\mapsto d',B\mapsto\_\} \\
-          q_{d'} & s=q_{d}\land i=\{A\mapsto d',B\mapsto \rread\} \\
-          q_{d} & s=q_{d}\land i=\{A\mapsto \_,B\mapsto \rnoread\} \\
-          q_0 & otherwise \\
-        \end{array}
-        \right.
-      \end{displaymath}
+      \begin{small}
+        \begin{displaymath}
+          \lambda(\Sigma)(s,i)=\left\{
+          \begin{array}[ht]{ll}
+            q_{d'} & s=q_0\land i=\{A\mapsto d',B\mapsto\_\} \\
+            q_{d'} & s=q_{d}\land i=\{A\mapsto d',B\mapsto \rread\} \\
+            q_{d} & s=q_{d}\land i=\{A\mapsto \_,B\mapsto \rnoread\} \\
+            q_0 & otherwise \\
+          \end{array}
+          \right.
+        \end{displaymath}
+      \end{small}
   \end{itemize}
 \end{example}
 
@@ -511,34 +513,36 @@ clearance.
     \item[-] $S(\Sigma)=\{q_{i,d}|0\leq i\leq n, d\in \Sigma\}\cup\{q_0\}$
     \item[-] $I=\{A\}$, $O=\{B\}$, $s_0=q_0$
     \item[-] output function
-      \begin{displaymath}
-        \small
-        \delta(\Sigma)(s,i)=\left\{
-        \begin{array}[ht]{ll}
-          \{B\mapsto d\} & s=q_{n,d}\land i=\{A\mapsto \_,B\mapsto \rread\}\\
-          \rblock & s=q_{n,d}\land \\
-          & (i=T\lor i=\{A\mapsto \_,B\mapsto \rnoread\}) \\
-          \rblock & s=q_{j,d}\land 0 \leq j < n\land \\
-          & (i=\{A\mapsto \_,B\mapsto \rread\}\lor \\
-          & i=\{A\mapsto d,B\mapsto \_\})\\
-          \rempty & otherwise\\
-        \end{array}
-        \right.
-      \end{displaymath} 
+      \begin{small}
+        \begin{displaymath}
+          \delta(\Sigma)(s,i)=\left\{
+          \begin{array}[ht]{ll}
+            \{B\mapsto d\} & s=q_{n,d}\land i=\{A\mapsto \_,B\mapsto \rread\}\\
+            \rblock & s=q_{n,d}\land \\
+            & (i=T\lor i=\{A\mapsto \_,B\mapsto \rnoread\}) \\
+            \rblock & s=q_{j,d}\land 0 \leq j < n\land \\
+            & (i=\{A\mapsto \_,B\mapsto \rread\}\lor \\
+            & i=\{A\mapsto d,B\mapsto \_\})\\
+            \rempty & otherwise\\
+          \end{array}
+          \right.
+        \end{displaymath} 
+      \end{small}
     \item[-] transition function
-      \begin{displaymath}
-        \small
-        \lambda(\Sigma)(s,i)=\left\{
-        \begin{array}[ht]{ll}
-          q_{0,d} & s=q_0 \land i=\{A\mapsto d,B\mapsto \_\} \\
-          q_{j+1,d} & s=q_{j,d}\land i=T\land0 \leq j < n\\
-          q_0 & s=q_{n,d}\land i=\{A\mapsto \bot,B\mapsto \rread\} \\
-          q_{0,d'} & s=q_{n,d}\land i=\{A\mapsto d',B\mapsto \rread\} \\
-          q_0 & s=q_{n,d} \land i=T \\
-          s & otherwise \\
-        \end{array}
-        \right.
-      \end{displaymath}
+      \begin{small}
+        \begin{displaymath}
+          \lambda(\Sigma)(s,i)=\left\{
+          \begin{array}[ht]{ll}
+            q_{0,d} & s=q_0 \land i=\{A\mapsto d,B\mapsto \_\} \\
+            q_{j+1,d} & s=q_{j,d}\land i=T\land0 \leq j < n\\
+            q_0 & s=q_{n,d}\land i=\{A\mapsto \bot,B\mapsto \rread\} \\
+            q_{0,d'} & s=q_{n,d}\land i=\{A\mapsto d',B\mapsto \rread\} \\
+            q_0 & s=q_{n,d} \land i=T \\
+            s & otherwise \\
+          \end{array}
+          \right.
+        \end{displaymath}
+      \end{small}
   \end{itemize}
 \end{example}
 
@@ -610,33 +614,35 @@ ends and source ends in the same connector.
     \item[-] $\mathcal{PM}'.s_0=\mathcal{PM}.s_0$
     \item[-] $\forall\Sigma, i\in
       Input(\Sigma,\mathcal{PM}'.I,\mathcal{PM}'.O).\mathcal{PM}'.\delta(\Sigma)(s,i)=$
-      \begin{displaymath}
-        \small
-        \left\{
-        \begin{array}[h]{lr}
-          \rempty & i=T \\
-          \mathcal{PM}.\delta(\Sigma)(s,i\cup\{\IN:d\})\downarrow_{\mathcal{PM}'.O} & (*)\\
-          \rblock & otherwise \\
-        \end{array}
-        \right.
-      \end{displaymath}
+      \begin{small}
+        \begin{displaymath}
+          \left\{
+          \begin{array}[h]{lr}
+            \rempty & i=T \\
+            \mathcal{PM}.\delta(\Sigma)(s,i\cup\{\IN:d\})\downarrow_{\mathcal{PM}'.O} & (*)\\
+            \rblock & otherwise \\
+          \end{array}
+          \right.
+        \end{displaymath}
+      \end{small}
       where the condition (*) is defined as
       \[
       \exists d.\mathcal{PM}.\delta(\Sigma)(s,i\cup\{\IN:d\})(\OUT)=d
       \]
     \item[-] $\forall\Sigma, i\in
       Input(\Sigma,\mathcal{PM}'.I,\mathcal{PM}'.O).$
-      \begin{displaymath}
-        \small
-        \mathcal{PM}.\lambda(\Sigma)(s,i)=
-        \left\{
-        \begin{array}[ht]{lr}
-          \mathcal{PM}.\lambda(\Sigma,T) & i=T \\
-          \mathcal{PM}.\lambda(\Sigma,i\cup\{\IN:d\}) & (*)\\
-          s & otherwise \\
-        \end{array}
-        \right.
-      \end{displaymath}
+      \begin{small}
+        \begin{displaymath}
+          \mathcal{PM}.\lambda(\Sigma)(s,i)=
+          \left\{
+          \begin{array}[ht]{lr}
+            \mathcal{PM}.\lambda(\Sigma,T) & i=T \\
+            \mathcal{PM}.\lambda(\Sigma,i\cup\{\IN:d\}) & (*)\\
+            s & otherwise \\
+          \end{array}
+          \right.
+        \end{displaymath}
+      \end{small}
   \end{itemize}
 \end{definition}
 
@@ -649,39 +655,51 @@ later, once the alphabet $\Sigma$ is provided.
 In this section, we use L* algorithm to extract Reo coordinators from blackbox
 implementations in 3 steps:
 \emph{constructing hypothesis}, \emph{enclosing hypothesis} and \emph{validating hypothesis}. Besides,
-Here the input symbols and output symbols of the blackbox are supposed to be provided as $\mathcal{I}$
-and $\mathcal{O}$.
+here the input and output symbols of the blackbox are provided as $\mathcal{I}$ and $\mathcal{O}$,
+and the blackbox implementation is supposed to be equivalent to a Mealy machine where all states are
+reachable.
 
 \subsection{Observation Table}
-Results of membership queries come out as $mq(s)=o$, where $s\in\mathcal{I}+$.
-Now the question is, \emph{how to find the connection betweensuch query results and Mealy machines?}
+\emph{Observation Tables}, proposed in \cite{DBLP:journals/iandc/Angluin87}, is used to construct
+a hypothetical Mealy machine from results membership queries.
 
-Generally, Mealy machines are composed of \emph{states} and \emph{transitions}.
-Provided with a Mealy machine $m$, any input sequence in $m.I^+$ leads to a unique state. 
-Such a sequence is called an \emph{access sequence} of this state.
-Particularly, we use $\varepsilon$, the \emph{empty sequnce}, to denote the initial state.
-Similarly, if a blackbox model has the same bahavior with a Mealy machine, we can use access
-sequences to label its states and, in the same way, input actions to label its transitions.
-For example, we consider a Mealy machine which is staying in some state labelled by $s$. With an
-action $a$ provided, the Mealy machine will jump to a new state labelled by $s'=sa$ and generate an
-output $mq(sa)$. 
+Generally, a Mealy machines is determined by its \emph{states} and \emph{transitions}.
+As for blackboxes, input sequence $s\in\mathcal{I}^*$ can be used to denote its state 
+after execution of $s$. Similarly, for all $a\in\mathcal{I}$, $sa$ indicates the successor
+state of $s$ after execution of $a$.
+However, under such notations, there are \emph{infinite} number of states where most are
+reduplicate.
 
-Different access sequences may lead to similar states. Here we use \emph{suffixes} set $D$ to
-distinguish states where $D\subseteq \mathcal{I}^+$ is initialized as $\{d=\{i\}|i\in\mathcal{I}\}$. 
-\begin{definition}[Equivalence under Suffixes]
+States are distinguished, usually, by their \emph{subsequent behavior}. Suppose $s_1\neq s_2\in
+\mathcal{I}^*$, the corresponding of $s_1$ and $s_2$ are exactly the same iff $\forall d\in
+\mathcal{I}^+. mq(s_1d)=mq(s_2d)$. Since we can never check it on every $d\in\mathcal{I}^+$, an
+alternative way is to use a set of \emph{suffixes} to distinguish them approximately.
+\begin{definition}[$D$-Equivalence]
   provided with two access sequences $s_1,s_2$ and a set of suffixes $D\subset\mathcal{I}^+$, we say
-  the corresponding states of $s_1$ and $s_2$ are equivalent under $D$ (denoted as $s_1\sim_D s_2$)
+  the corresponding states of $s_1$ and $s_2$ are $D$-equivalent (denoted as $s_1\sim_D s_2$)
   iff $\forall d\in D, mq(s_1d) = mq(s_2d)$.
 \end{definition}
+\begin{definition}[Access Sequence]
+  Given an input sequence $s$, we define the access sequence of $s$ as
+  \[
+  acc(s,D)=\min\{s'\in\mathcal{I}^*|s'\sim_D s\}
+  \]
+\end{definition}
 
-Since all this \emph{inputs} and \emph{outputs} can be observed outside the
-model, we can use the same notations to describe a black box as a hypothetical Mealy machine.
-Following this idea, \emph{Observation Tables}, proposed in \cite{DBLP:journals/iandc/Angluin87},
-shows a tabular form of such hypothetical models. In observation tables, rows represent states with
-label of their access sequences and columns are labelled with suffixes. Successors of a state $s$ is,
-intuitively, denoted as extended access sequences $sa$ where $a$ is a single input action. 
-A cell with column-label $d$ and row-label $s$ should contain the value $mq(sd)$. Algorithm
-\ref{alg:buildtable} shows how to build such an observation table.
+Formally, an observation table is defined as a tuple $(S,D)$ where $S\subset\mathcal{I}^*$ indicates
+the access sequences of states and $D\subset\mathcal{I}^*$ indicates the suffixes. Its
+tabular form can be found in Figure \ref{fig:hypo}. In such tables, columns are labelled with
+$d\in D$, and rows are labelled with input sequences. Rows are divided into two parts. The upper
+part, labelled with $s\in S$, shows the states in current hypothesis (in form of access sequences).
+The lower part, labelled with $sa$ (where $s\in S,a\in\mathcal{I}$) indicates all the transitions
+from $S$. A cell with row label $s$ and column label $d$ is filled with $mq(sd)$.
+
+An observation table $(S,D)$ is \emph{closed} if 
+\[
+\forall s\in S,a\in\mathcal{I}.\exists s'\in S. sa\sim_D s'
+\]
+
+Algorithm \ref{alg:buildtable} shows how to build an closed observation table.
 
 \begin{algorithm} 
   \caption{CloseTable} 
@@ -701,13 +719,13 @@ A cell with column-label $d$ and row-label $s$ should contain the value $mq(sd)$
 \end{algorithm}
 
 Taking a 2-Timer channel as an example, we now illustrate how this algorithm works. 
-We assume that the source end of this 2-Timer channel is $A$, the sink end is $B$ and the alphabet
+We assume that the source end of this 2-Timer channel is $A$, the sink end is $B$, and the alphabet
 is $\{a\}$. We briefly denote $\{A:a,B:\rnoread\}$ and other input/output actions in form of
 $a,\rnoread$.
 
 Firstly, $obs$ is initialized as empty and the empty sequence $\varepsilon$ is pushed in $unclosed$.
 Then we will explore all the access sequences in $unclosed$ and calculate its successors. Here the
-$unclosed$ set consists of access sequences that has no equivalent fellow with less length. 
+$unclosed$ set consists of access sequences that has no equivalent fellow in $S$. 
 For example, figure \ref{fig:hypo} shows the $obs$ of a 2-Timer channel after the first
 iteration. The five successors of $\varepsilon$ is presented as the bottom part of the table, where
 four are equivalent with $\varepsilon$ but $a,\rnoread$ is not. Therefore, we take $a,\rnoread$ as a
@@ -745,57 +763,56 @@ self-loop.
 
 \begin{figure}[ht]
   \begin{center}
-    \begin{displaymath}
-      \small
-      \begin{array}{l||ccccc||c}
-        \hline
-        & a,\rread & \bot,\rread & a,\rnoread & \bot,\rnoread & T & \mbox{AccessSequence}\\
-        \hline\hline
-        \varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        \hline
-        a,\rread & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
-        \bot,\rread & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        a,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
-        \bot,\rnoread & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        T & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        \hline
-        a,\rnoread-a,\rread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
-        a,\rnoread-\bot,\rread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
-        a,\rnoread-a,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
-        a,\rnoread-\bot,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
-        a,\rnoread-T & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
-        \hline
-      \end{array}
-    \end{displaymath}
+    \begin{small}
+      \begin{displaymath}
+        \begin{array}{l||ccccc||c}
+          \hline
+          & a,\rread & \bot,\rread & a,\rnoread & \bot,\rnoread & T & \mbox{AccessSequence}\\
+          \hline\hline
+          \varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+          \hline
+          a,\rread & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
+          \bot,\rread & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+          a,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
+          \bot,\rnoread & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+          T & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+          \hline
+          a,\rnoread-a,\rread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
+          a,\rnoread-\bot,\rread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
+          a,\rnoread-a,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
+          a,\rnoread-\bot,\rnoread & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
+          a,\rnoread-T & \rblock & \rblock & \rblock & \rempty & \rempty & a,\rnoread \\
+          \hline
+        \end{array}
+      \end{displaymath}
+    \end{small}
   \end{center}
   \caption{A Closed Observation Table}
   \label{fig:hypo2}
 \end{figure}
 
 \subsection{Counter-Examples' Analysis} 
-Apparently, the closed hypothesis presented in Figure \ref{fig:hypo2} is not equal to the 2-Timer
-channel. It's easy to find a counter-example $s=a,\rnoread-T-T-\bot,\rread$ where $mq(s)=a$ while
+Apparently, the closed hypothesis presented in Figure \ref{fig:hypo2} is not the 2-Timer
+channel. It's easy to find a counter-example $s_0=a,\rnoread-T-T-\bot,\rread$ where $mq(s)=a$ while
 according to the hypothesis, the result shoud have been $\rempty$. In this section, we show how to
 find and analyze counter-examples using the method in \cite{DBLP:conf/sfm/SteffenHM11}. 
 
 Firstly, we give a formal definition of \emph{counter-examples}. With a observation table $obs$ and
-a sequence $s$, we use $acc(s)$ to denote the access sequence of $obs\xrightarrow{s}$ and $hq(s)$ to
-denote the corresponding output.
+a sequence $s$, we use $hq(obs,s)$ to denote the execution result of $obs$ under the input sequence
+$s$. Obviously we have $hq(obs,s) = mq(acc(s')a)$ where $a$ is the last element of $s$ and $s=s'a$.
 
 \begin{definition}[Counter-Example]
-  We use $hq$ to denote execution result of the hypothetical Mealy machine, sequence $s$ is called a
-  counter-example iff $mq(s)\neq hq(s)$.
+  sequence $s$ is called a counter-example of $obs$ iff $mq(s)\neq hq(obs,s)$.
 \end{definition}
 
 Now we consider the reason that lead to existance of counter examples. Since
 the suffix set $D$ is used to distinguish different states, the existance of counter-examples
 shows that the current suffix set $D$ is not powerful enough to distinguish all different states.
 
-Considering a counter example $s$, we have
+Considering a counter example $s$, we define the function MaxSuffix($s,obs$) as
 \[
-\mbox{MaxSuffix}(s)=\max_d\{s=s'd, mq(acc(s')d)\neq mq(s)\}
+\max\{d\in\mathcal{I}^+|s=s'd, mq(acc(s',obs.D)d)\neq mq(s)\}
 \]
-Since $mq(acc(s))=hq(s)\neq mq(s)$ and $mq(s) = mq(s)$, the existance of such $d$ is easy to prove.
 After appending $d$ in $D$, we can rebuild a closed hypothesis where $s$ is no longer a
 counter-example.
 
@@ -974,7 +991,9 @@ time behavior, the Mealy machine model needs a lot of changes instead of a simpl
 we will also try to improve our algorithm to handle non-deterministic behaviors. This is not a brand
 new topic \cite{DBLP:journals/eceasst/VolpatoT15}, but we believe that there is still room for
 improvement.  
-\bibliographystyle{abbrv}
+
+\bibliographystyle{IEEEtran}
+% \bibliography{IEEEabrv, bib}
 \bibliography{bib}
 
 \end{document}
