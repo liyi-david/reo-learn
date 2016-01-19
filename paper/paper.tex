@@ -646,15 +646,15 @@ later, once the alphabet $\Sigma$ is provided.
 
 \section{From Blackbox to Timed Connectors} 
 \label{sec:activelearning}
-In this section, we show how to use L* algorithm to extract models from blackboxes in  3 steps:
-\emph{constructing hypothesis}, \emph{enclosing hypothesis} and \emph{checking hypothesis}. Besides,
-we assume that input symbols and output symbols of the blackbox have been provided as $\mathcal{I}$
+In this section, we use L* algorithm to extract Reo coordinators from blackbox
+implementations in 3 steps:
+\emph{constructing hypothesis}, \emph{enclosing hypothesis} and \emph{validating hypothesis}. Besides,
+Here the input symbols and output symbols of the blackbox are supposed to be provided as $\mathcal{I}$
 and $\mathcal{O}$.
 
 \subsection{Observation Table}
-As mentioned above, membership queries provide us information with the form $mq(s)=o$, where $s$ is
-an input sequence in $\Sigma^{+}$. Now the question is, \emph{how to find the connection between
-such query results and Mealy machines?}
+Results of membership queries come out as $mq(s)=o$, where $s\in\mathcal{I}+$.
+Now the question is, \emph{how to find the connection betweensuch query results and Mealy machines?}
 
 Generally, Mealy machines are composed of \emph{states} and \emph{transitions}.
 Provided with a Mealy machine $m$, any input sequence in $m.I^+$ leads to a unique state. 
@@ -666,12 +666,8 @@ For example, we consider a Mealy machine which is staying in some state labelled
 action $a$ provided, the Mealy machine will jump to a new state labelled by $s'=sa$ and generate an
 output $mq(sa)$. 
 
-Different access sequences may lead to similar states. For example, a 2-Timer channel will dispense
-any accepted data item in 2 time units. After that, the state of this channel is exactly same as its
-initial state. Here \emph{suffixes} are used to distinguish different states as shown in the
-following definition, where $D$ is initialized as $\mathcal{I}$. Under such a suffix set, two states
-are considered different only when they have different one-step behaviors.
-
+Different access sequences may lead to similar states. Here we use \emph{suffixes} set $D$ to
+distinguish states where $D\subseteq \mathcal{I}^+$ is initialized as $\{d=\{i\}|i\in\mathcal{I}\}$. 
 \begin{definition}[Equivalence under Suffixes]
   provided with two access sequences $s_1,s_2$ and a set of suffixes $D\subset\mathcal{I}^+$, we say
   the corresponding states of $s_1$ and $s_2$ are equivalent under $D$ (denoted as $s_1\sim_D s_2$)
