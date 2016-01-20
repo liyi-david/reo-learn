@@ -134,7 +134,7 @@ learning is used to extract \emph{Mealy machines} or \emph{regular languages} wi
   \label{fig:howto}
 \end{figure}
 
-In this paper we address this question by proposing an active learning framework as shown in Figure
+In this paper we address this question by proposing an active learning framework as shown in Fig.
 \ref{fig:howto} to automatically extract timed connector models from blackbox implementations. 
 To achieve this goal, we first introduce \emph{parameterized Mealy machine} as a parameterized
 semantics for timed Reo connectors, which can be transformed to concrete Mealy machines with a
@@ -178,7 +178,7 @@ channel ends dispense data out of the channel.
   \label{fig:basic}
 \end{figure}
 
-Figure \ref{fig:basic} shows the graphical representation of some basic channel types in Reo, whose
+Fig. \ref{fig:basic} shows the graphical representation of some basic channel types in Reo, whose
 behavior are described as follows:
 
 \begin{itemize}
@@ -203,7 +203,7 @@ behavior are described as follows:
 Channels are joint together in \emph{nodes}. There are three types of nodes:
 \emph{source}, \emph{sink} and \emph{mixed} nodes, depending on whether all channel ends that
 coincide on a node are source ends, sink ends or a combination of both.
-(see Figure \ref{fig:node})
+(see Fig. \ref{fig:node})
 
 \begin{figure}[ht]
   \begin{center}
@@ -227,9 +227,9 @@ from one of its coincident sink ends and replicates it into all of its coinciden
   \label{fig:reoconnector}
 \end{figure}
 
-Figure \ref{fig:reoconnector} provides a simple example to illustrate how complex
+Fig. \ref{fig:reoconnector} provides a simple example to illustrate how complex
 connectors are constructed and used in coordination. In this example, we have three components
-COM1,COM2 and MONITOR. With an \emph{alternator} connector as shown in Figure
+COM1,COM2 and MONITOR. With an \emph{alternator} connector as shown in Fig.
 \ref{fig:reoconnector}, MONITOR can obtain data items from COM1 and COM2 alternately. This example
 has been implemented in \texttt{Golang} as shown in Section \ref{sec:reolib}.
 Besides, all the connectors are supposed to have \emph{deterministic} behavior hereinafter to meet
@@ -286,7 +286,7 @@ accurate models with smaller dataset.
   \label{fig:activelearning}
 \end{figure}
 
-Figure \ref{fig:activelearning} shows the sketch of active learning, wherein:
+Fig. \ref{fig:activelearning} shows the sketch of active learning, wherein:
 \begin{itemize}
   \item[-] \emph{Teacher} and \emph{Student}: Active learning is an interactive process where
     students ask questions and teachers answer. Here learning algorithm plays the role of student.
@@ -320,7 +320,7 @@ interface, which is responsible for two types of queries.
     approximate results.
 \end{itemize}
 
-These queries are given by \emph{learning algorithms}, or so-called \emph{students} in Figure
+These queries are given by \emph{learning algorithms}, or so-called \emph{students} in Fig.
 \ref{fig:activelearning}. From the \emph{mq} results, a learning algorithm constructs a
 \emph{hypothesis} and then check it with \emph{eq}. If counter-examples are found, we turn back and
 repeat the hypothesis construction until the equivalence query returns \emph{true}.
@@ -492,7 +492,7 @@ to indicate that there is no constraint on channel end $A$.
   \end{itemize}
 \end{example}
 
-Besides, the concrete Mealy machine (where $\Sigma=\{d\}$) is shown in Figure \ref{fig:pmmfifo},
+Besides, the concrete Mealy machine (where $\Sigma=\{d\}$) is shown in Fig. \ref{fig:pmmfifo},
 where labels of edges are in form of $\frac{input}{output}$. All $\rblock$ edges are ignored for
 clearance.
 \begin{figure}[ht]
@@ -606,7 +606,7 @@ input of $\mathcal{PM}_2$. Timed action $T$ is only executed simultaneously betw
 and $\mathcal{PM}_2$.
 
 As mentioned above, we cannot connect a sink end of $\mathcal{PM}_2$ to a source end of
-$\mathcal{PM}_1$, which makes it difficult to construct connectors like alternator in Figure
+$\mathcal{PM}_1$, which makes it difficult to construct connectors like alternator in Fig.
 \ref{fig:reoconnector}. To solve the problem, we define a \emph{link} operator to connect sink
 ends and source ends in the same connector.
 
@@ -696,10 +696,10 @@ sequence $acc(s,D)$ of $s$ is defined as the shortest sequence in $\{s'\in\mathc
 s\}$\footnote{When there are multiple satisfying sequences with the same length, we use a certain tactic
 to pick up one from them determinstically.}.
 
-Formally, an observation table (see Figure \ref{fig:hypo} as an example) is determined by a tuple $(S,D)$ where
+Formally, an observation table (see Fig. \ref{fig:hypo} as an example) is determined by a tuple $(S,D)$ where
 $S\subset\mathcal{I}^*$ is a set of the access sequences of states and $D\subset\mathcal{I}^*$
 is a set of suffixes. In such tables, columns are labelled with suffixes in $D$, and rows are
-labelled with input sequences. As shown in Figure \ref{fig:hypo}, rows are divided into two parts. The upper
+labelled with input sequences. As shown in Fig. \ref{fig:hypo}, rows are divided into two parts. The upper
 part, labelled with access sequence $s\in S$, denotes the states covered in the current hypothesis.
 The lower part, labelled with sequences in $\{sa|s\in S,a\in\mathcal{I}\}\backslash S$ (representing
 any potentially unclosed transition) denotes all the transitions outside $s\in S$. A cell with row
@@ -748,7 +748,7 @@ Firstly, $obs.S$ is initialized with the initial state (denoted by $\varepsilon$
 initialized with all one-step suffixes.
 Then we explore all the access sequences in $obs.S$ and calculate its successors. Here
 $unclosed$ consists of access sequences that has no equivalent sequence in $obs.S$. 
-For example, Figure \ref{fig:hypo} shows the $obs$ of a 2-Timer channel after the first
+For example, Fig. \ref{fig:hypo} shows the $obs$ of a 2-Timer channel after the first
 iteration. The five successors of $\varepsilon$ are presented at the bottom of the table, where
 four are equivalent with $\varepsilon$ but $(a,\rnoread)$ is not. Therefore, we take $(a,\rnoread)$ as a
 brand-new state and all of its successors need further exploration. 
@@ -806,12 +806,12 @@ self-loop.
       \end{array}
     \end{displaymath}
   \end{center}
-  \caption{A Closed Version of Figure \ref{fig:hypo}}
+  \caption{A Closed Version of Fig. \ref{fig:hypo}}
   \label{fig:hypo2}
 \end{figure}
 
 \subsection{Counter Examples' Analysis} 
-Apparently, the closed hypothesis presented in Figure \ref{fig:hypo2} is different with the 2-Timer
+Apparently, the closed hypothesis presented in Fig. \ref{fig:hypo2} is different with the 2-Timer
 channel. It's easy to find a counter-example $s_0=(a,\rnoread),T,T,(\bot,\rread)$ where $mq(s_0)=a$ while
 according to the hypothesis, the result should be $\rempty$. In this section, we show how to
 find and analyze counter-examples using the method in \cite{DBLP:conf/sfm/SteffenHM11}. 
@@ -893,7 +893,7 @@ item would be dropped if no read operation comes within $n$ time units.
   \label{fig:expfifosemantics}
 \end{figure}
 
-Figure \ref{fig:expfifosemantics} shows the learning result of this example where $n=2$ and
+Fig. \ref{fig:expfifosemantics} shows the learning result of this example where $n=2$ and
 $\Sigma=\{a\}$.
 To simplify the graph, we ignore all the trivial transitions $\frac{(\bot,\rnoread)}{\rempty}$
 and block transitions. More details of this case can be found in our \emph{github repo}.
@@ -959,7 +959,7 @@ can be found in Table \ref{tabel:cacheoptimization}.
 
 Our implementation in \texttt{Golang} is well-prepared not only for academic use
 but also for practical concurrent programming. The following code shows how to construct an alternator
-connector (see Figure \ref{fig:reoconnector}) in \texttt{Golang}. An intact version of this example
+connector (see Fig. \ref{fig:reoconnector}) in \texttt{Golang}. An intact version of this example
 can be found in our github repo.
 
 \begin{lstlisting}
