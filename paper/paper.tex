@@ -193,9 +193,11 @@ behavior are described as follows:
     data item whenever the buffer is empty. 
   \item [-] A t-timer channel accepts any data item from its source end, and later dispense it to
     its sink end after a delay of $t$ time units.
-    \footnote{Here the interpretation of t-Timer is a bit different as in other works like
-    \cite{DBLP:conf/sefm/ArbabBBR04, DBLP:conf/tase/Meng12}, but we can easily transform between the
-    two kinds of behavior by composing with some other basic channels.}
+    \begin{footnote}
+      Here the interpretation of t-Timer is a bit different as in other works like
+      \cite{DBLP:conf/sefm/ArbabBBR04, DBLP:conf/tase/Meng12}, but we can easily transform between the
+      two kinds of behavior by composing with some other basic channels.
+    \end{footnote}
 \end{itemize}
 
 Channels are joint together in \emph{nodes}. There are three types of nodes:
@@ -809,30 +811,35 @@ self-loop.
   \label{fig:hypo2}
 \end{figure}
 
-\subsection{Counter-Examples' Analysis} 
-Apparently, the closed hypothesis presented in Figure \ref{fig:hypo2} is not the 2-Timer
+\subsection{Counter Examples' Analysis} 
+Apparently, the closed hypothesis presented in Figure \ref{fig:hypo2} is different with the 2-Timer
 channel. It's easy to find a counter-example $s_0=a,\rnoread-T-T-\bot,\rread$ where $mq(s)=a$ while
-according to the hypothesis, the result shoud have been $\rempty$. In this section, we show how to
+according to the hypothesis, the result should be $\rempty$. In this section, we show how to
 find and analyze counter-examples using the method in \cite{DBLP:conf/sfm/SteffenHM11}. 
 
-Firstly, we give a formal definition of \emph{counter-examples}. With a observation table $obs$ and
-a sequence $s$, we use $hq(obs,s)$ to denote the execution result of $obs$ under the input sequence
-$s$. Obviously we have $hq(obs,s) = mq(acc(s')a)$ where $a$ is the last element of $s$ and $s=s'a$.
+Firstly, we give a formal definition of \emph{counter examples}. With a observation table $obs$ and
+a sequence $s$, we use $hq(obs,s)$ to denote the execution result of its corresponding hypothesis
+$\mathcal{H}$ under the input sequence
+$s$. Obviously we have $hq(obs,s) = mq(acc(s')a)$ where $s=s'a,a\in\mathcal{I}$.
 
-\begin{definition}[Counter-Example]
-  sequence $s$ is called a counter-example of $obs$ iff $mq(s)\neq hq(obs,s)$.
+\begin{definition}[Counter Example]
+  an input sequence $s$ is a counter example of $obs$ iff $mq(s)\neq hq(obs,s)$.
 \end{definition}
 
 Now we consider the reason that lead to existance of counter examples. Since
-the suffix set $D$ is used to distinguish different states, the existance of counter-examples
-shows that the current suffix set $D$ is not powerful enough to distinguish all different states.
+the suffix set $D$ is used to distinguish states, the existance of counter-examples
+shows that the current suffix set $D$ is not powerful enough to recognize the uncovered states in
+$next$ (see in Algorithm \ref{alg:buildtable}).
 
-Considering a counter example $s$, we define the function MaxSuffix($s,obs$) as
+Considering a counter example $s$, we need a new suffix to distinguish the uncovered states, which
+can be calculated by Suffix($s,obs$):
 \[
 \max\{d\in\mathcal{I}^+|s=s'd, mq(acc(s',obs.D)d)\neq mq(s)\}
 \]
-After appending $d$ in $D$, we can rebuild a closed hypothesis where $s$ is no longer a
-counter-example.
+After appending $d$ in $D$, we can prove that at least one new state will be found.
+
+\begin{theorem}
+\end{theorem}
 
 The whole L* algorithm can be concluded as follows.
 \begin{algorithm} 
@@ -843,10 +850,10 @@ The whole L* algorithm can be concluded as follows.
   $obs.S$ initialized as empty\;
   $obs.D$ initialized as $\{\{i\}|i\in\mathcal{I}\}$\;
   \Repeat{$ce=true$}{
-    $obs$ = CloseTable($mq$, $\mathcal{I}$, $D$)\;
+    $obs$ = CloseTable($mq$, $\mathcal{I}$, $obs$)\;
     $ce=eq(obs)$\;
-    \If {$ce!=true$} {
-      D.append(MaxSuffix(s))\;
+    \If {$ce\neq true$} {
+      D.append(Suffix(s))\;
     }
   }
   \Return $obs$\; 
