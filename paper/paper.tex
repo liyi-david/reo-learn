@@ -36,7 +36,7 @@
 % some tikz-styles on reo channels, not required in papers that have nothing to do with Reo
 
 % finally no todos should exist in this draft
-\usepackage[textsize=tiny]{todonotes}
+% \usepackage[textsize=tiny]{todonotes}
 
 % -------------------------------------- configurations -----------------------------------------
 % declaration of environments
@@ -84,7 +84,7 @@ liyi\_math@pku.edu.cn, yiwuwang@126.com, summeng@math.pku.edu.cn
   constructed by joining basic channels and the PMM of connectors can be transformed into Mealy
   machines. Moreover, we adapt L*, a well-known learning algorithm, to timed connectors (in the form
   of Mealy machines). The new algorithm has shown its efficiency in multiple case studies. 
-  This framework has been implemented as a package in \texttt{Golang}.
+  This framework has been implemented in \texttt{Golang}.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -118,7 +118,7 @@ question faced by most of them: \emph{how to obtain the formal models?}
 \emph{Correctness} of connectors is closely related to some low-level implementation details.
 For example, well-written code may behave dramatically weird with an improper set of concurrency
 primitives. Such scenarios happen frequently in embedded systems with different hardware platforms or
-operating systems. Consequently, manually extracting a proper model for an existing connector
+operating systems. Consequently, manually extracting a proper model from an existing connector
 implementation seems rather unreliable, even with reference to its source code.
 
 As a branch of \emph{machine learning} technique, active learning offers a means to obtain
@@ -244,7 +244,8 @@ the current inputs. Besides, Mealy machines are supposed to be \emph{input enabl
 that all possible inputs should be acceptable in all states. In other words, if an input is invalid
 for some state, we need to manually define an additional state to describe such exceptions.
 
-Various forms of Mealy machines have been defined in the literature. 
+Various forms of Mealy machines have been defined in the
+literature\cite{George1955A,DBLP:journals/jcss/Broy14,DBLP:conf/sfm/SteffenHM11}. 
 Since active automata learning requires the system-under-learn to be deterministic, in
 this paper we take the deterministic Mealy machine model as defined in 
 \cite{DBLP:conf/sfm/SteffenHM11}. 
@@ -253,7 +254,7 @@ this paper we take the deterministic Mealy machine model as defined in
   A Mealy machine is a 6-tuple $(S, s_0, I, O, \delta, \lambda)$ consisting of:
   \begin{itemize}
     \item[-] a finite set of states $S$
-    \item[-] an initial $s_0\in S$
+    \item[-] an initial state $s_0\in S$
     \item[-] a finite set of inputs $I$
     \item[-] a finite set of outputs $O$
     \item[-] an output function $\delta : S \times  I \rightarrow O$ mapping a pair
@@ -325,8 +326,10 @@ repeat the hypothesis construction until the equivalence query returns \emph{tru
 More details on the active automata learning algorithm will be presented in Section
 \ref{sec:activelearning}. 
 
+
 \section{Timed Connectors as Mealy Machines}
 \label{sec:semantics}
+
 In this section, we illustrate how to transform a timed connector into a Mealy machine with timed
 action.
 Since time is not involved in original Mealy machine, we first discuss how to formalize the time
@@ -649,9 +652,9 @@ ends and source ends in the same connector.
   \end{itemize}
 \end{definition}
 
-With \emph{link} and \emph{prop} defined, a connector can be formed by simpler ones in
-form of \emph{parameterized Mealy machines}. It will be transformed into a concrete Mealy machine
-later, once the alphabet $\Sigma$ is provided.
+With \emph{link} and \emph{prop} defined, connectors can be constructed by simpler ones in
+form of PMMs. It will be transformed into a concrete Mealy machine later, once the alphabet $\Sigma$
+is provided.
 
 \section{From Blackbox to Timed Connectors} 
 \label{sec:activelearning}
@@ -663,39 +666,40 @@ and the blackbox implementation is supposed to be equivalent to a Mealy machine 
 reachable.
 
 \subsection{Observation Table}
-\emph{Observation Tables}, proposed in \cite{DBLP:journals/iandc/Angluin87}, is used to construct
-a hypothetical Mealy machine from the results of membership queries.
+\emph{Observation Tables}, proposed in \cite{DBLP:journals/iandc/Angluin87}, are used to construct
+hypothetical Mealy machines from the results of membership queries.
 
-Generally, a Mealy machines is determined by its \emph{states} and \emph{transitions}.
+Mealy machines are composed of \emph{states} and \emph{transitions}.
 As for blackboxes, input sequence $s\in\mathcal{I}^*$ can be used to denote its state 
-after execution of $s$. Similarly, for all $a\in\mathcal{I}$, $sa$ indicates the successor
-state of $s$ after execution of $a$.
-However, under such notations, there are \emph{infinite} number of states where most are
+after executing $s$. Similarly, for all $a\in\mathcal{I}$, we use $sa$ to denote the successor
+state of $s$ after executing $a$.
+However, under such notations, there are \emph{infinite} number of states, among which most are
 reduplicate.
 
 States are distinguished, usually, by their \emph{subsequent behavior}. Suppose $s_1\neq s_2\in
-\mathcal{I}^*$, the corresponding of $s_1$ and $s_2$ are exactly the same iff $\forall d\in
+\mathcal{I}^*$, we say the corresponding of states $s_1$ and $s_2$ are equivalent iff $\forall d\in
 \mathcal{I}^+. mq(s_1d)=mq(s_2d)$. Since we can never check it on every $d\in\mathcal{I}^+$, an
 alternative way is to use a set of \emph{suffixes} to distinguish them approximately.
 \begin{definition}[$D$-Equivalence]
-  provided with two access sequences $s_1,s_2$ and a set of suffixes $D\subset\mathcal{I}^+$, we say
-  the corresponding states of $s_1$ and $s_2$ are $D$-equivalent (denoted as $s_1\sim_D s_2$)
-  iff $\forall d\in D, mq(s_1d) = mq(s_2d)$.
-\end{definition}
-\begin{definition}[Access Sequence]
-  Given an input sequence $s$, we define the access sequence of $s$ as
-  \[
-  acc(s,D)=\min\{s'\in\mathcal{I}^*|s'\sim_D s\}
-  \]
+  provided with a set of suffixes $D\subset\mathcal{I}^+$, we say the corresponding states of
+  $s_1,s_2\in\mathcal{I}^*$ are $D$-equivalent (denoted as $s_1\sim_D s_2$)
+  iff $mq(s_1d) = mq(s_2d)$ for all $d\in D$.
 \end{definition}
 
-Formally, an observation table is defined as a tuple $(S,D)$ where $S\subset\mathcal{I}^*$ indicates
-the access sequences of states and $D\subset\mathcal{I}^*$ indicates the suffixes. Its
-tabular form can be found in Figure \ref{fig:hypo}. In such tables, columns are labelled with
-$d\in D$, and rows are labelled with input sequences. Rows are divided into two parts. The upper
-part, labelled with $s\in S$, shows the states in current hypothesis (in form of access sequences).
-The lower part, labelled with $sa$ (where $s\in S,a\in\mathcal{I}$) indicates all the transitions
-from $S$. A cell with row label $s$ and column label $d$ is filled with $mq(sd)$.
+Now we use \emph{access sequence} to describe the states. Given an input sequence $s$, the access
+sequence of $s$ is defined as
+\[
+acc(s,D)=\min\{s'\in\mathcal{I}^*|s'\sim_D s\}
+\]
+
+Formally, an observation table (see in Figure \ref{fig:hypo}) is determined by a tuple $(S,D)$ where
+$S\subset\mathcal{I}^*$ is a set of the access sequences of states and $D\subset\mathcal{I}^*$
+is a set of suffixes. In such tables, columns are labelled with suffixes in $D$, and rows are
+labelled with input sequences. As shown in the example, rows are divided into two parts. The upper
+part, labelled with access sequence $s\in S$, denotes the states covered in the current hypothesis.
+The lower part, labelled with sequences in $\{sa|s\in S,a\in\mathcal{I}\}\backslash S$ (representing
+any potentially unclosed transition) denotes all the transitions outside $s\in S$. A cell with row
+label $s$ and column label $d$ is filled with $mq(sd)$.
 
 An observation table $(S,D)$ is \emph{closed} if 
 \[
@@ -710,9 +714,8 @@ constructed from $obs$ as follows:
   \item[-] $s_0$ corresponds to the empty sequence $\varepsilon$
     
     \emph{(we use input sequences to indicate their corresponding states in following parts)}
-    \todo{define the empty sequence}
   \item[-] $\delta(s,a)=mq(sa)$
-  \item[-] $\lambda(s,a)=acc(sa,obs.D)$
+  \item[-] $\lambda(s,a)=acc(sa,obs.D)$. Since $obs$ is closed, we always have $\lambda(s,a)\in S$.
 \end{itemize}
 
 Algorithm \ref{alg:buildtable} shows how to build an closed observation table.
@@ -721,15 +724,13 @@ Algorithm \ref{alg:buildtable} shows how to build an closed observation table.
   \caption{CloseTable} 
   \label{alg:buildtable}
   \small
-  \KwIn{Oracle interface $mq$, Input actions $\mathcal{I}$, suffix set $D$}
-  \KwOut{Observation table $obs$} 
-  $obs$ initialized as empty\;
-  $unclosed=\{\varepsilon\}$\;
+  \KwIn{An oracle interface $mq$, An input actions $\mathcal{I}$, An observation table $obs$}
+  \KwOut{A closed observation table $obs$} 
   \Repeat{$unclosed=\varnothing$}
   {
-    $next=\{st|\forall s\in unclosed,\forall t\in \mathcal{I}\}$\;
-    append $unclosed$ to $obs$\;
-    $unclosed=\{seq\in next|\forall a\in obs, seq \not\sim_D a\}$\;
+    $next=\{st|\forall s\in obs.S,\forall t\in \mathcal{I}\}\backslash obs.S$\;
+    $unclosed=\{seq\in next|\forall a\in obs.S, seq \not\sim_{obs.D} a\}$\;
+    $obs.S$ = $obs.S\cup unclosed$\;
   }
   \Return $obs$\; 
 \end{algorithm}
@@ -739,9 +740,10 @@ We assume that the source end of this 2-Timer channel is $A$, the sink end is $B
 is $\{a\}$. We briefly denote $\{A:a,B:\rnoread\}$ and other input/output actions in form of
 $a,\rnoread$.
 
-Firstly, $obs$ is initialized as empty and the empty sequence $\varepsilon$ is pushed in $unclosed$.
-Then we will explore all the access sequences in $unclosed$ and calculate its successors. Here the
-$unclosed$ set consists of access sequences that has no equivalent fellow in $S$. 
+Firstly, $obs.S$ is initialized with the initial state (denoted by $\varepsilon$), and $obs.D$ is
+initialized with all one-step suffixes.
+Then we will explore all the access sequences in $obs.S$ and calculate its successors. Here the
+$unclosed$ set consists of access sequences that has no equivalent fellow in $obs.S$. 
 For example, figure \ref{fig:hypo} shows the $obs$ of a 2-Timer channel after the first
 iteration. The five successors of $\varepsilon$ is presented as the bottom part of the table, where
 four are equivalent with $\varepsilon$ but $a,\rnoread$ is not. Therefore, we take $a,\rnoread$ as a
@@ -772,8 +774,8 @@ machine presented in the following figure).
   \label{fig:hypo}
 \end{figure}
 
-In the second iteration, we explore the successors of $a,\rnoread$. Fortunately we find that every
-successor has a shorted equivalence fellow (\emph{itself}). Consequently, the algorithm terminates
+In the second iteration, we explore the successors of $a,\rnoread$. Fortunately, now every
+successor has a equivalence fellow in $obs.S$ (\emph{itself}). Consequently, the algorithm terminates
 with a closed hypothesis where all the unclosed edge shown in Figure \ref{fig:hypo} turn into
 self-loop.
 
@@ -838,7 +840,8 @@ The whole L* algorithm can be concluded as follows.
   \label{alg:lstar}
   \KwIn{Oracle interface $mq,eq$, Input actions $\mathcal{I}$}
   \KwOut{Observation table $obs$} 
-  $D=I$\;
+  $obs.S$ initialized as empty\;
+  $obs.D$ initialized as $\{\{i\}|i\in\mathcal{I}\}$\;
   \Repeat{$ce=true$}{
     $obs$ = CloseTable($mq$, $\mathcal{I}$, $D$)\;
     $ce=eq(obs)$\;
@@ -989,18 +992,18 @@ items from the sink end C and print them on the screen. Finally, we have an inte
 ``MSG\_A'' and ``MSG\_B''.
  
 \section{Conclusion and Future Work}
-In this paper, we come up with an approach to learn timed connectors from blackboxes. We define
-the \emph{parameterized Mealy machine} to serve as an operational semantics of Reo. Then we
-describe a set of basic channels with parameterized Mealy machine, which can be used to construct
-complex connectors by means of the production operator and link operator.
-Besides, we show that every connector can be transformed into a Mealy
-machine with time action T, and such Mealy machines can be extracted by an improved version of
-well-knwon active learning algorithm L*.
+In this paper, we come up with an approach to extract timed connectors from blackbox
+implementations. We propose \emph{parameterized Mealy machine} to describe the behavior of Reo
+connectors. Then we define the product operator and link operator, which can be used to
+construct complex connectors from simpler ones.
+Besides, we show how PMMs behave as the bridge between Reo connectors and concrete Mealy
+machines with timed action T provided. 
 
-The original L* algorithm run into the bottleneck when time is involved. By a tree-style cache, we
-make significant reduction on membership queries and, in turn, improve the performance of learning
-algorithm. As a by-product, we also encapsulate the Reo connector as a distributable package which
-could contribute to concurrent programming.
+We also adapt the well-knwon active learning algorithm L* to deal with time domain.
+When time is taken into consideration, the original L* algorithm run into the bottleneck.
+By a tree-style cache, we make significant reduction on membership queries and, in turn,
+improve the performance of learning algorithm. As a by-product, we also encapsulate the Reo
+connector as a distributable package which could contribute to concurrent programming.
 
 Our future works would mainly focus on better support of dense time. To describe dense
 time behavior, the Mealy machine model needs a lot of changes instead of a simple T action. Besides,
