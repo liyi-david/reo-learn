@@ -6,10 +6,10 @@
   
   \fifoe{(P-A)}{(P-B)}{}
 
-  \tikzstyle{every state}=[fill=black,draw=none,text=white,font=\small]
-  \tikzstyle{red}=[fill=red]
+  \tikzstyle{every state}=[fill=white,text=black,font=\small]
+  \tikzstyle{init}=[fill=gray,draw=none,text=white]
 
-  \node[initial,state] (Q0)                     {$q_{0}$};
+  \node[initial,state,init] (Q0)                     {$q_{0}$};
   \node[state]         (QA)  [right = of Q0]    {$q_{d}$};
 
   \path
