@@ -1,0 +1,32 @@
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.6cm,
+  semithick]
+  \tikzstyle{every node}=[font=\small]
+
+  % draw the alternator
+  \ionode{(P-A)}{(0,0)}{}
+  \ionode{(P-B)}{(0,-1.5)}{}
+  \ionode{(P-C)}{(1.5,0)}{}
+
+  \sync{(P-A)}{(P-C)}{}
+  \fifoe{(P-B)}{(P-C)}{}
+  \syncdrain{(P-A)}{(P-B)}{}
+
+  % draw the coordination
+  \ionode{(C-A)}{(4.5,-0.3)}{}
+  \ionode{(C-B)}{(4.5,-1.3)}{}
+  \ionode{(C-C)}{(5.5,-0.3)}{}
+
+  \sync{(C-A)}{(C-C)}{}
+  \fifoe{(C-B)}{(C-C)}{}
+  \syncdrain{(C-A)}{(C-B)}{}
+
+  \node (COM1) at (3.5, 0) {COM1};
+  \node (COM2) at (3.5, -1.5) {COM2};
+  \node (MONI) at (6.8, 0) {MONITOR};
+  \sync{(COM1)}{(C-A)}{}
+  \sync{(COM2)}{(C-B)}{}
+  \sync{(C-C)}{(MONI)}{}
+
+  \sync{(2.2,-0.7)}{(2.8,-0.7)}{}
+
+\end{tikzpicture}

@@ -1,0 +1,24 @@
+\begin{tikzpicture}
+  \tikzset{every node} = [font=\small]
+
+  \ionode{(P-A)}{(0,0)}{node [above left] {A}}
+  \ionode{(P-B)}{(5,0)}{node [above right] {B}}
+  \mixednode{(P-C)}{(1,0)}{}
+  \mixednode{(P-D)}{(3,0)}{}
+  \mixednode{(P-E)}{(4,0)}{}
+  \mixednode{(P-F)}{(1,-1)}{}
+  \mixednode{(P-G)}{(2,-1)}{}
+  \mixednode{(P-H)}{(3,-1)}{}
+
+  \fifoe{(P-C)}{(P-D)}{}
+  \syncdrain{(P-D)}{(P-H)}{}
+  \sync{(P-A)}{(P-C)}{}
+  \sync{(P-C)}{(P-F)}{}
+  \sync{(P-D)}{(P-E)}{}
+  \sync{(P-E)}{(P-B)}{}
+  \sync{(P-E)}{(P-H)}{}
+  \lossysync{(P-G)}{(P-H)}{}
+
+  \timer{(P-F)}{(P-G)}{node [above] {n}}
+
+\end{tikzpicture}

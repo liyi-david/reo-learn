@@ -1,0 +1,25 @@
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.9cm,
+  semithick]
+  \tikzstyle{initial}=[fill=gray,text=white]
+  \tikzstyle{every node}=[font=\small]
+  \tikzstyle{nodraw}=[draw=none]
+
+  \node[initial,state, nodraw] (Q0) at (0,1)   {$q_0$};
+  \node[state]         (Q1) at (6,0)   {$q_1$};
+  \node[state]         (Q2) at (2,0)  {$q_2$};
+  \node[state]         (Q3) at (4,0)   {$q_3$};
+  \node[state]         (Q4) at (0,-1)  {$q_4$};
+  
+  \path
+  (Q0) edge [bend left]  node         {$\frac{(a,\rnoread)}{\rempty}$} (Q1)
+  (Q0) edge              node [left]  {$\frac{(a,\rread)}{a}$} (Q4)
+  (Q0) edge [loop left]  node         {$\frac{(\bot,\rnoread)/T}{\rempty}$} (Q0)
+  (Q1) edge              node         {$\frac{T}{\rempty}$} (Q3)
+  (Q1) edge [bend left]  node         {$\frac{(\bot,\rread)}{a}$} (Q4)
+  (Q2) edge              node [above] {$\frac{T}{\rempty}$} (Q0)
+  (Q3) edge              node         {$\frac{(\bot,\rread)}{a}$} (Q2)
+  (Q3) edge [bend right] node         {$\frac{T}{\rempty}$} (Q0)
+  (Q4) edge              node         {$\frac{T}{\rempty}$} (Q2)
+  ;
+\end{tikzpicture}
+

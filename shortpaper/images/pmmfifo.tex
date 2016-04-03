@@ -1,0 +1,25 @@
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.6cm,
+  semithick]
+  \tikzstyle{every node}=[font=\small]
+  \ionode{(P-A)}{(-4,0)}{(-4,0.5) node {$A$}}
+  \ionode{(P-B)}{(-2,0)}{(-2, 0.5) node {$B$}}
+  
+  \fifoe{(P-A)}{(P-B)}{}
+
+  \tikzstyle{every state}=[fill=white,text=black,font=\small]
+  \tikzstyle{init}=[fill=gray,draw=none,text=white]
+
+  \node[initial,state,init] (Q0)                     {$q_{0}$};
+  \node[state]         (QA)  [right = of Q0]    {$q_{d}$};
+
+  \path
+  (Q0)
+  edge  [bend left]     node {$\frac{\{A\mapsto d, B\mapsto \rnoread\}}{\varnothing}$} (QA)
+  edge  [loop below]    node {$\frac{\{A\mapsto \bot, B\mapsto \rread\}}{\varnothing}$} (QA)
+  edge  [loop above]    node {$\frac{\{A\mapsto d, B\mapsto \rread\}}{\{B\mapsto d\}}$} (QA)
+  (QA)
+  edge  [bend left]     node {$\frac{\{A\mapsto \bot,B\mapsto \rread\}}{\{B\mapsto d\}}$} (Q0)
+  edge  [loop right]    node {$\frac{\{A\mapsto d,B\mapsto \rread\}}{\{B\mapsto d\}}$} (QA)
+  ;
+\end{tikzpicture}
+

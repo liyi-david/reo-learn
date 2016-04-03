@@ -1,0 +1,43 @@
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.9cm,
+                    semithick]
+  \tikzstyle{every state}=[fill=black,draw=none,text=white,font=\small]
+  \tikzstyle{red}=[fill=red]
+
+  \node[initial,state] (Q000)                    {$q_{000}$};
+  \node[state,red]         (Q001) [right of=Q000] {$q_{001}$};
+  \node[state,red]         (Q011) [right of=Q001] {$q_{011}$};
+  \node[state]         (Q111) [right of=Q011] {$q_{111}$};
+
+  \path (Q000) edge  [bend left]   node {$\frac{\{A\}}{\varnothing}$} (Q001)
+               edge  [loop below]  node {$\frac{\varnothing}{\varnothing}$} (Q001)
+               edge  [loop above]  node {$
+                                     \frac{\{B\}}{\{\overline{B}\}}/
+                                     \frac{\{A,B\}}{\{A\}}
+                                   $} (Q000)
+        (Q001) edge  [bend left]   node {$\frac{\{B\}}{\{A\}}$} (Q000)
+               edge  [loop below]  node {$\frac{\varnothing}{\varnothing}$} (Q001)
+               edge  [loop above]  node {$
+                                     \frac{\{A,B\}}{\{A\}}
+                                   $} (Q001)
+               edge  [bend left]   node {$\frac{\{A\}}{\{\varnothing\}}$} (Q011)
+        (Q011) edge  [bend left]   node {$\frac{\{B\}}{\{A\}}$} (Q001)
+               edge  [loop below]  node {$\frac{\varnothing}{\varnothing}$} (Q011)
+               edge  [loop above]  node {$
+                                     \frac{\{A,B\}}{\{A\}}
+                                   $} (Q011)
+               edge  [bend left]   node {$\frac{\{A\}}{\{\varnothing\}}$} (Q111)
+        (Q111) edge  [bend left]   node {$\frac{\{B\}}{\{A\}}$} (Q011)
+               edge  [loop below]  node {$\frac{\varnothing}{\varnothing}$} (Q111)
+               edge  [loop above]  node {$
+                                     \frac{\{A,B\}}{\{A\}}/
+                                     \frac{\{A\}}{\{\overline{A}\}}
+                                   $} (Q111)
+        %(B) edge [loop above] node {1,1,L} (B)
+            %edge              node {0,1,L} (C)
+        %(C) edge              node {0,1,L} (D)
+            %edge [bend left]  node {1,0,R} (E)
+        %(D) edge [loop below] node {1,1,R} (D)
+            %edge              node {0,1,R} (A)
+  ;
+\end{tikzpicture}
+
