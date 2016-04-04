@@ -37,6 +37,8 @@
 
 % finally no todos should exist in this draft
 \usepackage[textsize=tiny]{todonotes}
+\usepackage{xcolor}
+\newcommand{\liyi}[1]{\textcolor{red}{Liyi: {#1}}}
 
 % -------------------------------------- configurations -----------------------------------------
 % declaration of environments
@@ -105,12 +107,17 @@ Reo}\cite{DBLP:conf/sefm/ArbabBBR04,DBLP:conf/tase/Meng12} is used in this paper
 connectors in DRES. 
 Reo is a channel based exogenous coordination language proposed by F. Arbab in
 \cite{DBLP:journals/mscs/Arbab04}, which is a powerful ``glue language'' in component-based
-development\cite{DBLP:journals/sigsoft/Gill03}. What's more, 
-Formal verification and validation techniques have also been proved applicable for timed connectors, 
-e.g. a comformance testing framework on timed connectors has been proposed in \cite{DBLP:conf/tase/LiCWS15}.
-A SAT-based bounded model checking approach was adapted in \cite{DBLP:journals/scp/Kemper12} for
-verifying connectors.
+development\cite{DBLP:journals/sigsoft/Gill03}. 
+\begin{figure}[ht]
+  \begin{center}
+    \input{./images/basic.tex}
+  \end{center}
+  \caption{Basic Reo Channels}
+  \label{fig:basic}
+\end{figure}
 
+Formal verification and validation techniques have also been proved applicable for timed connectors
+\cite{DBLP:conf/tase/LiCWS15,DBLP:journals/scp/Kemper12} 
 However, most of these tools heavily rely on manually modelling.
 \emph{Correctness} of connectors is closely related to some low-level implementation details.
 For example, well-written code may behave dramatically weird with an improper set of concurrency
@@ -118,34 +125,32 @@ primitives. Such scenarios happen frequently in embedded systems with different 
 operating systems. Consequently, manually extracting a proper model from an existing connector
 implementation seems rather unreliable, even with reference to its source code.
 
-In this paper we address this question by means of active learning \cite{de2010grammatical,
-DBLP:journals/iandc/Angluin87, DBLP:conf/fase/RaffeltS06}.
+In this paper we address this question by means of active learning
+\cite{DBLP:journals/iandc/Angluin87, DBLP:conf/fase/RaffeltS06}.
 First of all, we introduce \emph{parameterized Mealy machine} as a parameterized
 semantics for timed Reo, which can be transformed to concrete Mealy machines with a
 specified alphabet. Then the $L*$ algorithm \cite{DBLP:journals/iandc/Angluin87} is adapted and
 optimized to extract Mealy machines with timed action from the connector implementations as
 blackboxes. 
 
-The rest of the paper is organized as follows: In Section
-Section \ref{sec:semantics}, we defines an
+The rest of the paper is organized as follows: In Section \ref{sec:semantics}, we defines an
 operational semantics of Reo, which is used in Section \ref{sec:activelearning} to show how to
 extract Reo models from blackboxes by means of active learning. In Section
 \ref{sec:experiment}, we discuss the implementation and optimization of the approach. 
 Finally, Section VI concludes the paper. Due to the limit of space, many technical details are
 omitted in this paper.
-Please refer to \todo{github repo} for further contents.
+Please refer to \cite{reo-learn-github} for further contents.
 
 
 \section{Timed Connectors as Mealy Machines}
 \label{sec:semantics}
 
-In this section, we illustrate how to transform a timed connector into a Mealy machine with timed
-action.
-Since time is not involved in original Mealy machine, we first discuss how to formalize the time
-dimension in Mealy machine. After that, we present the notion of \emph{parameterized Mealy
-machine} as a bridge between connectors and Mealy machines.
-
-\todo{time domain?}
+In this section, we introduce PMM as an intermediate form to transform timed connectors into
+Mealy machines with timed action. In this paper, we assume that time dimension is defined on the
+national number $\mathbb{Q}$, which is generally as expressive as $\mathbb{R}$ and much easier to
+formalize\cite{DBLP:journals/fmsd/PrabhakarDM015}. Since connectors contain only finite number of
+channels, we can always find a minimal time unit (denoted as $T$) where real-time connectors can be
+discretized.
 
 %\subsection{Time Domain}
 %Time has been investigated in several extensions of Reo. For example, timed
@@ -176,12 +181,10 @@ machine} as a bridge between connectors and Mealy machines.
 %transition will take one time unit to finish.
 
 \subsection{Parameterized Mealy Machine}
-We present a model named \emph{parameterized Mealy machine} to model timed connectors. PMM is
-supposed to behave as a bridge between Mealy machines and timed connectors. Connectors are firstly
-defined as PMMs, and composed by \emph{product} and \emph{link} operators. Then, concrete
-Mealy-machine model can be generated from the PMM model.
-Following the formal definition of Mealy machine in Section \ref{sec:preliminaries}, we define the
-\emph{parameterized Mealy machine} as follows. 
+In this work, we use \emph{Mealy machines} to model Reo connectors.
+Mealy machine is an extension of finite state machine to model reactive systems.
+Following its definition in \cite{DBLP:conf/sfm/SteffenHM11}, we present a model here named
+\emph{parameterized Mealy machine} to formalize timed connectors.
 
 \begin{definition}[Parameterized Mealy Machine]
   A \emph{Parameterized Mealy Machine} with a parameter $\Sigma$ is defined as a 6-tuple
@@ -204,27 +207,23 @@ Following the formal definition of Mealy machine in Section \ref{sec:preliminari
 
 In the definition above, \emph{Input} and \emph{Output} are used to generate the set of input actions
 and output actions from the corresponding alphabets and source/sink ends. $Input(\Sigma,I,O)$ is
-defined as a set of functions on $I\cup O$ and an additional \emph{time action} T,  
-where for all $f\in Input(\Sigma,I,O)\backslash \{T\}$ we have
+defined as the intersection of the set of input events $Evt_{in}$ and an additional \emph{time
+action} T. Here every $in\in Evt_{in}$ is an evaluation on both sink and source ends and
 \[
-\forall i\in I.f(i)\in \Sigma\cup\{\bot\}\land \forall o\in O.f(o)\in\{\rread, \rnoread\}
+\forall i\in I.in(i)\in\Sigma\cup\{\rempty\}\land \forall o\in O.in(o)\in\{\rnoread, \rread\}
 \]
 where we use $\bot$ to indicate that there is \emph{no} data item on a channel end. 
 Besides, $\rread$ means that a sink end is ready for writing, $\rnoread$ otherwise. 
 In the same way,
-$Output(\Sigma,O)$ is defined as a set of functions on $O$, with an additional symbol
-$\rblock$ indicating an input failure. Similarly, for all $f\in
-Output(\Sigma,O)\backslash\{\rblock\}$,
-\[
-\forall o\in O. f(o)\in \Sigma\cup\{\bot\}
-\]
+$Output(\Sigma,O)$ is defined as a set of output events in form of evaluations on $O$, with an
+additional symbol $\rblock$ indicating an input failure.
 
-A non-timed input action $a\in Input(\Sigma,I,O)$ can be restricted to $I'\subseteq I$, denoted by
-$a\downarrow_{I'}$ which is defined on $Input(\Sigma,I',O)$ and satisfies
-\[
-\forall i\in I'. a\downarrow_{I'}(i)=a(i)
-\]
-Restriction on output actions can be defined similarly.
+%A non-timed input action $a\in Input(\Sigma,I,O)$ can be restricted to $I'\subseteq I$, denoted by
+%$a\downarrow_{I'}$ which is defined on $Input(\Sigma,I',O)$ and satisfies
+%\[
+%\forall i\in I'. a\downarrow_{I'}(i)=a(i)
+%\]
+%Restriction on output actions can be defined similarly.
 
 \begin{example}[Input and Output]
   If we have a simple alphabet with only one item $d_0$, a source-end named $A$, and a
@@ -236,14 +235,14 @@ Restriction on output actions can be defined similarly.
   \end{eqnarray*}
   and its output actions
   \[
-  Output(\{d_0\},\{A\},\{B\}) =\{\{B\mapsto d_0\},\{B\mapsto \bot\}, \rblock\}
+  Output(\{d_0\},\{A\},\{B\}) =\{\{B\mapsto d_0\},\varnothing, \rblock\}
   \]
 \end{example}
 
 We use $\varnothing$ to denote the empty output when no data item is written to any sink end.
-For example, in this case $\{B\mapsto\bot\}$ can be briefly denoted as $\rempty$.
+For example, in the above case $\varnothing$ is used to denote $\{B\mapsto\bot\}$.
 
-Parameterized Mealy machines can be seen as an abstraction of Mealy machines, and we
+Parameterized Mealy machines can be seen as an abstraction of Mealy machines, hence we
 still need a convert function between the two models.
 
 \begin{definition}[Concretize Mapping]
@@ -260,76 +259,10 @@ still need a convert function between the two models.
   \end{eqnarray*}
 \end{definition}
 
-Now we can use PMMs to specify timed Reo. Here we take the asynchronous channel (FIFO1), the
-synchronous channel (Sync) and the timed channel (Timer) as examples. For simplicity, we use $A=\_$
-to indicate that there is no constraint on channel end $A$.
-
-%\begin{example}[FIFO1]
-  %\label{example:pmmfifo}
-  %The PMM of a FIFO1 with source end $A$ and sink end $B$ can be defined as follows.
-  %\begin{itemize}
-    %\item[-] $S(\Sigma)=\{q_0\}\cup\{q_d|d\in\Sigma\}$
-    %\item[-] $I=\{A\}$, $O=\{B\}$, $s_0=q_0$
-    %\item[-] output function
-      %\begin{small}
-        %\begin{displaymath}
-          %\delta(\Sigma)(s,i)=\left\{
-          %\begin{array}[ht]{ll}
-            %\rempty & s=q_0\land i=\{A\mapsto\_,B\mapsto\rnoread\} \\
-            %\rblock & s=q_0\land i=\{A\mapsto d',B\mapsto\rread\} \\
-            %\rblock & s=q_0\land i=\{A\mapsto\bot,B\mapsto\rread\} \\
-            %\rempty & s=q_d\land i=\{A\mapsto\bot,B\mapsto\rnoread\} \\     
-            %\{B\mapsto d\} & s=q_d\land i=\{A\mapsto\_,B\mapsto\rread\}\\
-            %\rblock & s=q_d\land i=\{A\mapsto d',B\mapsto \rnoread\} \\
-          %\end{array}
-          %\right.
-        %\end{displaymath}
-      %\end{small}
-    %\item[-] transition function
-      %\begin{small}
-        %\begin{displaymath}
-          %\lambda(\Sigma)(s,i)=\left\{
-          %\begin{array}[ht]{ll}
-            %q_{d'} & s=q_0\land i=\{A\mapsto d',B\mapsto\_\} \\
-            %q_{d'} & s=q_{d}\land i=\{A\mapsto d',B\mapsto \rread\} \\
-            %q_{d} & s=q_{d}\land i=\{A\mapsto \_,B\mapsto \rnoread\} \\
-            %q_0 & otherwise \\
-          %\end{array}
-          %\right.
-        %\end{displaymath}
-      %\end{small}
-  %\end{itemize}
-%\end{example}
-
-%Besides, the concrete Mealy machine (where $\Sigma=\{d\}$) is shown in Fig. \ref{fig:pmmfifo},
-%where labels of edges are in form of $\frac{input}{output}$. All $\rblock$ edges are ignored for
-%clearance.
-%\begin{figure}[ht]
-  %\begin{center}
-    %\input{./images/pmmfifo.tex}
-  %\end{center}
-  %\caption{PMM-based Semantics of $\smap{FIFO1}_\Sigma$, where $\Sigma=\{d\}$}
-  %\label{fig:pmmfifo}
-%\end{figure}
-
-%\begin{example}[Sync]
-  %The PMM of a Sync with a source-end A and a sink-end B can be defined as:
-  %\begin{itemize}
-    %\item[-] $S(\Sigma)=\{q_0\}$, $I=\{A\}$, $O=\{B\}$, $s_0=q_0$
-    %\item[-] output function
-      %\begin{displaymath}
-        %\delta(\Sigma)(s,i)=\left\{
-        %\begin{array}[ht]{ll}
-          %\rempty & i=\{A\mapsto\bot,B\mapsto\rnoread\} \\
-          %\{B\mapsto d\} & i=\{A\mapsto d,B\mapsto\rread\}\\
-          %\rblock & i=\{A\mapsto\bot,B\mapsto\rread\} \\
-          %\rblock & i=\{A\mapsto d,B\mapsto\rnoread\} \\
-        %\end{array}
-        %\right.
-      %\end{displaymath}
-    %\item[-] transition function $\lambda(\Sigma)(s,i)=q_0$.
-  %\end{itemize}
-%\end{example}
+Now we can use PMMs to specify timed Reo. Here we take the timed channel (Timer) as an example. In
+timed Reo, a n-timer accepts a data item from its source end, and then put it to its sink end after
+n time units. Throughout the duration, the channel cannot accept any more data items.
+For simplicity, we use $A=\_$ to indicate that there is no constraint on channel end $A$.
 
 \begin{example}[n-Timer]
   The PMM of an n-Timer with a source-end A and a sink-end B can be defined as:
@@ -373,98 +306,101 @@ to indicate that there is no constraint on channel end $A$.
 Similarly, we can use PMMs to describe the behavior of other basic timed Reo
 channels. Now we show how to compose these channels into more complicated connectors.
 
-\begin{definition}[Product]
-  For two PMMs $\mathcal{PM}_1$ and $\mathcal{PM}_2$, if
-  $\mathcal{PM}_2.O\cap\mathcal{PM}_1.I=\varnothing$, their product 
-  \[
-  \mathcal{PM'} = prod(\mathcal{PM}_1,\mathcal{PM}_2)  \]
-  can be defined as follows.
-  \begin{itemize}
-  	\item[-] $\forall\Sigma. \mathcal{PM}'.S(\Sigma)=\mathcal{PM}_1.S(\Sigma)\times \mathcal{PM}_2.S(\Sigma)$
-    \item[-] $\mathcal{PM}'.I=(\mathcal{PM}_1.I\cup \mathcal{PM}_2.I)\backslash \mathcal{PM}_1.O$
-    \item[-] $\mathcal{PM}'.O=(\mathcal{PM}_1.O\cup \mathcal{PM}_2.O)\backslash \mathcal{PM}_2.I$
-  \end{itemize}
-  \emph{(Here we assume that sink ends of $\mathcal{PM}_1$ can be connected to source ends of
-  $\mathcal{PM}_2$, but not vise versa)}
-  \begin{itemize}
-    \item[-] $\mathcal{PM}'.s_0=(\mathcal{PM}_1.s_0, \mathcal{PM}_2.s_0)$
-    \item[-] $\forall\Sigma. \mathcal{PM}'.\delta(\Sigma)((s_1,s_2), i)=$
-      \begin{displaymath}
-        \left\{
-        \begin{array}[ht]{ll}
-          (\bigcup_{j=1,2} Out_j)\downarrow_{\mathcal{PM}'.O} & i\neq T\land(\bigwedge_{j=1,2} Out_j\neq\rblock) \\
-          \rempty & i = T \\
-          \rblock & otherwise \\
-        \end{array}
-        \right.
-      \end{displaymath}
-      where we have
-      \begin{itemize}
-        \item[*] $i\in Input(\Sigma,\mathcal{PM}'.I,\mathcal{PM}'.O)$
-        \item[*] $In_1 = i\downarrow_{\mathcal{PM}_1.I}$
-        \item[*] $In_2 = (Out_1 \cup i)\downarrow_{\mathcal{PM}_2.I}$
-        \item[*] $Out_j = \mathcal{PM}_j.\delta(\Sigma)(s_j,In_j)$ for $j=1,2$
-      \end{itemize}
-    \item[-] $\forall\Sigma. \mathcal{PM}'. \lambda(\Sigma)((s_1,s_2),i)=(s_1',s_2')$
-      where for $j=1,2$, $s_j' = \mathcal{PM}_j.\lambda(\Sigma)(s_j,In_j)$.
-  \end{itemize}
-\end{definition}
+\liyi{Actually I'm not sure if omitting definition of prod and link is a good idea. Generally I
+think this paper should focus on two parts: definition of PMM and optimization of L* algorithm.}
 
-The idea in \emph{product} is quite simple. The output of $\mathcal{PM}_1$ would be provided as part of the
-input of $\mathcal{PM}_2$. Timed action $T$ is only executed simultaneously between $\mathcal{PM}_1$
-and $\mathcal{PM}_2$.
+%\begin{definition}[Product]
+  %For two PMMs $\mathcal{PM}_1$ and $\mathcal{PM}_2$, if
+  %$\mathcal{PM}_2.O\cap\mathcal{PM}_1.I=\varnothing$, their product 
+  %\[
+  %\mathcal{PM'} = prod(\mathcal{PM}_1,\mathcal{PM}_2)  \]
+  %can be defined as follows.
+  %\begin{itemize}
+    %\item[-] $\forall\Sigma. \mathcal{PM}'.S(\Sigma)=\mathcal{PM}_1.S(\Sigma)\times \mathcal{PM}_2.S(\Sigma)$
+    %\item[-] $\mathcal{PM}'.I=(\mathcal{PM}_1.I\cup \mathcal{PM}_2.I)\backslash \mathcal{PM}_1.O$
+    %\item[-] $\mathcal{PM}'.O=(\mathcal{PM}_1.O\cup \mathcal{PM}_2.O)\backslash \mathcal{PM}_2.I$
+  %\end{itemize}
+  %\emph{(Here we assume that sink ends of $\mathcal{PM}_1$ can be connected to source ends of
+  %$\mathcal{PM}_2$, but not vise versa)}
+  %\begin{itemize}
+    %\item[-] $\mathcal{PM}'.s_0=(\mathcal{PM}_1.s_0, \mathcal{PM}_2.s_0)$
+    %\item[-] $\forall\Sigma. \mathcal{PM}'.\delta(\Sigma)((s_1,s_2), i)=$
+      %\begin{displaymath}
+        %\left\{
+        %\begin{array}[ht]{ll}
+          %(\bigcup_{j=1,2} Out_j)\downarrow_{\mathcal{PM}'.O} & i\neq T\land(\bigwedge_{j=1,2} Out_j\neq\rblock) \\
+          %\rempty & i = T \\
+          %\rblock & otherwise \\
+        %\end{array}
+        %\right.
+      %\end{displaymath}
+      %where we have
+      %\begin{itemize}
+        %\item[*] $i\in Input(\Sigma,\mathcal{PM}'.I,\mathcal{PM}'.O)$
+        %\item[*] $In_1 = i\downarrow_{\mathcal{PM}_1.I}$
+        %\item[*] $In_2 = (Out_1 \cup i)\downarrow_{\mathcal{PM}_2.I}$
+        %\item[*] $Out_j = \mathcal{PM}_j.\delta(\Sigma)(s_j,In_j)$ for $j=1,2$
+      %\end{itemize}
+    %\item[-] $\forall\Sigma. \mathcal{PM}'. \lambda(\Sigma)((s_1,s_2),i)=(s_1',s_2')$
+      %where for $j=1,2$, $s_j' = \mathcal{PM}_j.\lambda(\Sigma)(s_j,In_j)$.
+  %\end{itemize}
+%\end{definition}
 
-As mentioned above, we cannot connect a sink end of $\mathcal{PM}_2$ to a source end of
-$\mathcal{PM}_1$, which makes it difficult to construct connectors like alternator in Fig.
-\ref{fig:reoconnector}. To solve the problem, we define a \emph{link} operator to connect sink
-ends and source ends in the same connector.
+%The idea in \emph{product} is quite simple. The output of $\mathcal{PM}_1$ would be provided as part of the
+%input of $\mathcal{PM}_2$. Timed action $T$ is only executed simultaneously between $\mathcal{PM}_1$
+%and $\mathcal{PM}_2$.
 
-\begin{definition}[Link]
-  The \emph{link} operator constructs connector by connecting a sink end $\OUT$ to a source end $\IN$
-  within the same connector.   
-  \[
-  \mathcal{PM}' = link(\mathcal{PM}, \OUT, \IN)
-  \]
-  Here we assume that $\IN\in \mathcal{PM}.I$ and $\OUT\in \mathcal{PM}.O$.
+%As mentioned above, we cannot connect a sink end of $\mathcal{PM}_2$ to a source end of
+%$\mathcal{PM}_1$, which makes it difficult to construct connectors like alternator in Fig.
+%\ref{fig:reoconnector}. To solve the problem, we define a \emph{link} operator to connect sink
+%ends and source ends in the same connector.
 
-  \begin{itemize}
-  	\item[-] $\forall\Sigma. \mathcal{PM}'.S(\Sigma)=\mathcal{PM}.S(\Sigma)$
-    \item[-] $\mathcal{PM}'.I=\mathcal{PM}.I\backslash\{\IN\}$
-    \item[-] $\mathcal{PM}'.O=\mathcal{PM}.O\backslash\{\OUT\}$
-    \item[-] $\mathcal{PM}'.s_0=\mathcal{PM}.s_0$
-    \item[-] $\forall\Sigma, i\in
-      Input(\Sigma,\mathcal{PM}'.I,\mathcal{PM}'.O).\mathcal{PM}'.\delta(\Sigma)(s,i)=$
-      \begin{small}
-        \begin{displaymath}
-          \left\{
-          \begin{array}[h]{lr}
-            \rempty & i=T \\
-            \mathcal{PM}.\delta(\Sigma)(s,i\cup\{\IN\mapsto d\})\downarrow_{\mathcal{PM}'.O} & (*)\\
-            \rblock & otherwise \\
-          \end{array}
-          \right.
-        \end{displaymath}
-      \end{small}
-      where the condition (*) is defined as
-      \[
-      \exists d.\mathcal{PM}.\delta(\Sigma)(s,i\cup\{\IN\mapsto d\})(\OUT)=d
-      \]
-    \item[-] $\forall\Sigma, i\in
-      Input(\Sigma,\mathcal{PM}'.I,\mathcal{PM}'.O).$
-      \begin{small}
-        \begin{displaymath}
-          \mathcal{PM}.\lambda(\Sigma)(s,i)=
-          \left\{
-          \begin{array}[ht]{lr}
-            \mathcal{PM}.\lambda(\Sigma,T) & i=T \\
-            \mathcal{PM}.\lambda(\Sigma,i\cup\{\IN\mapsto d\}) & (*)\\
-            s & otherwise \\
-          \end{array}
-          \right.
-        \end{displaymath}
-      \end{small}
-  \end{itemize}
-\end{definition}
+%\begin{definition}[Link]
+  %The \emph{link} operator constructs connector by connecting a sink end $\OUT$ to a source end $\IN$
+  %within the same connector.   
+  %\[
+  %\mathcal{PM}' = link(\mathcal{PM}, \OUT, \IN)
+  %\]
+  %Here we assume that $\IN\in \mathcal{PM}.I$ and $\OUT\in \mathcal{PM}.O$.
+
+  %\begin{itemize}
+    %\item[-] $\forall\Sigma. \mathcal{PM}'.S(\Sigma)=\mathcal{PM}.S(\Sigma)$
+    %\item[-] $\mathcal{PM}'.I=\mathcal{PM}.I\backslash\{\IN\}$
+    %\item[-] $\mathcal{PM}'.O=\mathcal{PM}.O\backslash\{\OUT\}$
+    %\item[-] $\mathcal{PM}'.s_0=\mathcal{PM}.s_0$
+    %\item[-] $\forall\Sigma, i\in
+      %Input(\Sigma,\mathcal{PM}'.I,\mathcal{PM}'.O).\mathcal{PM}'.\delta(\Sigma)(s,i)=$
+      %\begin{small}
+        %\begin{displaymath}
+          %\left\{
+          %\begin{array}[h]{lr}
+            %\rempty & i=T \\
+            %\mathcal{PM}.\delta(\Sigma)(s,i\cup\{\IN\mapsto d\})\downarrow_{\mathcal{PM}'.O} & (*)\\
+            %\rblock & otherwise \\
+          %\end{array}
+          %\right.
+        %\end{displaymath}
+      %\end{small}
+      %where the condition (*) is defined as
+      %\[
+      %\exists d.\mathcal{PM}.\delta(\Sigma)(s,i\cup\{\IN\mapsto d\})(\OUT)=d
+      %\]
+    %\item[-] $\forall\Sigma, i\in
+      %Input(\Sigma,\mathcal{PM}'.I,\mathcal{PM}'.O).$
+      %\begin{small}
+        %\begin{displaymath}
+          %\mathcal{PM}.\lambda(\Sigma)(s,i)=
+          %\left\{
+          %\begin{array}[ht]{lr}
+            %\mathcal{PM}.\lambda(\Sigma,T) & i=T \\
+            %\mathcal{PM}.\lambda(\Sigma,i\cup\{\IN\mapsto d\}) & (*)\\
+            %s & otherwise \\
+          %\end{array}
+          %\right.
+        %\end{displaymath}
+      %\end{small}
+  %\end{itemize}
+%\end{definition}
 
 With \emph{prod} and \emph{link} defined, connectors can be constructed by composing simpler ones in
 the form of PMMs. It can be transformed into a concrete Mealy machine later, once the alphabet
@@ -479,190 +415,250 @@ The input and output symbols of the blackbox implementation are provided as $\ma
 $\mathcal{O}$, and the blackbox implementation is supposed to be equivalent to a Mealy machine where
 all states are reachable.
 
-\subsection{Observation Table}
-\emph{Observation Tables}, proposed in \cite{DBLP:journals/iandc/Angluin87}, are used to construct
-hypothetical Mealy machines from the results of membership queries.
+\subsection{Active Learning: Overview}
+In this section, we briefly introduce the main ideas of active automata learning.
 
-Mealy machines consist of \emph{states} and \emph{transitions}.
-As for blackboxes, input sequence $s\in\mathcal{I}^*$ can be used to denote its state 
-after executing $s$. Similarly, for all $a\in\mathcal{I}$, we use $sa$ to denote the successor
-state of $s$ after executing $a$.
-However, under such notations, there are \emph{infinite} number of states, among which most are
-duplicate.
+Active learning \cite{settles2010active} is a special case of semi-supervised machine learning where
+a learning algorithm is able to interactively query the target systems to obtain the desired outputs
+under certain inputs. By well-designed query strategy, active learning is able to obtain more
+accurate models with smaller data-set.
 
-States are distinguished, usually, by their \emph{subsequent behavior}. Suppose $s_1\neq s_2\in
-\mathcal{I}^*$, we say the corresponding of states $s_1$ and $s_2$ are equivalent iff $\forall d\in
-\mathcal{I}^+. mq(s_1d)=mq(s_2d)$. Since we can never check it on every $d\in\mathcal{I}^+$, an
-alternative way is to use a set of \emph{suffixes} to distinguish them approximately.
-\begin{definition}[$D$-Equivalence]
-  Provided with a set of suffixes $D\subset\mathcal{I}^+$, the corresponding states of
-  $s_1,s_2\in\mathcal{I}^*$ are $D$-equivalent (denoted as $s_1\sim_D s_2$)
-  iff $mq(s_1d) = mq(s_2d)$ for all $d\in D$.
-\end{definition}
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[width=.5\textwidth]{./images/activelearning.png}
+  \end{center}
+  \caption{Active Automata Learning}
+  \label{fig:activelearning}
+\end{figure}
 
-Now we use \emph{access sequence} to describe the states. Given an input sequence $s$, the access
-sequence $acc(s,D)$ of $s$ is defined as the shortest sequence in $\{s'\in\mathcal{I}^*|s'\sim_D
-s\}$\footnote{When there are multiple satisfying sequences with the same length, we use a certain tactic
-to pick up one from them determinstically.}.
-
-Formally, an observation table (see Fig. \ref{fig:hypo} as an example) is determined by a tuple $(S,D)$ where
-$S\subset\mathcal{I}^*$ is a set of the access sequences of states and $D\subset\mathcal{I}^*$
-is a set of suffixes. In such tables, columns are labelled with suffixes in $D$, and rows are
-labelled with input sequences. As shown in Fig. \ref{fig:hypo}, rows are divided into two parts. The upper
-part, labelled with access sequence $s\in S$, denotes the states covered in the current hypothesis.
-The lower part, labelled with sequences in $\{sa|s\in S,a\in\mathcal{I}\}\backslash S$ (representing
-any potentially unclosed transition) denotes all the transitions outside $s\in S$. A cell with row
-label $s$ and column label $d$ is filled with $mq(sd)$.
-
-An observation table $(S,D)$ is \emph{closed} if 
-\[
-\forall s\in S,a\in\mathcal{I}.\exists s'\in S. sa\sim_D s'
-\]
-
-From a closed observation table $obs$, we can construct a hypothetical Mealy machine $\mathcal{H}=\langle
-S,s_0,\mathcal{I},\mathcal{O},\delta,\lambda\rangle$ in a straight-forward way:
+Fig. \ref{fig:activelearning} shows the sketch of active learning, wherein:
 \begin{itemize}
-  \item[-] Every state in $S$ corresponds to an input sequence in $obs.S$
-  \item[-] $s_0$ corresponds to the empty sequence $\varepsilon$
-    
-    \emph{(we use input sequences to indicate their corresponding states in following parts)}
-  \item[-] $\delta(s,a)=mq(sa)$
-  \item[-] $\lambda(s,a)=acc(sa,obs.D)$. Since $obs$ is closed, we always have $\lambda(s,a)\in S$.
+  \item[-] \emph{Teacher} and \emph{Student}: Active learning is an interactive process where
+    students ask questions and teachers answer. Here learning algorithm plays the role of student.
+  \item[-] \emph{Oracles} is an interface specifying which kind of questions can be answered by the
+    teacher.
+  \item[-] \emph{SUL} is an abbreviation of System Under Learn. In this paper, we take blackbox
+    models as our SULs.
+  \item[-] \emph{CEGAR} indicates Counter-Example Guided Abstraction
+    Refinement\cite{DBLP:conf/cav/ClarkeGJLV00}. In active learning, we need counter-examples to
+    guide us on further queries and cover the undistinguished states.
 \end{itemize}
 
-Algorithm \ref{alg:buildtable} shows how to build a closed observation table.
+When applying active automata learning on some model, we assume that the model should be equivalent
+to some \emph{Mealy machine}, i.e., a deterministic model accepting a finite set of inputs and
+mapping them to a finite set of outputs.
 
-\begin{algorithm} 
-  \caption{EncloseTable} 
-  \label{alg:buildtable}
-  \small
-  \KwIn{An oracle interface $mq$, An input actions $\mathcal{I}$, An observation table $obs$}
-  \KwOut{A closed observation table $obs'$} 
-  \Repeat{$unclosed=\varnothing$}
-  {
-    $next=\{st|\forall s\in obs.S,\forall t\in \mathcal{I}\}\backslash obs.S$\;
-    $unclosed=\{seq\in next|\forall a\in obs.S, seq \not\sim_{obs.D} a\}$\;
-    $obs'.S$ = $obs.S\cup unclosed$\;
-    $obs'.D$ = $obs.D$\;
-  }
-  \Return $obs'$\; 
-\end{algorithm}
+Such a model is encapsulated as a \emph{teacher} by the \emph{Oracle}, which handles
+all communication with the model. The oracle also serves as a so-called \emph{Minimal Adequate Teacher}
+interface, which is responsible for two types of queries.
 
-Taking a 2-Timer channel as an example, we now illustrate how this algorithm works. 
-We assume that the source end of this 2-Timer channel is $A$, the sink end is $B$, and the alphabet
-is $\{a\}$. We briefly denote $\{A\mapsto a,B\mapsto \rnoread\}$ and other input/output actions in form of
-$(a,\rnoread)$.
+\begin{itemize}
+  \item[-] \textbf{Membership Query} (hereinafter referred to as \emph{mq}) In grammar-learning
+    \cite{DBLP:journals/iandc/Angluin87}, \emph{mq} checks if a word is a member of certain language
+    defined by the given grammar. When it comes to
+    automata learning, \emph{mq} is supposed to provide \emph{simulation results} for given input
+    sequences.
+  \item[-] \textbf{Equivalence Query} (hereinafter referred to as \emph{eq}) Given a hypothesis
+    (usually constructed by the learning algorithm), \emph{eq} checks whether the hypothesis is
+    equivalent to the system-under-learn and generates a counter-example if needed. Generally,
+    \emph{eq} is irrealizable when SUL is a blackbox. So we tactically use $mq$ to achieve the
+    approximate results.
+\end{itemize}
 
-Firstly, $obs.S$ is initialized with the initial state (denoted by $\varepsilon$), and $obs.D$ is
-initialized with all one-step suffixes.
-Then we explore all the access sequences in $obs.S$ and calculate its successors. Here
-$unclosed$ consists of access sequences that has no equivalent sequence in $obs.S$. 
-For example, Fig. \ref{fig:hypo} shows the $obs$ of a 2-Timer channel after the first
-iteration. The five successors of $\varepsilon$ are presented at the bottom of the table, where
-four are equivalent with $\varepsilon$ but $(a,\rnoread)$ is not. Therefore, we take $(a,\rnoread)$ as a
-brand-new state and all of its successors need further exploration. 
+These queries are given by \emph{learning algorithms}, or so-called \emph{students} in Fig.
+\ref{fig:activelearning}. From the \emph{mq} results, a learning algorithm constructs a
+\emph{hypothesis} and then check it with \emph{eq}. If counter-examples are found, we turn back and
+repeat the hypothesis construction until the equivalence query returns \emph{true}.
 
-%\begin{figure}[ht]
-  %\begin{center}
-    %\begin{displaymath}
-      %\begin{array}{l||ccccc||c}
-        %\hline
-        %& (a,\rread) & (\bot,\rread) & (a,\rnoread) & (\bot,\rnoread) & T & acc\\
-        %\hline\hline
-        %\varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
-        %\hline
-        %(a,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
-        %(\bot,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        %\rowcolor[gray]{.9}
-        %(a,\rnoread) & \rblock & \rblock & \rblock & \rempty & \rempty & unclosed\\
-        %(\bot,\rnoread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        %T & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        %\hline
-      %\end{array}
-    %\end{displaymath}
-    %% \input{./images/hypo.tex}
-  %\end{center}
-  %\caption{Observation Table and Corresponding Hypothesis}
-  %\label{fig:hypo}
-%\end{figure}
+More details on the active automata learning algorithm will be presented in Section
+\ref{sec:activelearning}.
 
-In the second iteration, we explore the successors of $(a,\rnoread)$. Fortunately, now every
-successor has an equivalence sequence in $obs.S$, \emph{i.e.}, itself. Consequently, the algorithm terminates
-with a closed hypothesis where all the unclosed edges turn into
-self-loop.
 
-%\begin{figure}[ht]
-  %\begin{center}
-    %\begin{displaymath}
-      %\begin{array}{l||ccccc||c}
-        %\hline
-        %& (a,\rread) & (\bot,\rread) & (a,\rnoread) & (\bot,\rnoread) & T & acc\\
-        %\hline\hline
-        %\varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        %(a,\rnoread) & \rblock & \rblock & \rblock & \rempty & \rempty & (a,\rnoread) \\
-        %\hline
-        %(a,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
-        %(\bot,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        %(\bot,\rnoread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        %T & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        %(a,\rnoread),(a,\rread) & \rblock & \rblock & \rblock & \rempty & \rempty & (a,\rnoread) \\
-        %(a,\rnoread),(\bot,\rread) & \rblock & \rblock & \rblock & \rempty & \rempty & (a,\rnoread) \\
-        %(a,\rnoread),(a,\rnoread) & \rblock & \rblock & \rblock & \rempty & \rempty & (a,\rnoread) \\
-        %(a,\rnoread),(\bot,\rnoread) & \rblock & \rblock & \rblock & \rempty & \rempty &
-        %(a,\rnoread) \\
-        %(a,\rnoread),T & \rblock & \rblock & \rblock & \rempty & \rempty & (a,\rnoread) \\
-        %\hline
-      %\end{array}
-    %\end{displaymath}
-  %\end{center}
-  %\caption{A Closed Version of Fig. \ref{fig:hypo}}
-  %\label{fig:hypo2}
-%\end{figure}
 
-\subsection{Counter Examples' Analysis} 
-Apparently, the closed hypothesis presented in Fig. \ref{fig:hypo2} is different with the 2-Timer
-channel. It's easy to find a counter-example $s_0=(a,\rnoread),T,T,(\bot,\rread)$ where $mq(s_0)=a$ while
-according to the hypothesis, the result should be $\rempty$. In this section, we show how to
-find and analyze counter-examples using the method in \cite{DBLP:conf/sfm/SteffenHM11}. 
+%\subsection{Observation Table}
+%\emph{Observation Tables}, proposed in \cite{DBLP:journals/iandc/Angluin87}, are used to construct
+%hypothetical Mealy machines from the results of membership queries.
 
-Firstly, we give a formal definition of \emph{counter examples}. With an observation table $obs$ and
-a sequence $s$, we use $hq(obs,s)$ to denote the execution result of its corresponding hypothesis
-$\mathcal{H}$ under the input sequence
-$s$. Obviously we have $hq(obs,s) = mq(acc(s')a)$ where $s=s'a,a\in\mathcal{I}$.
+%Mealy machines consist of \emph{states} and \emph{transitions}.
+%As for blackboxes, input sequence $s\in\mathcal{I}^*$ can be used to denote its state 
+%after executing $s$. Similarly, for all $a\in\mathcal{I}$, we use $sa$ to denote the successor
+%state of $s$ after executing $a$.
+%However, under such notations, there are \emph{infinite} number of states, among which most are
+%duplicate.
 
-\begin{definition}[Counter Example]
-  an input sequence $s$ is a counter example of $obs$ iff $mq(s)\neq hq(obs,s)$.
-\end{definition}
+%States are distinguished, usually, by their \emph{subsequent behavior}. Suppose $s_1\neq s_2\in
+%\mathcal{I}^*$, we say the corresponding of states $s_1$ and $s_2$ are equivalent iff $\forall d\in
+%\mathcal{I}^+. mq(s_1d)=mq(s_2d)$. Since we can never check it on every $d\in\mathcal{I}^+$, an
+%alternative way is to use a set of \emph{suffixes} to distinguish them approximately.
+%\begin{definition}[$D$-Equivalence]
+  %Provided with a set of suffixes $D\subset\mathcal{I}^+$, the corresponding states of
+  %$s_1,s_2\in\mathcal{I}^*$ are $D$-equivalent (denoted as $s_1\sim_D s_2$)
+  %iff $mq(s_1d) = mq(s_2d)$ for all $d\in D$.
+%\end{definition}
 
-Now we consider the reason that leads to existance of counter examples. Since
-the suffix set $D$ is used to distinguish states, the existance of counter-examples
-shows that the current suffix set $D$ is not powerful enough to recognize the uncovered states in
-$next$ (see Algorithm \ref{alg:buildtable}).
+%Now we use \emph{access sequence} to describe the states. Given an input sequence $s$, the access
+%sequence $acc(s,D)$ of $s$ is defined as the shortest sequence in $\{s'\in\mathcal{I}^*|s'\sim_D
+%s\}$\footnote{When there are multiple satisfying sequences with the same length, we use a certain tactic
+%to pick up one from them determinstically.}.
 
-For a counter example $s$, we need a new Suffix$(s,obs)$ to distinguish the uncovered state
-represented by $s$, which is defined as the longest sequence in
-\[
-\{d\in\mathcal{I}^+|s=s'd, mq(acc(s',obs.D)d)\neq mq(s)\}
-\]
-After appending Suffix$(s,obs)$ to $D$, it's obvious that at least one uncovered state will be found.
+%Formally, an observation table (see Fig. \ref{fig:hypo} as an example) is determined by a tuple $(S,D)$ where
+%$S\subset\mathcal{I}^*$ is a set of the access sequences of states and $D\subset\mathcal{I}^*$
+%is a set of suffixes. In such tables, columns are labelled with suffixes in $D$, and rows are
+%labelled with input sequences. As shown in Fig. \ref{fig:hypo}, rows are divided into two parts. The upper
+%part, labelled with access sequence $s\in S$, denotes the states covered in the current hypothesis.
+%The lower part, labelled with sequences in $\{sa|s\in S,a\in\mathcal{I}\}\backslash S$ (representing
+%any potentially unclosed transition) denotes all the transitions outside $s\in S$. A cell with row
+%label $s$ and column label $d$ is filled with $mq(sd)$.
 
-The whole L* algorithm can be concluded as follows.
-\begin{algorithm} 
-  \caption{L*} 
-  \label{alg:lstar}
-  \KwIn{Oracle interfaces $mq,eq$, Input actions $\mathcal{I}$}
-  \KwOut{Observation table $obs$} 
-  $obs.S$ initialized as empty\;
-  $obs.D$ initialized as $\{[i]|i\in\mathcal{I}\}$\;
-  \Repeat{$ce=true$}{
-    $obs$ = EncloseTable($mq$, $\mathcal{I}$, $obs$)\;
-    $ce=eq(obs)$\;
-    \If {$ce\neq true$} {
-      $obs.D$.append(Suffix$(ce, obs)$)\;
-    }
-  }
-  \Return $obs$\; 
-\end{algorithm}
+%An observation table $(S,D)$ is \emph{closed} if 
+%\[
+%\forall s\in S,a\in\mathcal{I}.\exists s'\in S. sa\sim_D s'
+%\]
+
+%From a closed observation table $obs$, we can construct a hypothetical Mealy machine $\mathcal{H}=\langle
+%S,s_0,\mathcal{I},\mathcal{O},\delta,\lambda\rangle$ in a straight-forward way:
+%\begin{itemize}
+  %\item[-] Every state in $S$ corresponds to an input sequence in $obs.S$
+  %\item[-] $s_0$ corresponds to the empty sequence $\varepsilon$
+    
+    %\emph{(we use input sequences to indicate their corresponding states in following parts)}
+  %\item[-] $\delta(s,a)=mq(sa)$
+  %\item[-] $\lambda(s,a)=acc(sa,obs.D)$. Since $obs$ is closed, we always have $\lambda(s,a)\in S$.
+%\end{itemize}
+
+%Algorithm \ref{alg:buildtable} shows how to build a closed observation table.
+
+%\begin{algorithm} 
+  %\caption{EncloseTable} 
+  %\label{alg:buildtable}
+  %\small
+  %\KwIn{An oracle interface $mq$, An input actions $\mathcal{I}$, An observation table $obs$}
+  %\KwOut{A closed observation table $obs'$} 
+  %\Repeat{$unclosed=\varnothing$}
+  %{
+    %$next=\{st|\forall s\in obs.S,\forall t\in \mathcal{I}\}\backslash obs.S$\;
+    %$unclosed=\{seq\in next|\forall a\in obs.S, seq \not\sim_{obs.D} a\}$\;
+    %$obs'.S$ = $obs.S\cup unclosed$\;
+    %$obs'.D$ = $obs.D$\;
+  %}
+  %\Return $obs'$\; 
+%\end{algorithm}
+
+%Taking a 2-Timer channel as an example, we now illustrate how this algorithm works. 
+%We assume that the source end of this 2-Timer channel is $A$, the sink end is $B$, and the alphabet
+%is $\{a\}$. We briefly denote $\{A\mapsto a,B\mapsto \rnoread\}$ and other input/output actions in form of
+%$(a,\rnoread)$.
+
+%Firstly, $obs.S$ is initialized with the initial state (denoted by $\varepsilon$), and $obs.D$ is
+%initialized with all one-step suffixes.
+%Then we explore all the access sequences in $obs.S$ and calculate its successors. Here
+%$unclosed$ consists of access sequences that has no equivalent sequence in $obs.S$. 
+%For example, Fig. \ref{fig:hypo} shows the $obs$ of a 2-Timer channel after the first
+%iteration. The five successors of $\varepsilon$ are presented at the bottom of the table, where
+%four are equivalent with $\varepsilon$ but $(a,\rnoread)$ is not. Therefore, we take $(a,\rnoread)$ as a
+%brand-new state and all of its successors need further exploration. 
+
+%%\begin{figure}[ht]
+  %%\begin{center}
+    %%\begin{displaymath}
+      %%\begin{array}{l||ccccc||c}
+        %%\hline
+        %%& (a,\rread) & (\bot,\rread) & (a,\rnoread) & (\bot,\rnoread) & T & acc\\
+        %%\hline\hline
+        %%\varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
+        %%\hline
+        %%(a,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
+        %%(\bot,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+        %%\rowcolor[gray]{.9}
+        %%(a,\rnoread) & \rblock & \rblock & \rblock & \rempty & \rempty & unclosed\\
+        %%(\bot,\rnoread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+        %%T & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+        %%\hline
+      %%\end{array}
+    %%\end{displaymath}
+    %%% \input{./images/hypo.tex}
+  %%\end{center}
+  %%\caption{Observation Table and Corresponding Hypothesis}
+  %%\label{fig:hypo}
+%%\end{figure}
+
+%In the second iteration, we explore the successors of $(a,\rnoread)$. Fortunately, now every
+%successor has an equivalence sequence in $obs.S$, \emph{i.e.}, itself. Consequently, the algorithm terminates
+%with a closed hypothesis where all the unclosed edges turn into
+%self-loop.
+
+%%\begin{figure}[ht]
+  %%\begin{center}
+    %%\begin{displaymath}
+      %%\begin{array}{l||ccccc||c}
+        %%\hline
+        %%& (a,\rread) & (\bot,\rread) & (a,\rnoread) & (\bot,\rnoread) & T & acc\\
+        %%\hline\hline
+        %%\varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+        %%(a,\rnoread) & \rblock & \rblock & \rblock & \rempty & \rempty & (a,\rnoread) \\
+        %%\hline
+        %%(a,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
+        %%(\bot,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+        %%(\bot,\rnoread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+        %%T & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+        %%(a,\rnoread),(a,\rread) & \rblock & \rblock & \rblock & \rempty & \rempty & (a,\rnoread) \\
+        %%(a,\rnoread),(\bot,\rread) & \rblock & \rblock & \rblock & \rempty & \rempty & (a,\rnoread) \\
+        %%(a,\rnoread),(a,\rnoread) & \rblock & \rblock & \rblock & \rempty & \rempty & (a,\rnoread) \\
+        %%(a,\rnoread),(\bot,\rnoread) & \rblock & \rblock & \rblock & \rempty & \rempty &
+        %%(a,\rnoread) \\
+        %%(a,\rnoread),T & \rblock & \rblock & \rblock & \rempty & \rempty & (a,\rnoread) \\
+        %%\hline
+      %%\end{array}
+    %%\end{displaymath}
+  %%\end{center}
+  %%\caption{A Closed Version of Fig. \ref{fig:hypo}}
+  %%\label{fig:hypo2}
+%%\end{figure}
+
+%\subsection{Counter Examples' Analysis} 
+%Apparently, the closed hypothesis presented in Fig. \ref{fig:hypo2} is different with the 2-Timer
+%channel. It's easy to find a counter-example $s_0=(a,\rnoread),T,T,(\bot,\rread)$ where $mq(s_0)=a$ while
+%according to the hypothesis, the result should be $\rempty$. In this section, we show how to
+%find and analyze counter-examples using the method in \cite{DBLP:conf/sfm/SteffenHM11}. 
+
+%Firstly, we give a formal definition of \emph{counter examples}. With an observation table $obs$ and
+%a sequence $s$, we use $hq(obs,s)$ to denote the execution result of its corresponding hypothesis
+%$\mathcal{H}$ under the input sequence
+%$s$. Obviously we have $hq(obs,s) = mq(acc(s')a)$ where $s=s'a,a\in\mathcal{I}$.
+
+%\begin{definition}[Counter Example]
+  %an input sequence $s$ is a counter example of $obs$ iff $mq(s)\neq hq(obs,s)$.
+%\end{definition}
+
+%Now we consider the reason that leads to existance of counter examples. Since
+%the suffix set $D$ is used to distinguish states, the existance of counter-examples
+%shows that the current suffix set $D$ is not powerful enough to recognize the uncovered states in
+%$next$ (see Algorithm \ref{alg:buildtable}).
+
+%For a counter example $s$, we need a new Suffix$(s,obs)$ to distinguish the uncovered state
+%represented by $s$, which is defined as the longest sequence in
+%\[
+%\{d\in\mathcal{I}^+|s=s'd, mq(acc(s',obs.D)d)\neq mq(s)\}
+%\]
+%After appending Suffix$(s,obs)$ to $D$, it's obvious that at least one uncovered state will be found.
+
+%The whole L* algorithm can be concluded as follows.
+%\begin{algorithm} 
+  %\caption{L*} 
+  %\label{alg:lstar}
+  %\KwIn{Oracle interfaces $mq,eq$, Input actions $\mathcal{I}$}
+  %\KwOut{Observation table $obs$} 
+  %$obs.S$ initialized as empty\;
+  %$obs.D$ initialized as $\{[i]|i\in\mathcal{I}\}$\;
+  %\Repeat{$ce=true$}{
+    %$obs$ = EncloseTable($mq$, $\mathcal{I}$, $obs$)\;
+    %$ce=eq(obs)$\;
+    %\If {$ce\neq true$} {
+      %$obs.D$.append(Suffix$(ce, obs)$)\;
+    %}
+  %}
+  %\Return $obs$\; 
+%\end{algorithm}
 
 
 
@@ -671,13 +667,12 @@ The whole L* algorithm can be concluded as follows.
 \label{sec:experiment}
 
 Both \emph{Reo Coordination Models} and \emph{Adapted L* Algorithm} are implemented in
-Golang\cite{golang}, which is widely known for its elegant design and impressive efficiency.
-Moreover, with a CSP-style\cite{DBLP:books/ph/Hoare85} cocurrency model, \texttt{Golang} shares many
-similar ideas with Reo, and in turn makes our implementation much more natural.
+Golang. With a CSP-style\cite{DBLP:books/ph/Hoare85} cocurrency model, the Google-production language
+\texttt{Golang} shares quite a few similar ideas with Reo, and in turn makes our implementation much
+more natural.
 
 All the following experiments are coded under Golang \emph{1.2.1} and executed on a laptop with 8GB
-of RAM and a Core i7-3630 CPU. The source code is available at
-\url{https://github.com/liyi-david/reo-learn}.
+of RAM and a Core i7-3630 CPU. The source code is available at \cite{reo-learn-github}.
 
 \subsection{Case Study}
 A simple example of timed connector is presented to show how L* works.
@@ -710,23 +705,23 @@ and block transitions. More details of this case can be found in our \emph{githu
 \subsection{Performance Optimization}
 As a well-known learning algorithm, L* has proved its efficiency in models without time.
 However, when dealing with timed connectors, the algorithm failed to meet our expectation.
-\todo{draw the two tables in github}
-%\begin{table}[ht]
-  %\renewcommand{\arraystretch}{1.3}
-  %\caption{Time-Cost Analysis}
-  %\label{tabel:timecost}
-  %\centering
-  %\begin{tabular}{l||rrr}
-    %\hline
-    %& FIFO1 & Alternator & Gate \\
-    %\hline\hline
-    %Membership Query(s) & 41.571 & 126.468 & 169.161 \\
-    %Hypothesis Query(s) & 0.001 & 0.003 & 0.004 \\
-    %Total Time(s) & 41.715 & 165.114 & 247.098 \\
-    %Membership Query(\%) & 99.6 & 76.6 & 68.5 \\
-    %\hline
-  %\end{tabular}
-%\end{table}
+
+\begin{table}[ht]
+  \renewcommand{\arraystretch}{1.3}
+  \caption{Time-Cost Analysis}
+  \label{tabel:timecost}
+  \centering
+  \begin{tabular}{l||rrr}
+    \hline
+    & FIFO1 & Alternator & Gate \\
+    \hline\hline
+    Membership Query(s) & 41.571 & 126.468 & 169.161 \\
+    Hypothesis Query(s) & 0.001 & 0.003 & 0.004 \\
+    Total Time(s) & 41.715 & 165.114 & 247.098 \\
+    Membership Query(\%) & 99.6 & 76.6 & 68.5 \\
+    \hline
+  \end{tabular}
+\end{table}
 
 As shown in Table \ref{tabel:timecost}, time consumption mainly comes from membership queries.
 With time involved, every single membership query takes a lot of time inevitably.
@@ -744,21 +739,21 @@ If previous simulation results are stored in a well-maintained cache, the time-c
 simulation process could be reduced signficiantly. In this work, we use a multiway tree to buffer
 these results.
 
-%\begin{table}[ht]
-  %\renewcommand{\arraystretch}{1.3}
-  %\caption{Reduction of Membership Queries}
-  %\label{tabel:cacheoptimization}
-  %\centering
-  %\begin{tabular}{l||rrr}
-    %\hline
-    %& FIFO & Alternator & Gate \\
-    %\hline\hline
-    %Original Algorithm & 93 & 880 & 1034 \\
-    %Cached Algorithm & 90 & 725 & 707 \\
-    %Reduction Rate & 3.2\% & 21.4\% & 31.6\% \\
-    %\hline
-  %\end{tabular}
-%\end{table}
+\begin{table}[ht]
+  \renewcommand{\arraystretch}{1.3}
+  \caption{Reduction of Membership Queries}
+  \label{tabel:cacheoptimization}
+  \centering
+  \begin{tabular}{l||rrr}
+    \hline
+    & FIFO & Alternator & Gate \\
+    \hline\hline
+    Original Algorithm & 93 & 880 & 1034 \\
+    Cached Algorithm & 90 & 725 & 707 \\
+    Reduction Rate & 3.2\% & 21.4\% & 31.6\% \\
+    \hline
+  \end{tabular}
+\end{table}
 
 With cache applied, we have made considerable reduction on the calls of membership queries. The results
 can be found in Table \ref{tabel:cacheoptimization}.
