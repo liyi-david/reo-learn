@@ -72,18 +72,18 @@ liyi\_math@pku.edu.cn, summeng@math.pku.edu.cn, yiwuwang@126.com
 }
 
 \begin{document}
-\maketitle 
+\maketitle
 \begin{abstract}
   Coordination models and languages play a key role in formally specifying the communication and
   interaction among different components in large-scale distributed and concurrent systems. In this
   paper, we propose an active learning framework to extract timed connector models from black-box
-  system implementation. 
+  system implementation.
   We first introduce parameterized Mealy machine(PMM) as an operational semantic
   model for channel-based coordination language Reo. PMM serves as a bridge
   between Reo connectors and Mealy machines. With the product operator, complex connectors can be
   constructed by joining basic channels and the PMMs of connectors can be transformed into Mealy
   machines. Moreover, we adapt L*, a well-known learning algorithm, to timed connectors (in the form
-  of Mealy machines). The new algorithm has shown its efficiency in multiple case studies. 
+  of Mealy machines). The new algorithm has shown its efficiency in multiple case studies.
   This framework has been implemented in \texttt{Golang}.
 \end{abstract}
 
@@ -91,28 +91,29 @@ liyi\_math@pku.edu.cn, summeng@math.pku.edu.cn, yiwuwang@126.com
   Active Learning, Coordination Languages, Timed Connectors
 \end{IEEEkeywords}
 
-\section{Introduction} 
+\section{Introduction}
 
 Distributed real-time embedded systems (DRES) are reforming our lives with the
-Internet of Things(IoT), wherein individual components are composed via \emph{connectors} 
+Internet of Things, wherein individual components are composed via \emph{connectors}
 to build complex systems. Such systems could be distributed logically or physically, which
 makes coordination processes even more complicated. In this case, we need to specify the coordination
 processes with \emph{coordination languages}, such that formal techniques can be applied to
 guarantee their reliability.
 
-\emph{Timed Reo} is a real-time extension of the coordination language \emph{Reo}, which can be used
+\emph{Timed Reo} \cite{DBLP:conf/sefm/ArbabBBR04} is a real-time extension of the coordination language \emph{Reo}
+\cite{DBLP:journals/mscs/Arbab04}, which can be used
 to describe the coordination process in DRES clearly and intuitively. Different formal
 semantics have been proposed to specify the behavior of timed Reo.
-For example, an operational semantics based on \emph{timed constraint automata} was raised by Baier et
-al.\cite{DBLP:conf/sefm/ArbabBBR04}, where a variant of LTL was also proposed to describe the
+For example, an operational semantics based on \emph{timed constraint automata} was proposed in 
+\cite{DBLP:conf/sefm/ArbabBBR04}, where a variant of LTL was also proposed to describe the
 properties of timed connectors.
 In \cite{DBLP:conf/tase/Meng12}, a UTP design model was proposed to specify the behavior of timed
-connectors.. 
+connectors.
 
-Formal verification and validation techniques have also been proved applicable for timed connectors, 
-e.g. a comformance testing framework on timed connectors has been proposed in \cite{DBLP:conf/tase/LiCWS15}.
-A SAT-based bounded model checking approach was adapted in \cite{DBLP:journals/scp/Kemper12} for
-verifying connectors. Although these solutions are practical and impressive, there is one important
+Formal verification and validation techniques have also been proved applicable for timed connectors,
+e.g. a conformance testing framework on timed connectors has been proposed in \cite{DBLP:conf/tase/LiCWS15}.
+A SAT-based bounded approach was adapted in \cite{DBLP:journals/scp/Kemper12} for model checking
+connectors. Although these solutions are practical and impressive, there is one important
 question faced by most of them: \emph{how to obtain the formal models?}
 
 \emph{Correctness} of connectors is closely related to some low-level implementation details.
@@ -128,37 +129,37 @@ learning is used to extract \emph{Mealy machines} or \emph{regular languages} wi
 
 \begin{figure}[ht]
   \begin{center}
-    \includegraphics[width=.4\textwidth]{./images/howto.png}
+    \includegraphics[width=.45\textwidth]{./images/howto.png}
   \end{center}
   \caption{The Active Learning Framework}
   \label{fig:howto}
 \end{figure}
 
 In this paper we address this question by proposing an active learning framework as shown in Fig.
-\ref{fig:howto} to automatically extract timed connector models from blackbox implementations. 
+\ref{fig:howto} to automatically extract timed connector models from blackbox implementations.
 To achieve this goal, we first introduce \emph{parameterized Mealy machine} as a parameterized
 semantics for timed Reo connectors, which can be transformed to concrete Mealy machines with a
 given alphabet. Then the $L*$ algorithm \cite{DBLP:journals/iandc/Angluin87} is adapted and
 optimized to extract Mealy machines with timed action from the connector implementations as
-blackboxes. 
+blackboxes.
 
 The rest of the paper is organized as follows: In Section
-\ref{sec:preliminaries} we briefly illustrate some basic concepts, including the coordination
-language Reo, Mealy machine, and active automata learning. Section \ref{sec:semantics} defines an
-operational semantics of Reo, which is used in Section \ref{sec:activelearning} to show how to
+\ref{sec:preliminaries} we illustrate some basic concepts, including the coordination
+language Reo, Mealy machine, and active automata learning. Section \ref{sec:semantics} briefly presents an
+operational semantics of Reo based on PMM, which is used in Section \ref{sec:activelearning} to show how to
 extract Reo models from blackboxes by means of active learning. In Section
 \ref{sec:experiment}, we discuss the implementation and optimization of the approach in
 \texttt{Golang}. Finally, Section VI concludes the paper.
 
-\section{Preliminaries} 
+\section{Preliminaries}
 \label{sec:preliminaries}
-\subsection{Reo Coordination Language} 
+\subsection{Reo Coordination Language}
 \label{sec:reo}
 We provide here a brief overview of the main concepts in Reo. Further details can be found in
 \cite{DBLP:journals/mscs/Arbab04, DBLP:journals/scp/BaierSAR06}.
 
 Reo is a channel based exogenous coordination language proposed by F. Arbab in
-\cite{DBLP:journals/mscs/Arbab04}. 
+\cite{DBLP:journals/mscs/Arbab04}.
 A coordinator in Reo, also called \emph{connector}, provides the protocol that controls and
 organizes the communication, synchronization and cooperation among the components which
 communicate through the connector. Connectors can be defined without dependence on components,
@@ -168,7 +169,7 @@ development\cite{DBLP:journals/sigsoft/Gill03}.
 In Reo, complex connectors are made up of simpler ones. The atomic connectors are called
 \emph{channels}, and each of them has two \emph{channel ends}. There are two types of channel ends:
 \emph{source} and \emph{sink}. Source channel ends accept data into the channel, while sink
-channel ends dispense data out of the channel. 
+channel ends dispense data out of the channel.
 
 \begin{figure}[ht]
   \begin{center}
@@ -189,8 +190,8 @@ behavior are described as follows:
   \item [-] A \emph{SyncDrain} channel has two source ends and no sink end. It can accept a data
     item through one of its source end iff a data item is also available to be accepted
     simultaneously through the other end. Then both items will be dropped.
-  \item [-] A \emph{FIFO1} channel is an asychronous channel with a buffer cell. It accepts a
-    data item whenever the buffer is empty. 
+  \item [-] A \emph{FIFO1} channel is an asynchronous channel with a buffer cell. It accepts a
+    data item whenever the buffer is empty.
   \item [-] A t-timer channel accepts any data item from its source end, and later dispense it to
     its sink end after a delay of $t$ time units.
     \footnote{
@@ -216,7 +217,7 @@ coincide on a node are source ends, sink ends or a combination of both.
 Components can be linked to source nodes or sink nodes. A component can write data items to its
 corresponding source node only if the data item can be dispensed simultaneously to all source ends
 on this node. Similarly, a component can read a data item only if there is at least one readable
-sink end on its corresponding node. A mixed node non-determinstically selects and takes a data item
+sink end on its corresponding node. A mixed node non-deterministically selects and takes a data item
 from one of its coincident sink ends and replicates it into all of its coincident source ends.
 
 \begin{figure}[ht]
@@ -236,7 +237,7 @@ Besides, all the connectors are supposed to have \emph{deterministic} behavior h
 the requirement of active learning algorithm L*.
 
 
-\subsection{Mealy Machines} 
+\subsection{Mealy Machines}
 
 In this work, we use \emph{Mealy machines} to model Reo connectors.
 Mealy machine was first proposed by George. H. Mealy in \cite{George1955A} as an extension of finite
@@ -247,10 +248,10 @@ that all possible inputs should be acceptable in all states. In other words, if 
 for some state, we need to manually define an additional state to describe such exceptions.
 
 Various forms of Mealy machines have been defined in the
-literature\cite{George1955A,DBLP:journals/jcss/Broy14,DBLP:conf/sfm/SteffenHM11}. 
+literature\cite{George1955A,DBLP:journals/jcss/Broy14,DBLP:conf/sfm/SteffenHM11}.
 Since active automata learning requires the system-under-learn to be deterministic, in
-this paper we take the deterministic Mealy machine model as defined in 
-\cite{DBLP:conf/sfm/SteffenHM11}. 
+this paper we take the deterministic Mealy machine model as defined in
+\cite{DBLP:conf/sfm/SteffenHM11}.
 
 \begin{definition}[Mealy machine]
   A Mealy machine is a 6-tuple $(S, s_0, I, O, \delta, \lambda)$ consisting of:
@@ -271,12 +272,12 @@ both finite. Hereinafter, Mealy machines are always supposed to be finite in thi
 
 
 \subsection{Active Learning}
-In this section, we briefly introduce the main ideas of active automata learning. 
+In this section, we briefly introduce the main ideas of active automata learning.
 
 Active learning \cite{settles2010active} is a special case of semi-supervised machine learning where
 a learning algorithm is able to interactively query the target systems to obtain the desired outputs
 under certain inputs. By well-designed query strategy, active learning is able to obtain more
-accurate models with smaller dataset. 
+accurate models with smaller data-set.
 
 \begin{figure}[ht]
   \begin{center}
@@ -305,7 +306,7 @@ mapping them to a finite set of outputs.
 
 Such a model is encapsulated as a \emph{teacher} by the \emph{Oracle}, which handles
 all communication with the model. The oracle also serves as a so-called \emph{Minimal Adequate Teacher}
-interface, which is responsible for two types of queries. 
+interface, which is responsible for two types of queries.
 
 \begin{itemize}
   \item[-] \textbf{Membership Query} (hereinafter referred to as \emph{mq}) In grammar-learning
@@ -315,7 +316,7 @@ interface, which is responsible for two types of queries.
     sequences.
   \item[-] \textbf{Equivalence Query} (hereinafter referred to as \emph{eq}) Given a hypothesis
     (usually constructed by the learning algorithm), \emph{eq} checks whether the hypothesis is
-    equivalent to the system-under-learn and generates a counter-example if needed. Generally, 
+    equivalent to the system-under-learn and generates a counter-example if needed. Generally,
     \emph{eq} is irrealizable when SUL is a blackbox. So we tactically use $mq$ to achieve the
     approximate results.
 \end{itemize}
@@ -326,7 +327,7 @@ These queries are given by \emph{learning algorithms}, or so-called \emph{studen
 repeat the hypothesis construction until the equivalence query returns \emph{true}.
 
 More details on the active automata learning algorithm will be presented in Section
-\ref{sec:activelearning}. 
+\ref{sec:activelearning}.
 
 
 \section{Timed Connectors as Mealy Machines}
@@ -340,7 +341,7 @@ machine} as a bridge between connectors and Mealy machines.
 
 \subsection{Time Domain}
 Time has been investigated in several extensions of Reo. For example, timed
-Reo\cite{DBLP:conf/sefm/ArbabBBR04, DBLP:conf/fmoods/MengA07}, hybrid Reo\cite{DBLP:conf/icfem/ChenSS14}, etc.
+Reo\cite{DBLP:conf/sefm/ArbabBBR04}, resource-sensitive timed Reo\cite{DBLP:conf/fmoods/MengA07}, hybrid Reo\cite{DBLP:conf/icfem/ChenSS14}, etc.
 Generally, these models are designed to handle real-time behavior where time is defined on the
 real number field $\mathbb{R}$. However, there are also some works like
 \cite{DBLP:journals/fmsd/PrabhakarDM015} where
@@ -372,11 +373,11 @@ supposed to behave as a bridge between Mealy machines and timed connectors. Conn
 defined as PMMs, and composed by \emph{product} and \emph{link} operators. Then, concrete
 Mealy-machine model can be generated from the PMM model.
 Following the formal definition of Mealy machine in Section \ref{sec:preliminaries}, we define the
-\emph{parameterized Mealy machine} as follows. 
+\emph{parameterized Mealy machine} as follows.
 
 \begin{definition}[Parameterized Mealy Machine]
   A \emph{Parameterized Mealy Machine} with a parameter $\Sigma$ is defined as a 6-tuple
-  $\mathcal{PM}=\langle S, s_0, I, O, \delta, \lambda\rangle$ where 
+  $\mathcal{PM}=\langle S, s_0, I, O, \delta, \lambda\rangle$ where
   \begin{itemize}
     \item[-] The value of $\Sigma$ is a \emph{finite} data set (hereinafter referred as
       alphabet), e.g.  $\{a,b\}$,
@@ -395,13 +396,13 @@ Following the formal definition of Mealy machine in Section \ref{sec:preliminari
 
 In the definition above, \emph{Input} and \emph{Output} are used to generate the set of input actions
 and output actions from the corresponding alphabets and source/sink ends. $Input(\Sigma,I,O)$ is
-defined as a set of functions on $I\cup O$ and an additional \emph{time action} T,  
+defined as a set of functions on $I\cup O$ and an additional \emph{time action} T,
 where for all $f\in Input(\Sigma,I,O)\backslash \{T\}$ we have
 \[
 \forall i\in I.f(i)\in \Sigma\cup\{\bot\}\land \forall o\in O.f(o)\in\{\rread, \rnoread\}
 \]
-where we use $\bot$ to indicate that there is \emph{no} data item on a channel end. 
-Besides, $\rread$ means that a sink end is ready for writing, $\rnoread$ otherwise. 
+where we use $\bot$ to indicate that there is \emph{no} data item on a channel end.
+Besides, $\rread$ means that a sink end is ready for writing, $\rnoread$ otherwise.
 In the same way,
 $Output(\Sigma,O)$ is defined as a set of functions on $O$, with an additional symbol
 $\rblock$ indicating an input failure. Similarly, for all $f\in
@@ -442,7 +443,7 @@ still need a convert function between the two models.
   an abstract parameterized Mealy machine $\mathcal{PM}$ and the alphabet $\Sigma$. Apparently
   $\smap{\mathcal{PM}}_{\Sigma}$ can be described as
   \begin{eqnarray*}
-    \smap{\mathcal{PM}}_{\Sigma} &=& 
+    \smap{\mathcal{PM}}_{\Sigma} &=&
     \langle
     \mathcal{PM}.S(\Sigma), \mathcal{PM}.s_0, \\
     & & Input(\Sigma, \mathcal{PM}.I, \mathcal{PM}.O), Output(\Sigma, \mathcal{PM}.O), \\
@@ -469,7 +470,7 @@ to indicate that there is no constraint on channel end $A$.
             \rempty & s=q_0\land i=\{A\mapsto\_,B\mapsto\rnoread\} \\
             \rblock & s=q_0\land i=\{A\mapsto d',B\mapsto\rread\} \\
             \rblock & s=q_0\land i=\{A\mapsto\bot,B\mapsto\rread\} \\
-            \rempty & s=q_d\land i=\{A\mapsto\bot,B\mapsto\rnoread\} \\     
+            \rempty & s=q_d\land i=\{A\mapsto\bot,B\mapsto\rnoread\} \\
             \{B\mapsto d\} & s=q_d\land i=\{A\mapsto\_,B\mapsto\rread\}\\
             \rblock & s=q_d\land i=\{A\mapsto d',B\mapsto \rnoread\} \\
           \end{array}
@@ -541,7 +542,7 @@ clearance.
             \rempty & otherwise\\
           \end{array}
           \right.
-        \end{displaymath} 
+        \end{displaymath}
       \end{small}
     \item[-] transition function
       \begin{small}
@@ -566,7 +567,7 @@ channels. Now we show how to compose these channels into more complicated connec
 
 \begin{definition}[Product]
   For two PMMs $\mathcal{PM}_1$ and $\mathcal{PM}_2$, if
-  $\mathcal{PM}_2.O\cap\mathcal{PM}_1.I=\varnothing$, their product 
+  $\mathcal{PM}_2.O\cap\mathcal{PM}_1.I=\varnothing$, their product
   \[
   \mathcal{PM'} = prod(\mathcal{PM}_1,\mathcal{PM}_2)  \]
   can be defined as follows.
@@ -612,7 +613,7 @@ ends and source ends in the same connector.
 
 \begin{definition}[Link]
   The \emph{link} operator constructs connector by connecting a sink end $\OUT$ to a source end $\IN$
-  within the same connector.   
+  within the same connector.
   \[
   \mathcal{PM}' = link(\mathcal{PM}, \OUT, \IN)
   \]
@@ -661,11 +662,11 @@ With \emph{prod} and \emph{link} defined, connectors can be constructed by compo
 the form of PMMs. It can be transformed into a concrete Mealy machine later, once the alphabet
 $\Sigma$ is provided.
 
-\section{From Blackbox to Timed Connectors} 
+\section{From Blackbox to Timed Connectors}
 \label{sec:activelearning}
 In this section, we use L* algorithm to extract Reo coordinators from blackbox
 implementations in 3 steps:
-\emph{constructing hypothesis}, \emph{enclosing hypothesis} and \emph{validating hypothesis}. 
+\emph{constructing hypothesis}, \emph{enclosing hypothesis} and \emph{validating hypothesis}.
 The input and output symbols of the blackbox implementation are provided as $\mathcal{I}$ and
 $\mathcal{O}$, and the blackbox implementation is supposed to be equivalent to a Mealy machine where
 all states are reachable.
@@ -675,7 +676,7 @@ all states are reachable.
 hypothetical Mealy machines from the results of membership queries.
 
 Mealy machines consist of \emph{states} and \emph{transitions}.
-As for blackboxes, input sequence $s\in\mathcal{I}^*$ can be used to denote its state 
+As for blackboxes, input sequence $s\in\mathcal{I}^*$ can be used to denote its state
 after executing $s$. Similarly, for all $a\in\mathcal{I}$, we use $sa$ to denote the successor
 state of $s$ after executing $a$.
 However, under such notations, there are \emph{infinite} number of states, among which most are
@@ -694,7 +695,7 @@ alternative way is to use a set of \emph{suffixes} to distinguish them approxima
 Now we use \emph{access sequence} to describe the states. Given an input sequence $s$, the access
 sequence $acc(s,D)$ of $s$ is defined as the shortest sequence in $\{s'\in\mathcal{I}^*|s'\sim_D
 s\}$\footnote{When there are multiple satisfying sequences with the same length, we use a certain tactic
-to pick up one from them determinstically.}.
+to pick up one from them deterministically.}.
 
 Formally, an observation table (see Fig. \ref{fig:hypo} as an example) is determined by a tuple $(S,D)$ where
 $S\subset\mathcal{I}^*$ is a set of the access sequences of states and $D\subset\mathcal{I}^*$
@@ -705,7 +706,7 @@ The lower part, labelled with sequences in $\{sa|s\in S,a\in\mathcal{I}\}\backsl
 any potentially unclosed transition) denotes all the transitions outside $s\in S$. A cell with row
 label $s$ and column label $d$ is filled with $mq(sd)$.
 
-An observation table $(S,D)$ is \emph{closed} if 
+An observation table $(S,D)$ is \emph{closed} if
 \[
 \forall s\in S,a\in\mathcal{I}.\exists s'\in S. sa\sim_D s'
 \]
@@ -715,7 +716,7 @@ S,s_0,\mathcal{I},\mathcal{O},\delta,\lambda\rangle$ in a straight-forward way:
 \begin{itemize}
   \item[-] Every state in $S$ corresponds to an input sequence in $obs.S$
   \item[-] $s_0$ corresponds to the empty sequence $\varepsilon$
-    
+
     \emph{(we use input sequences to indicate their corresponding states in following parts)}
   \item[-] $\delta(s,a)=mq(sa)$
   \item[-] $\lambda(s,a)=acc(sa,obs.D)$. Since $obs$ is closed, we always have $\lambda(s,a)\in S$.
@@ -723,12 +724,12 @@ S,s_0,\mathcal{I},\mathcal{O},\delta,\lambda\rangle$ in a straight-forward way:
 
 Algorithm \ref{alg:buildtable} shows how to build a closed observation table.
 
-\begin{algorithm} 
-  \caption{EncloseTable} 
+\begin{algorithm}
+  \caption{EncloseTable}
   \label{alg:buildtable}
   \small
   \KwIn{An oracle interface $mq$, An input actions $\mathcal{I}$, An observation table $obs$}
-  \KwOut{A closed observation table $obs'$} 
+  \KwOut{A closed observation table $obs'$}
   \Repeat{$unclosed=\varnothing$}
   {
     $next=\{st|\forall s\in obs.S,\forall t\in \mathcal{I}\}\backslash obs.S$\;
@@ -736,10 +737,10 @@ Algorithm \ref{alg:buildtable} shows how to build a closed observation table.
     $obs'.S$ = $obs.S\cup unclosed$\;
     $obs'.D$ = $obs.D$\;
   }
-  \Return $obs'$\; 
+  \Return $obs'$\;
 \end{algorithm}
 
-Taking a 2-Timer channel as an example, we now illustrate how this algorithm works. 
+Taking a 2-Timer channel as an example, we now illustrate how this algorithm works.
 We assume that the source end of this 2-Timer channel is $A$, the sink end is $B$, and the alphabet
 is $\{a\}$. We briefly denote $\{A\mapsto a,B\mapsto \rnoread\}$ and other input/output actions in form of
 $(a,\rnoread)$.
@@ -747,11 +748,11 @@ $(a,\rnoread)$.
 Firstly, $obs.S$ is initialized with the initial state (denoted by $\varepsilon$), and $obs.D$ is
 initialized with all one-step suffixes.
 Then we explore all the access sequences in $obs.S$ and calculate its successors. Here
-$unclosed$ consists of access sequences that has no equivalent sequence in $obs.S$. 
+$unclosed$ consists of access sequences that has no equivalent sequence in $obs.S$.
 For example, Fig. \ref{fig:hypo} shows the $obs$ of a 2-Timer channel after the first
 iteration. The five successors of $\varepsilon$ are presented at the bottom of the table, where
 four are equivalent with $\varepsilon$ but $(a,\rnoread)$ is not. Therefore, we take $(a,\rnoread)$ as a
-brand-new state and all of its successors need further exploration. 
+brand-new state and all of its successors need further exploration.
 
 \begin{figure}[ht]
   \begin{center}
@@ -810,11 +811,11 @@ self-loop.
   \label{fig:hypo2}
 \end{figure}
 
-\subsection{Counter Examples' Analysis} 
+\subsection{Counter Examples' Analysis}
 Apparently, the closed hypothesis presented in Fig. \ref{fig:hypo2} is different with the 2-Timer
 channel. It's easy to find a counter-example $s_0=(a,\rnoread),T,T,(\bot,\rread)$ where $mq(s_0)=a$ while
 according to the hypothesis, the result should be $\rempty$. In this section, we show how to
-find and analyze counter-examples using the method in \cite{DBLP:conf/sfm/SteffenHM11}. 
+find and analyze counter-examples using the method in \cite{DBLP:conf/sfm/SteffenHM11}.
 
 Firstly, we give a formal definition of \emph{counter examples}. With an observation table $obs$ and
 a sequence $s$, we use $hq(obs,s)$ to denote the execution result of its corresponding hypothesis
@@ -825,8 +826,8 @@ $s$. Obviously we have $hq(obs,s) = mq(acc(s')a)$ where $s=s'a,a\in\mathcal{I}$.
   an input sequence $s$ is a counter example of $obs$ iff $mq(s)\neq hq(obs,s)$.
 \end{definition}
 
-Now we consider the reason that leads to existance of counter examples. Since
-the suffix set $D$ is used to distinguish states, the existance of counter-examples
+Now we consider the reason that leads to existence of counter examples. Since
+the suffix set $D$ is used to distinguish states, the existence of counter-examples
 shows that the current suffix set $D$ is not powerful enough to recognize the uncovered states in
 $next$ (see Algorithm \ref{alg:buildtable}).
 
@@ -838,11 +839,11 @@ represented by $s$, which is defined as the longest sequence in
 After appending Suffix$(s,obs)$ to $D$, it's obvious that at least one uncovered state will be found.
 
 The whole L* algorithm can be concluded as follows.
-\begin{algorithm} 
-  \caption{L*} 
+\begin{algorithm}
+  \caption{L*}
   \label{alg:lstar}
   \KwIn{Oracle interfaces $mq,eq$, Input actions $\mathcal{I}$}
-  \KwOut{Observation table $obs$} 
+  \KwOut{Observation table $obs$}
   $obs.S$ initialized as empty\;
   $obs.D$ initialized as $\{[i]|i\in\mathcal{I}\}$\;
   \Repeat{$ce=true$}{
@@ -852,18 +853,18 @@ The whole L* algorithm can be concluded as follows.
       $obs.D$.append(Suffix$(ce, obs)$)\;
     }
   }
-  \Return $obs$\; 
+  \Return $obs$\;
 \end{algorithm}
 
 
 
 
-\section{Experiments} 
+\section{Experiments}
 \label{sec:experiment}
 
 Both \emph{Reo Coordination Models} and \emph{Adapted L* Algorithm} are implemented in
 Golang\cite{golang}, which is widely known for its elegant design and impressive efficiency.
-Moreover, with a CSP-style\cite{DBLP:books/ph/Hoare85} cocurrency model, \texttt{Golang} shares many
+Moreover, with a CSP-style\cite{DBLP:books/ph/Hoare85} concurrency model, \texttt{Golang} shares many
 similar ideas with Reo, and in turn makes our implementation much more natural.
 
 All the following experiments are coded under Golang \emph{1.2.1} and executed on a laptop with 8GB
@@ -932,7 +933,7 @@ After reviewing our algorithm, we found that simulations on similar sequences we
 \end{itemize}
 
 If previous simulation results are stored in a well-maintained cache, the time-cost in
-simulation process could be reduced signficiantly. In this work, we use a multiway tree to buffer
+simulation process could be reduced significantly. In this work, we use a multiway tree to buffer
 these results.
 
 \begin{table}[ht]
@@ -994,17 +995,17 @@ In this case, \emph{senders} are goroutines (basic parallel units in \texttt{Gol
 sending certain messages to some given port (A and B). A \emph{monitor} keeps trying to read data
 items from the sink end C and print them on the screen. Finally, we have an interleaved sequence of
 ``MSG\_A'' and ``MSG\_B''.
- 
+
 \section{Conclusion and Future Work}
 In this paper, we come up with an approach to extract timed connectors from blackbox
 implementations. We propose \emph{parameterized Mealy machine} to describe the behavior of Reo
 connectors. Then we define the product operator and link operator, which can be used to
 construct complex connectors from simpler ones.
 Besides, we show how PMMs behave as the bridge between Reo connectors and concrete Mealy
-machines with timed action T provided. 
+machines with timed action $T$ provided.
 
-We also adapt the well-known active learning algorithm L* to deal with time domain.
-When time is taken into consideration, the original L* algorithm run into a performance bottleneck.
+We also adapt the well-known active learning algorithm $L*$ to deal with time domain.
+When time is taken into consideration, the original $L*$ algorithm run into a performance bottleneck.
 By a tree-style cache, we make significant reduction on membership queries and, in turn,
 improve the performance of learning algorithm. As a by-product, we also encapsulate the Reo
 connector as a distributable package which could contribute to concurrent programming.
@@ -1013,7 +1014,7 @@ Our future work mainly focuses on better support of dense time. To describe dens
 time behavior, the Mealy machine model needs a lot of changes instead of a simple T action. Besides,
 we will also try to improve our algorithm to handle non-deterministic behavior. This is not a brand
 new topic \cite{DBLP:conf/isola/VolpatoT14}, but we believe that there is still room for
-improvement.  
+improvement.
 
 \section*{Acknowledgments}
 The work was partially supported by the National Natural Science Foundation of China under grant no.

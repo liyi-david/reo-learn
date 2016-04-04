@@ -75,15 +75,14 @@ liyi\_math@pku.edu.cn, summeng@math.pku.edu.cn, yiwuwang@126.com
 \maketitle 
 \begin{abstract}
   Coordination models and languages play a key role in formally specifying the communication and
-  interaction among different components in large-scale distributed and concurrent systems. In this
+  interaction among different components in large-scale concurrent systems. In this
   paper, we use active learning to extract timed connector models from black-box
   system implementation. 
-  We first introduce parameterized Mealy machine(PMM) as an operational semantic
-  model for channel-based coordination language Reo. PMM serves as a bridge
-  between Reo connectors and Mealy machines. With the product operator, complex connectors can be
-  constructed by joining basic channels and the PMMs of connectors can be transformed into Mealy
-  machines. Moreover, we adapt L*, a well-known learning algorithm, to timed connectors (in the form
-  of Mealy machines). The new algorithm has shown its efficiency in multiple case studies. 
+  Firstly, parameterized Mealy machines(PMM) is introduced as an operational semantic
+  model for channel-based coordination language Reo. With product and link operators defined, we can
+  construct complex connectors by joining basic channels in form of PMM. Moreover, with a
+  concretize mapping function, PMMs can be easily transformed into Mealy machines, and the latter can be
+  extracted by an optimized L* algorithm.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -94,63 +93,47 @@ liyi\_math@pku.edu.cn, summeng@math.pku.edu.cn, yiwuwang@126.com
 
 Distributed real-time embedded systems (DRES) are reforming our lives with the
 Internet of Things(IoT), wherein individual components are composed via \emph{connectors} 
-to build complex systems. Such systems could be distributed logically or physically, which
-makes coordination processes even more complicated. In this case, we need to specify the coordination
+to build complex systems. 
+%Such systems could be distributed logically or physically, which
+%makes coordination processes even more complicated. 
+In this case, we need to specify the coordination
 processes with \emph{coordination languages}, such that formal techniques can be applied to
 guarantee their reliability.
 
-\emph{Timed Reo} is a real-time extension of the coordination language \emph{Reo}, which can be used
-to describe the coordination process in DRES clearly and intuitively. 
-\todo{describe semantics in a more short way}
-%Different formal semantics have been proposed to specify the behavior of timed Reo.
-%For example, an operational semantics based on \emph{timed constraint automata} was raised by Baier et
-%al.\cite{DBLP:conf/sefm/ArbabBBR04}, where a variant of LTL was also proposed to describe the
-%properties of timed connectors.
-%In \cite{DBLP:conf/tase/Meng12}, a UTP design model was proposed to specify the behavior of timed
-%connectors.. 
-
+As a real-time extension of \emph{Reo}, \emph{Timed
+Reo}\cite{DBLP:conf/sefm/ArbabBBR04,DBLP:conf/tase/Meng12} is used in this paper to formalize
+connectors in DRES. 
+Reo is a channel based exogenous coordination language proposed by F. Arbab in
+\cite{DBLP:journals/mscs/Arbab04}, which is a powerful ``glue language'' in component-based
+development\cite{DBLP:journals/sigsoft/Gill03}. What's more, 
 Formal verification and validation techniques have also been proved applicable for timed connectors, 
 e.g. a comformance testing framework on timed connectors has been proposed in \cite{DBLP:conf/tase/LiCWS15}.
 A SAT-based bounded model checking approach was adapted in \cite{DBLP:journals/scp/Kemper12} for
-verifying connectors. Although these solutions are practical and impressive, there is one important
-question faced by most of them: \emph{how to obtain the formal models?}
+verifying connectors.
 
+However, most of these tools heavily rely on manually modelling.
 \emph{Correctness} of connectors is closely related to some low-level implementation details.
 For example, well-written code may behave dramatically weird with an improper set of concurrency
 primitives. Such scenarios happen frequently in embedded systems with different hardware platforms or
 operating systems. Consequently, manually extracting a proper model from an existing connector
 implementation seems rather unreliable, even with reference to its source code.
 
-As a branch of \emph{machine learning} technique, active learning offers a means to obtain
-high-level models from low-level models. Works in \cite{de2010grammatical,
-DBLP:journals/iandc/Angluin87, DBLP:conf/fase/RaffeltS06} show interesting examples where active
-learning is used to extract \emph{Mealy machines} or \emph{regular languages} without time domain.
-
-%\begin{figure}[ht]
-  %\begin{center}
-    %\includegraphics[width=.4\textwidth]{./images/howto.png}
-  %\end{center}
-  %\caption{The Active Learning Framework}
-  %\label{fig:howto}
-%\end{figure}
-
-In this paper we address this question by proposing an active learning framework as shown in Fig.
-\ref{fig:howto} to automatically extract timed connector models from blackbox implementations. 
-To achieve this goal, we first introduce \emph{parameterized Mealy machine} as a parameterized
-semantics for timed Reo connectors, which can be transformed to concrete Mealy machines with a
-given alphabet. Then the $L*$ algorithm \cite{DBLP:journals/iandc/Angluin87} is adapted and
+In this paper we address this question by means of active learning \cite{de2010grammatical,
+DBLP:journals/iandc/Angluin87, DBLP:conf/fase/RaffeltS06}.
+First of all, we introduce \emph{parameterized Mealy machine} as a parameterized
+semantics for timed Reo, which can be transformed to concrete Mealy machines with a
+specified alphabet. Then the $L*$ algorithm \cite{DBLP:journals/iandc/Angluin87} is adapted and
 optimized to extract Mealy machines with timed action from the connector implementations as
 blackboxes. 
 
-\todo{use a short paragraph to describe the preliminaries}
-
 The rest of the paper is organized as follows: In Section
-\ref{sec:preliminaries} we briefly illustrate some basic concepts, including the coordination
-language Reo, Mealy machine, and active automata learning. Section \ref{sec:semantics} defines an
+Section \ref{sec:semantics}, we defines an
 operational semantics of Reo, which is used in Section \ref{sec:activelearning} to show how to
 extract Reo models from blackboxes by means of active learning. In Section
-\ref{sec:experiment}, we discuss the implementation and optimization of the approach in
-\texttt{Golang}. Finally, Section VI concludes the paper.
+\ref{sec:experiment}, we discuss the implementation and optimization of the approach. 
+Finally, Section VI concludes the paper. Due to the limit of space, many technical details are
+omitted in this paper.
+Please refer to \todo{github repo} for further contents.
 
 
 \section{Timed Connectors as Mealy Machines}
@@ -505,7 +488,7 @@ As for blackboxes, input sequence $s\in\mathcal{I}^*$ can be used to denote its 
 after executing $s$. Similarly, for all $a\in\mathcal{I}$, we use $sa$ to denote the successor
 state of $s$ after executing $a$.
 However, under such notations, there are \emph{infinite} number of states, among which most are
-reduplicate.
+duplicate.
 
 States are distinguished, usually, by their \emph{subsequent behavior}. Suppose $s_1\neq s_2\in
 \mathcal{I}^*$, we say the corresponding of states $s_1$ and $s_2$ are equivalent iff $\forall d\in

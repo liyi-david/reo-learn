@@ -9,18 +9,16 @@ All the codes are written under Google Go.
 * lib
   * reo - Ports, basic Reo Channels, etc.
   * sul - SUL(System Under Learn), Oracles, Membership Query, and *Equivalence Query*
-  * learn
+  * learn - L* Algorithm
+  * trans - From Mealy machines to timed safety automata
 
-* example
+* examples
   * fifo
   * alternator
-  * 2-buffer (mainly used to test the counter-example processing algorithm)
+  * 2-buffer
 
-## TODO
-- abstract
-- full paper
-- there's problem in 2-buffer. in the second round, obstables cannot be displayed properly *partly solved on my laptop*
-- bugs found in new example **SOLVED**
+* sultest.go
+* calltest.go
 
 ## logs
 
