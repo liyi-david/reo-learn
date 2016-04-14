@@ -304,10 +304,20 @@ For simplicity, we use $A=\_$ to indicate that there is no constraint on channel
 \end{example}
 
 Similarly, we can use PMMs to describe the behavior of other basic timed Reo
-channels. Now we show how to compose these channels into more complicated connectors.
+channels. In Reo, as mentioned before, we compose complex connectors with simpler ones and basic
+channels recursively. Operator \emph{prod} and \emph{link} are used to apply such composing
+operation. 
 
-\liyi{Actually I'm not sure if omitting definition of prod and link is a good idea. Generally I
-think this paper should focus on two parts: definition of PMM and optimization of L* algorithm.}
+\begin{definition}[prod]
+  For two PMMs $\mathcal{PM}_1$ and $\mathcal{PM}_2$, we use the \emph{prod} operator
+  $\mathcal{PM'} = prod(\mathcal{PM}_1,\mathcal{PM}_2)$ to denote their production, where every
+  sink-end in $\mathcal{PM}_1$ is connected with it's homonymic source-end in $\mathcal{PM}_2$.
+\end{definition}
+
+\begin{definition}[link]
+  For a PMM $\mathcal{PM}$, we use the \emph{link} operator to connect its sink-end $\OUT$ with its
+  source-end $\IN$, formally denoted as $\mathcal{PM}' = link(\mathcal{PM}, \OUT, \IN)$.
+\end{definition}
 
 %\begin{definition}[Product]
   %For two PMMs $\mathcal{PM}_1$ and $\mathcal{PM}_2$, if
@@ -408,16 +418,14 @@ $\Sigma$ is provided.
 
 \section{From Blackbox to Timed Connectors} 
 \label{sec:activelearning}
-In this section, we use L* algorithm to extract Reo coordinators from blackbox
-implementations in 3 steps:
+In this section, we provide a brief introduction on the well-known L* algorithm, which is used
+to extract Reo coordinators from blackbox implementations in 3 steps:
 \emph{constructing hypothesis}, \emph{enclosing hypothesis} and \emph{validating hypothesis}. 
 The input and output symbols of the blackbox implementation are provided as $\mathcal{I}$ and
 $\mathcal{O}$, and the blackbox implementation is supposed to be equivalent to a Mealy machine where
 all states are reachable.
 
-\subsection{Active Learning: Overview}
-In this section, we briefly introduce the main ideas of active automata learning.
-
+\subsection{An Overview of Active Learning}
 Active learning \cite{settles2010active} is a special case of semi-supervised machine learning where
 a learning algorithm is able to interactively query the target systems to obtain the desired outputs
 under certain inputs. By well-designed query strategy, active learning is able to obtain more
@@ -425,7 +433,7 @@ accurate models with smaller data-set.
 
 \begin{figure}[ht]
   \begin{center}
-    \includegraphics[width=.5\textwidth]{./images/activelearning.png}
+    \includegraphics[width=.45\textwidth]{./images/actl.pdf}
   \end{center}
   \caption{Active Automata Learning}
   \label{fig:activelearning}
@@ -449,7 +457,8 @@ to some \emph{Mealy machine}, i.e., a deterministic model accepting a finite set
 mapping them to a finite set of outputs.
 
 Such a model is encapsulated as a \emph{teacher} by the \emph{Oracle}, which handles
-all communication with the model. The oracle also serves as a so-called \emph{Minimal Adequate Teacher}
+all communication with the model. The oracle also serves as a so-called \emph{Minimal Adequate
+Teacher} \cite{DBLP:journals/iandc/Angluin87}
 interface, which is responsible for two types of queries.
 
 \begin{itemize}
@@ -469,9 +478,6 @@ These queries are given by \emph{learning algorithms}, or so-called \emph{studen
 \ref{fig:activelearning}. From the \emph{mq} results, a learning algorithm constructs a
 \emph{hypothesis} and then check it with \emph{eq}. If counter-examples are found, we turn back and
 repeat the hypothesis construction until the equivalence query returns \emph{true}.
-
-More details on the active automata learning algorithm will be presented in Section
-\ref{sec:activelearning}.
 
 
 
@@ -642,28 +648,29 @@ More details on the active automata learning algorithm will be presented in Sect
 %\]
 %After appending Suffix$(s,obs)$ to $D$, it's obvious that at least one uncovered state will be found.
 
-%The whole L* algorithm can be concluded as follows.
-%\begin{algorithm} 
-  %\caption{L*} 
-  %\label{alg:lstar}
-  %\KwIn{Oracle interfaces $mq,eq$, Input actions $\mathcal{I}$}
-  %\KwOut{Observation table $obs$} 
-  %$obs.S$ initialized as empty\;
-  %$obs.D$ initialized as $\{[i]|i\in\mathcal{I}\}$\;
-  %\Repeat{$ce=true$}{
-    %$obs$ = EncloseTable($mq$, $\mathcal{I}$, $obs$)\;
-    %$ce=eq(obs)$\;
-    %\If {$ce\neq true$} {
-      %$obs.D$.append(Suffix$(ce, obs)$)\;
-    %}
-  %}
-  %\Return $obs$\; 
-%\end{algorithm}
+\subsection{L* Algorithm}
+The whole L* algorithm can be concluded as follows.
+\begin{algorithm} 
+  \caption{L*} 
+  \label{alg:lstar}
+  \KwIn{Oracle interfaces $mq,eq$, Input actions $\mathcal{I}$}
+  \KwOut{Observation table $obs$} 
+  $obs.S$ initialized as empty\;
+  $obs.D$ initialized as $\{[i]|i\in\mathcal{I}\}$\;
+  \Repeat{$ce=true$}{
+    $obs$ = EncloseTable($mq$, $\mathcal{I}$, $obs$)\;
+    $ce=eq(obs)$\;
+    \If {$ce\neq true$} {
+      $obs.D$.append(Suffix$(ce, obs)$)\;
+    }
+  }
+  \Return $obs$\; 
+\end{algorithm}
+
+In this algorithm, when we use \emph{observation tables} to represent hypothetical models. 
 
 
-
-
-\section{Experiments} 
+\section{Experiments}  
 \label{sec:experiment}
 
 Both \emph{Reo Coordination Models} and \emph{Adapted L* Algorithm} are implemented in
@@ -755,10 +762,10 @@ these results.
   \end{tabular}
 \end{table}
 
-With cache applied, we have made considerable reduction on the calls of membership queries. The results
+With the help of cache technique, we have made considerable reduction on the calls of membership queries. The results
 can be found in Table \ref{tabel:cacheoptimization}.
 
-\section{Conclusion and Future Work}
+\section{Conclusion and Fu ture Work}
 In this paper, we come up with an approach to extract timed connectors from blackbox
 implementations. We propose \emph{parameterized Mealy machine} to describe the behavior of Reo
 connectors. Then we define the product operator and link operator, which can be used to
