@@ -481,26 +481,26 @@ repeat the hypothesis construction until the equivalence query returns \emph{tru
 
 
 
-%\subsection{Observation Table}
-%\emph{Observation Tables}, proposed in \cite{DBLP:journals/iandc/Angluin87}, are used to construct
-%hypothetical Mealy machines from the results of membership queries.
+\subsection{Observation Table}
+\emph{Observation Tables}, proposed in \cite{DBLP:journals/iandc/Angluin87}, are used to construct
+hypothetical Mealy machines from the results of membership queries.
 
-%Mealy machines consist of \emph{states} and \emph{transitions}.
-%As for blackboxes, input sequence $s\in\mathcal{I}^*$ can be used to denote its state 
-%after executing $s$. Similarly, for all $a\in\mathcal{I}$, we use $sa$ to denote the successor
-%state of $s$ after executing $a$.
-%However, under such notations, there are \emph{infinite} number of states, among which most are
-%duplicate.
+Mealy machines consist of \emph{states} and \emph{transitions}.
+As for blackboxes, input sequence $s\in\mathcal{I}^*$ can be used to denote its state 
+after executing $s$. Similarly, for all $a\in\mathcal{I}$, we use $sa$ to denote the successor
+state of $s$ after executing $a$.
+However, under such notations, there are \emph{infinite} number of states, among which most are
+duplicate.
 
-%States are distinguished, usually, by their \emph{subsequent behavior}. Suppose $s_1\neq s_2\in
-%\mathcal{I}^*$, we say the corresponding of states $s_1$ and $s_2$ are equivalent iff $\forall d\in
-%\mathcal{I}^+. mq(s_1d)=mq(s_2d)$. Since we can never check it on every $d\in\mathcal{I}^+$, an
-%alternative way is to use a set of \emph{suffixes} to distinguish them approximately.
-%\begin{definition}[$D$-Equivalence]
-  %Provided with a set of suffixes $D\subset\mathcal{I}^+$, the corresponding states of
-  %$s_1,s_2\in\mathcal{I}^*$ are $D$-equivalent (denoted as $s_1\sim_D s_2$)
-  %iff $mq(s_1d) = mq(s_2d)$ for all $d\in D$.
-%\end{definition}
+States are distinguished, usually, by their \emph{subsequent behavior}. Suppose $s_1\neq s_2\in
+\mathcal{I}^*$, we say the corresponding of states $s_1$ and $s_2$ are equivalent iff $\forall d\in
+\mathcal{I}^+. mq(s_1d)=mq(s_2d)$. Since we can never check it on every $d\in\mathcal{I}^+$, an
+alternative way is to use a set of \emph{suffixes} to distinguish them approximately.
+\begin{definition}[$D$-Equivalence]
+  Provided with a set of suffixes $D\subset\mathcal{I}^+$, the corresponding states of
+  $s_1,s_2\in\mathcal{I}^*$ are $D$-equivalent (denoted as $s_1\sim_D s_2$)
+  iff $mq(s_1d) = mq(s_2d)$ for all $d\in D$.
+\end{definition}
 
 %Now we use \emph{access sequence} to describe the states. Given an input sequence $s$, the access
 %sequence $acc(s,D)$ of $s$ is defined as the shortest sequence in $\{s'\in\mathcal{I}^*|s'\sim_D
