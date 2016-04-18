@@ -453,9 +453,7 @@ Fig. \ref{fig:activelearning} shows the sketch of active learning, wherein:
 \end{itemize}
 
 When applying active automata learning on some model, we assume that the model should be equivalent
-to some \emph{Mealy machine}, i.e., a deterministic model accepting a finite set of inputs and
-mapping them to a finite set of outputs.
-
+to some \emph{Mealy machine}.
 Such a model is encapsulated as a \emph{teacher} by the \emph{Oracle}, which handles
 all communication with the model. The oracle also serves as a so-called \emph{Minimal Adequate
 Teacher} \cite{DBLP:journals/iandc/Angluin87}
@@ -469,9 +467,7 @@ interface, which is responsible for two types of queries.
     sequences.
   \item[-] \textbf{Equivalence Query} (hereinafter referred to as \emph{eq}) Given a hypothesis
     (usually constructed by the learning algorithm), \emph{eq} checks whether the hypothesis is
-    equivalent to the system-under-learn and generates a counter-example if needed. Generally,
-    \emph{eq} is irrealizable when SUL is a blackbox. So we tactically use $mq$ to achieve the
-    approximate results.
+    equivalent to the system-under-learn and generates a counter-example if needed. 
 \end{itemize}
 
 These queries are given by \emph{learning algorithms}, or so-called \emph{students} in Fig.
@@ -482,12 +478,12 @@ repeat the hypothesis construction until the equivalence query returns \emph{tru
 
 
 \subsection{Observation Table}
-\emph{Observation Tables}, proposed in \cite{DBLP:journals/iandc/Angluin87}, are used to construct
-hypothetical Mealy machines from the results of membership queries.
+\emph{Observation Tables}, proposed in \cite{DBLP:journals/iandc/Angluin87}, are used to describe
+hypothetical Mealy machines in learning algorithm L*.
 
-Mealy machines consist of \emph{states} and \emph{transitions}.
-As for blackboxes, input sequence $s\in\mathcal{I}^*$ can be used to denote its state 
-after executing $s$. Similarly, for all $a\in\mathcal{I}$, we use $sa$ to denote the successor
+As mentioned before, Mealy machines consist of \emph{states} and \emph{transitions}. However in
+blackboxes, we only have \emph{input sequences} and their corresponding \emph{outputs}.
+Similarly, for all $a\in\mathcal{I}$, we use $sa$ to denote the successor
 state of $s$ after executing $a$.
 However, under such notations, there are \emph{infinite} number of states, among which most are
 duplicate.
@@ -564,29 +560,30 @@ alternative way is to use a set of \emph{suffixes} to distinguish them approxima
 %four are equivalent with $\varepsilon$ but $(a,\rnoread)$ is not. Therefore, we take $(a,\rnoread)$ as a
 %brand-new state and all of its successors need further exploration. 
 
-%%\begin{figure}[ht]
-  %%\begin{center}
-    %%\begin{displaymath}
-      %%\begin{array}{l||ccccc||c}
-        %%\hline
-        %%& (a,\rread) & (\bot,\rread) & (a,\rnoread) & (\bot,\rnoread) & T & acc\\
-        %%\hline\hline
-        %%\varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
-        %%\hline
-        %%(a,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
-        %%(\bot,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        %%\rowcolor[gray]{.9}
-        %%(a,\rnoread) & \rblock & \rblock & \rblock & \rempty & \rempty & unclosed\\
-        %%(\bot,\rnoread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        %%T & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        %%\hline
-      %%\end{array}
-    %%\end{displaymath}
-    %%% \input{./images/hypo.tex}
-  %%\end{center}
-  %%\caption{Observation Table and Corresponding Hypothesis}
-  %%\label{fig:hypo}
-%%\end{figure}
+\begin{figure}[ht]
+  \begin{center}
+    \footnotesize
+    \begin{displaymath}
+      \begin{array}{l||ccccc||c}
+        \hline
+        & (a,\rread) & (\bot,\rread) & (a,\rnoread) & (\bot,\rnoread) & T & acc\\
+        \hline\hline
+        \varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
+        \hline
+        (a,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
+        (\bot,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+        \rowcolor[gray]{.9}
+        (a,\rnoread) & \rblock & \rblock & \rblock & \rempty & \rempty & unclosed\\
+        (\bot,\rnoread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+        T & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
+        \hline
+      \end{array}
+    \end{displaymath}
+    % \input{./images/hypo.tex}
+  \end{center}
+  \caption{Observation Table and Corresponding Hypothesis}
+  \label{fig:hypo}
+\end{figure}
 
 %In the second iteration, we explore the successors of $(a,\rnoread)$. Fortunately, now every
 %successor has an equivalence sequence in $obs.S$, \emph{i.e.}, itself. Consequently, the algorithm terminates
