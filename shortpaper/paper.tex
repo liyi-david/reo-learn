@@ -477,26 +477,41 @@ repeat the hypothesis construction until the equivalence query returns \emph{tru
 
 
 
-\subsection{Observation Table}
-\emph{Observation Tables}, proposed in \cite{DBLP:journals/iandc/Angluin87}, are used to describe
-hypothetical Mealy machines in learning algorithm L*.
+%\subsection{Observation Table}
+%\emph{Observation Tables}, proposed in \cite{DBLP:journals/iandc/Angluin87}, are used to describe
+%hypothesises in form of Mealy machines.
+%As mentioned before, Mealy machines are composed of \emph{states} and \emph{transitions}. However, in
+%blackboxes, only \emph{input sequences} and their corresponding \emph{outputs} are observable. A
+%natural idea is to use input sequences to indicate their corresponding states, and outputs to
+%describe the edges.
 
-As mentioned before, Mealy machines consist of \emph{states} and \emph{transitions}. However in
-blackboxes, we only have \emph{input sequences} and their corresponding \emph{outputs}.
-Similarly, for all $a\in\mathcal{I}$, we use $sa$ to denote the successor
-state of $s$ after executing $a$.
-However, under such notations, there are \emph{infinite} number of states, among which most are
-duplicate.
+%\begin{figure}[ht]
+  %\begin{center}
+    %\footnotesize
+    %\begin{displaymath}
+      %\begin{array}{l||ccccc}
+        %\hline
+        %& (a,\rread) & (\bot,\rread) & (a,\rnoread) & (\bot,\rnoread) & T \\
+        %\hline\hline
+        %\varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty  \\
+        %\hline
+        %(a,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        %(\bot,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        %\rowcolor[gray]{.9}
+        %(a,\rnoread) & \rblock & \rblock & \rblock & \rempty & \rempty \\
+        %(\bot,\rnoread) & \rblock & \rblock & \rempty & \rempty & \rempty \\
+        %T & \rblock & \rblock & \rempty & \rempty & \rempty  \\
+        %\hline
+      %\end{array}
+    %\end{displaymath}
+    %% \input{./images/hypo.tex}
+  %\end{center}
+  %\caption{Observation Table}
+  %\label{fig:hypo}
+%\end{figure}
 
-States are distinguished, usually, by their \emph{subsequent behavior}. Suppose $s_1\neq s_2\in
-\mathcal{I}^*$, we say the corresponding of states $s_1$ and $s_2$ are equivalent iff $\forall d\in
-\mathcal{I}^+. mq(s_1d)=mq(s_2d)$. Since we can never check it on every $d\in\mathcal{I}^+$, an
-alternative way is to use a set of \emph{suffixes} to distinguish them approximately.
-\begin{definition}[$D$-Equivalence]
-  Provided with a set of suffixes $D\subset\mathcal{I}^+$, the corresponding states of
-  $s_1,s_2\in\mathcal{I}^*$ are $D$-equivalent (denoted as $s_1\sim_D s_2$)
-  iff $mq(s_1d) = mq(s_2d)$ for all $d\in D$.
-\end{definition}
+%However, under such notations, there are \emph{infinite} number of states, among which most are
+%duplicate.
 
 %Now we use \emph{access sequence} to describe the states. Given an input sequence $s$, the access
 %sequence $acc(s,D)$ of $s$ is defined as the shortest sequence in $\{s'\in\mathcal{I}^*|s'\sim_D
@@ -560,30 +575,6 @@ alternative way is to use a set of \emph{suffixes} to distinguish them approxima
 %four are equivalent with $\varepsilon$ but $(a,\rnoread)$ is not. Therefore, we take $(a,\rnoread)$ as a
 %brand-new state and all of its successors need further exploration. 
 
-\begin{figure}[ht]
-  \begin{center}
-    \footnotesize
-    \begin{displaymath}
-      \begin{array}{l||ccccc||c}
-        \hline
-        & (a,\rread) & (\bot,\rread) & (a,\rnoread) & (\bot,\rnoread) & T & acc\\
-        \hline\hline
-        \varepsilon & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
-        \hline
-        (a,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon\\
-        (\bot,\rread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        \rowcolor[gray]{.9}
-        (a,\rnoread) & \rblock & \rblock & \rblock & \rempty & \rempty & unclosed\\
-        (\bot,\rnoread) & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        T & \rblock & \rblock & \rempty & \rempty & \rempty & \varepsilon \\
-        \hline
-      \end{array}
-    \end{displaymath}
-    % \input{./images/hypo.tex}
-  \end{center}
-  \caption{Observation Table and Corresponding Hypothesis}
-  \label{fig:hypo}
-\end{figure}
 
 %In the second iteration, we explore the successors of $(a,\rnoread)$. Fortunately, now every
 %successor has an equivalence sequence in $obs.S$, \emph{i.e.}, itself. Consequently, the algorithm terminates
@@ -646,7 +637,11 @@ alternative way is to use a set of \emph{suffixes} to distinguish them approxima
 %After appending Suffix$(s,obs)$ to $D$, it's obvious that at least one uncovered state will be found.
 
 \subsection{L* Algorithm}
-The whole L* algorithm can be concluded as follows.
+The whole L* algorithm can be briefly concluded as follows. In this algorithm,
+\begin{itemize}
+  \item \emph{observation table} is a widely-used data structure to describe the hypothesis.
+\end{itemize}
+Please refer to \cite{DBLP:conf/sfm/SteffenHM11, DBLP:journals/iandc/Angluin87} for further details.
 \begin{algorithm} 
   \caption{L*} 
   \label{alg:lstar}
@@ -655,7 +650,7 @@ The whole L* algorithm can be concluded as follows.
   $obs.S$ initialized as empty\;
   $obs.D$ initialized as $\{[i]|i\in\mathcal{I}\}$\;
   \Repeat{$ce=true$}{
-    $obs$ = EncloseTable($mq$, $\mathcal{I}$, $obs$)\;
+    $obs$ = EncloseHypothesis($mq$, $\mathcal{I}$, $obs$)\;
     $ce=eq(obs)$\;
     \If {$ce\neq true$} {
       $obs.D$.append(Suffix$(ce, obs)$)\;
@@ -664,7 +659,21 @@ The whole L* algorithm can be concluded as follows.
   \Return $obs$\; 
 \end{algorithm}
 
-In this algorithm, when we use \emph{observation tables} to represent hypothetical models. 
+The L* algorithm takes a set of input actions $\mathcal{I}$ and a oracle interface (which plays the
+role of SUL) as its parameters. And it returns a so-called \emph{observation table} as the final
+hypothesis. (Observation table is a widely-used data structure, which can represent a Mealy machine
+by its external observation.)
+In each iteration, the algorithm will:
+\begin{enumerate}
+  \item \emph{Enclose the hypothesis.} Active learning is very similar to a breadth-first-search
+    process on an unknown Mealy machine. At first, only the initial state is visible to us. We then
+    explore different input actions and check if they can lead to some state that is already known.
+    If every edge targets to an explored state, we will say that the hypothesis is \emph{closed}.
+  \item \emph{Equivalence checking.} After the hypothesis is enclosed, we need to check if the
+    current hypothesis is equivalent to the real model. Such $eq$ operation returns a
+    \emph{true} if they are equivalent, or a counter-example if not.
+  \item \emph{Counter-example Analysis.}  
+\end{enumerate}
 
 
 \section{Experiments}  
