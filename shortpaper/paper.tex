@@ -639,7 +639,11 @@ repeat the hypothesis construction until the equivalence query returns \emph{tru
 \subsection{L* Algorithm}
 The whole L* algorithm can be briefly concluded as follows. In this algorithm,
 \begin{itemize}
-  \item \emph{observation table} is a widely-used data structure to describe the hypothesis.
+  \item \emph{Observation table} is a widely-used data structure to describe the hypothesis. In such
+    tables, rows correspond to a states (denoted as $S$), and columns correspond to \emph{suffixes}
+    (denoted as $D$).
+  \item \emph{Suffixes} are used to distinguish different states. For example, two input sequences
+    $a$ and $b$ lead to the same state iff. $\forall c\in\mathcal{I}^*, mq(ac) = mq(bc)$.
 \end{itemize}
 Please refer to \cite{DBLP:conf/sfm/SteffenHM11, DBLP:journals/iandc/Angluin87} for further details.
 \begin{algorithm} 
@@ -672,7 +676,9 @@ In each iteration, the algorithm will:
   \item \emph{Equivalence checking.} After the hypothesis is enclosed, we need to check if the
     current hypothesis is equivalent to the real model. Such $eq$ operation returns a
     \emph{true} if they are equivalent, or a counter-example if not.
-  \item \emph{Counter-example Analysis.}  
+  \item \emph{Counter-example Analysis.} As mentioned before, we use suffixes to distinguish
+    different states. Consequently, lack of proper suffix may lead to counter-examples. By the
+    \emph{suffix} function, we can analyze the counter-example and find out which suffix is left out.
 \end{enumerate}
 
 
