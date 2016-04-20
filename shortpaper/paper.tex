@@ -433,7 +433,7 @@ accurate models with smaller data-set.
 
 \begin{figure}[ht]
   \begin{center}
-    \includegraphics[width=.45\textwidth]{./images/actl.pdf}
+    \includegraphics[width=.45\textwidth]{./images/actl.png}
   \end{center}
   \caption{Active Automata Learning}
   \label{fig:activelearning}
@@ -671,14 +671,15 @@ In each iteration, the algorithm will:
 \begin{enumerate}
   \item \emph{Enclose the hypothesis.} Active learning is very similar to a breadth-first-search
     process on an unknown Mealy machine. At first, only the initial state is visible to us. We then
-    explore different input actions and check if they can lead to some state that is already known.
+    explore different input actions, and check if their following state is already explored.
     If every edge targets to an explored state, we will say that the hypothesis is \emph{closed}.
-  \item \emph{Equivalence checking.} After the hypothesis is enclosed, we need to check if the
-    current hypothesis is equivalent to the real model. Such $eq$ operation returns a
-    \emph{true} if they are equivalent, or a counter-example if not.
+  \item \emph{Equivalence checking.} With a closed hypothesis generated, we still need $eq$ to check
+    if it is equivalent to the system-under-learn. \emph{Eq} returns \emph{true} if they are
+    equivalent, or a counter-example if not.
   \item \emph{Counter-example Analysis.} As mentioned before, we use suffixes to distinguish
-    different states. Consequently, lack of proper suffix may lead to counter-examples. By the
-    \emph{suffix} function, we can analyze the counter-example and find out which suffix is left out.
+    different states. Consequently, the correctness of our hypothesis relies heavily on proper suffixes.
+    The \emph{suffix} function are designed to analyze counter-examples and find out which suffix is
+    left out.
 \end{enumerate}
 
 
@@ -777,7 +778,7 @@ these results.
 With the help of cache technique, we have made considerable reduction on the calls of membership queries. The results
 can be found in Table \ref{tabel:cacheoptimization}.
 
-\section{Conclusion and Fu ture Work}
+\section{Conclusion and Future Work}
 In this paper, we come up with an approach to extract timed connectors from blackbox
 implementations. We propose \emph{parameterized Mealy machine} to describe the behavior of Reo
 connectors. Then we define the product operator and link operator, which can be used to
